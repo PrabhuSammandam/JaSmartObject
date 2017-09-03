@@ -6,12 +6,22 @@
  */
 
 #include "IMemAllocator.h"
-#include "port/windows/inc/MemAllocWindows.h"
 #include <stdio.h>
+
+#ifdef _OS_LINUX_
+#include "port/linux/inc/MemAllocLinux.h"
+#endif
 
 namespace ja_iot {
 namespace memory {
+
+#ifdef _OS_WINDOWS_
 static MemAllocWindows gs_mem_allocator_windows{};
+#endif
+
+#ifdef _OS_LINUX_
+static MemAllocLinux gs_mem_allocator_linux{};
+#endif
 
 IMemAllocator *MemAllocatorFactory::cur_mem_allocator_factory_ = nullptr;
 
@@ -39,6 +49,14 @@ IMemAllocator *MemAllocatorFactory::get(MemAlloctorType mem_allocator_type) {
 
   if (mem_allocator_type == MemAlloctorType::kWindows) {
     return (&gs_mem_allocator_windows);
+  }
+
+#endif
+
+#ifdef _OS_LINUX_
+
+  if (mem_allocator_type == MemAlloctorType::kLinux) {
+    return (&gs_mem_allocator_linux);
   }
 
 #endif
