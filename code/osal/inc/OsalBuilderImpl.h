@@ -10,6 +10,10 @@
 
 #ifdef _OS_WINDOWS_
 #include "windows/inc/OsalBuilderImplWindows.h"
-#endif
+#endif /* _OS_WINDOWS_ */
+
+#ifdef _OS_LINUX_
+#include "port/linux/inc/OsalBuilderImplLinux.h"
+#endif /* _OS_LINUX_ */
 
 #endif /* OSAL_INC_OSALBUILDERIMPL_H_ */

@@ -13,6 +13,7 @@
 #include "Mutex.h"
 #include "Condition.h"
 #include "Task.h"
+#include "Sem.h"
 
 namespace ja_iot {
 namespace osal {
@@ -31,6 +32,9 @@ class OsalMgr
 
     Task* AllocTask();
     void  FreeTask( Task *task );
+
+    Semaphore* alloc_semaphore();
+    void       free_semaphore( Semaphore * );
 
   private:
 

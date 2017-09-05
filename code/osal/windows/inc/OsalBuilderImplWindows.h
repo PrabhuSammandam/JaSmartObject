@@ -8,6 +8,8 @@
 #ifndef OSAL_WINDOWS_INC_OSALBUILDERIMPLWINDOWS_H_
 #define OSAL_WINDOWS_INC_OSALBUILDERIMPLWINDOWS_H_
 
+#ifdef _OS_WINDOWS_
+
 #include "PrimitiveDataTypes.h"
 #include "Condition.h"
 #include "OsalError.h"
@@ -40,5 +42,7 @@ private:
 };
 }
 }
+
+#endif _OS_WINDOWS_
 
 #endif /* OSAL_WINDOWS_INC_OSALBUILDERIMPLWINDOWS_H_ */

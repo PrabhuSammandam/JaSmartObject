@@ -5,6 +5,8 @@
  *      Author: psammand
  */
 
+#ifdef _OS_WINDOWS_
+
 #include "windows/inc/OsalBuilderImplWindows.h"
 #include "windows/inc/MutexImplWindows.h"
 #include "windows/inc/ConditionImplWindows.h"
@@ -37,7 +39,11 @@ OsalBuilderImplWindows::~OsalBuilderImplWindows ()
 void OsalBuilderImplWindows::Init()
 {
   _accessMutex = _gsMutexList.Alloc();
-  _accessMutex->Init();
+
+  if(_accessMutex != nullptr)
+  {
+	  _accessMutex->Init();
+  }
 }
 
 Mutex * OsalBuilderImplWindows::AllocateMutex()
@@ -98,3 +104,5 @@ void OsalBuilderImplWindows::FreeTask( Task *task )
 }
 }
 }
+
+#endif //_OS_WINDOWS_

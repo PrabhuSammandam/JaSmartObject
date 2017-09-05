@@ -8,6 +8,8 @@
 #ifndef OSAL_WINDOWS_INC_TASKIMPLWINDOWS_H_
 #define OSAL_WINDOWS_INC_TASKIMPLWINDOWS_H_
 
+#ifdef _OS_WINDOWS_
+
 #include "PrimitiveDataTypes.h"
 #include "Task.h"
 #include "OsalError.h"
@@ -15,13 +17,12 @@
 #include "Condition.h"
 #include <windows.h>
 
-namespace ja_iot
-{
-namespace osal
-{
+namespace ja_iot {
+namespace osal {
 class TaskImplWindows : public Task
 {
-public:
+  public:
+
     TaskImplWindows ();
 
     ~TaskImplWindows ();
@@ -37,22 +38,23 @@ public:
 
     void Run();
 
-private:
+  private:
 
-    HANDLE _taskHandle{ 0 };
-    Mutex *_mutex{ nullptr };
-    Condition *_condition{ nullptr };
-    u32    _taskPriority = 0;
-    u32    _stackSize    = 0;
-    bool _isToStop{ true };
-    ja_iot::base::MsgQ *_msgQ{ nullptr };
-
-    ITaskMsgHandler *_taskMsgHandler{ nullptr };
-    ITaskRoutine *_taskRoutine{ nullptr };
-    bool _isMsgQTask{ false };
-    pvoid _taskArg{ nullptr };
+    HANDLE               _taskHandle     = 0;
+    Mutex *              _mutex          = nullptr;
+    Condition *          _condition      = nullptr;
+    u32                  _taskPriority   = 0;
+    u32                  _stackSize      = 0;
+    bool                 _isToStop       = true;
+    ja_iot::base::MsgQ * _msgQ           = nullptr;
+    ITaskMsgHandler *    _taskMsgHandler = nullptr;
+    ITaskRoutine *       _taskRoutine    = nullptr;
+    bool                 _isMsgQTask     = false;
+    pvoid                _taskArg        = nullptr;
 };
 }
 }
+
+#endif /* _OS_WINDOWS_ */
 
 #endif /* OSAL_WINDOWS_INC_TASKIMPLWINDOWS_H_ */

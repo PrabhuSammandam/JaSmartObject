@@ -10,7 +10,7 @@
 
 namespace ja_iot {
 namespace osal {
-static OsalBuilder *_gsOsalBuilder{ nullptr };
+static OsalBuilder *gs_osal_builder = nullptr;
 OsalMgr OsalMgr::_instance{};
 
 OsalMgr * OsalMgr::Inst()
@@ -20,32 +20,42 @@ OsalMgr * OsalMgr::Inst()
 
 Mutex * OsalMgr::AllocMutex()
 {
-  return ( _gsOsalBuilder->AllocateMutex() );
+  return ( gs_osal_builder->AllocateMutex() );
 }
 
 void OsalMgr::FreeMutex( Mutex *mutex )
 {
-  _gsOsalBuilder->FreeMutex( mutex );
+  gs_osal_builder->FreeMutex( mutex );
 }
 
 Condition * OsalMgr::AllocCondition()
 {
-  return ( _gsOsalBuilder->CreateCondition() );
+  return ( gs_osal_builder->CreateCondition() );
 }
 
 void OsalMgr::FreeCondition( Condition *condition )
 {
-  _gsOsalBuilder->FreeCondition( condition );
+  gs_osal_builder->FreeCondition( condition );
 }
 
 Task * OsalMgr::AllocTask()
 {
-  return ( _gsOsalBuilder->AllocateTask() );
+  return ( gs_osal_builder->AllocateTask() );
 }
 
 void OsalMgr::FreeTask( Task *task )
 {
-  _gsOsalBuilder->FreeTask( task );
+  gs_osal_builder->FreeTask( task );
+}
+
+Semaphore * OsalMgr::alloc_semaphore()
+{
+  return ( gs_osal_builder->alloc_semaphore() );
+}
+
+void OsalMgr::free_semaphore( Semaphore *semaphore )
+{
+  gs_osal_builder->free_semaphore( semaphore );
 }
 
 OsalMgr::OsalMgr ()
@@ -54,8 +64,8 @@ OsalMgr::OsalMgr ()
 
 void OsalMgr::Init()
 {
-  _gsOsalBuilder = OSAL_GetBuilder();
-  _gsOsalBuilder->Init();
+  gs_osal_builder = OSAL_GetBuilder();
+  gs_osal_builder->Init();
 }
 }
 }
