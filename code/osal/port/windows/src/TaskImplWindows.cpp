@@ -7,7 +7,7 @@
 
 #ifdef _OS_WINDOWS_
 
-#include "windows/inc/TaskImplWindows.h"
+#include "port/windows/inc/TaskImplWindows.h"
 #include "OsalMgr.h"
 #include "ScopedMutex.h"
 

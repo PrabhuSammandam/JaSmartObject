@@ -7,10 +7,10 @@
 
 #ifdef _OS_WINDOWS_
 
-#include "windows/inc/OsalBuilderImplWindows.h"
-#include "windows/inc/MutexImplWindows.h"
-#include "windows/inc/ConditionImplWindows.h"
-#include "windows/inc/TaskImplWindows.h"
+#include "port/windows/inc/OsalBuilderImplWindows.h"
+#include "port/windows/inc/MutexImplWindows.h"
+#include "port/windows/inc/ConditionImplWindows.h"
+#include "port/windows/inc/TaskImplWindows.h"
 #include "SimpleList.h"
 #include "ScopedMutex.h"
 

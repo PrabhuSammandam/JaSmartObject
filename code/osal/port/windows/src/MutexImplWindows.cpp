@@ -7,7 +7,7 @@
 
 #ifdef _OS_WINDOWS_
 
-#include "windows/inc/MutexImplWindows.h"
+#include "port/windows/inc/MutexImplWindows.h"
 
 namespace ja_iot {
 namespace osal {
