@@ -37,12 +37,15 @@ public:
     Task * AllocateTask() override;
     void FreeTask( Task *task ) override;
 
+    Semaphore* alloc_semaphore()                      override;
+    void       free_semaphore( Semaphore *semaphore ) override;
+
 private:
     Mutex *_accessMutex{ nullptr };
 };
 }
 }
 
-#endif _OS_WINDOWS_
+#endif /* _OS_WINDOWS_ */
 
 #endif /* OSAL_WINDOWS_INC_OSALBUILDERIMPLWINDOWS_H_ */

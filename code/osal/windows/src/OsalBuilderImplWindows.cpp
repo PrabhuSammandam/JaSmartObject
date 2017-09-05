@@ -102,6 +102,14 @@ void OsalBuilderImplWindows::FreeTask( Task *task )
 
   _gsTaskList.Free( (TaskImplWindows *) task );
 }
+
+Semaphore* OsalBuilderImplWindows::alloc_semaphore() {
+	return nullptr;
+}
+
+void OsalBuilderImplWindows::free_semaphore(Semaphore* semaphore) {
+}
+
 }
 }
 
