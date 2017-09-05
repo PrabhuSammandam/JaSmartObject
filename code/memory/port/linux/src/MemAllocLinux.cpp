@@ -5,6 +5,8 @@
  *      Author: prabhu
  */
 
+#ifdef _OS_LINUX_
+
 #include "port/linux/inc/MemAllocLinux.h"
 
 namespace ja_iot {
@@ -27,3 +29,4 @@ void MemAllocLinux::free(void* p_memory) {
 }  // namespace memory
 }  // namespace ja_iot
 
+#endif /* _OS_LINUX_ */

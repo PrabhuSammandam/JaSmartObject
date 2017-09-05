@@ -5,6 +5,8 @@
  *      Author: psammand
  */
 
+#ifdef _OS_WINDOWS_
+
 #include "port/windows/inc/MemAllocWindows.h"
 
 namespace ja_iot {
@@ -24,3 +26,5 @@ void MemAllocWindows::free(void *p_memory) {
 }
 }
 }
+
+#endif /* _OS_WINDOWS_ */

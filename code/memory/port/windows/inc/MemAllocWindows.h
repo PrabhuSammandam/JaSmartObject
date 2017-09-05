@@ -8,6 +8,8 @@
 #ifndef MEMALLOCWINDOWS_H_
 #define MEMALLOCWINDOWS_H_
 
+#ifdef _OS_WINDOWS_
+
 #include <IMemAllocator.h>
 
 namespace ja_iot {
@@ -27,7 +29,5 @@ class MemAllocWindows : public IMemAllocator
 }
 }
 
-
-
-
+#endif /* _OS_WINDOWS_ */
 #endif /* MEMALLOCWINDOWS_H_ */

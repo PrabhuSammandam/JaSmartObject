@@ -8,6 +8,8 @@
 #ifndef MEMORY_PORT_LINUX_INC_MEMALLOCLINUX_H_
 #define MEMORY_PORT_LINUX_INC_MEMALLOCLINUX_H_
 
+#ifdef _OS_LINUX_
+
 #include <IMemAllocator.h>
 
 namespace ja_iot {
@@ -28,5 +30,7 @@ class MemAllocLinux : public IMemAllocator
 
 }  // namespace memory
 }  // namespace ja_iote
+
+#endif /* _OS_LINUX_ */
 
 #endif /* MEMORY_PORT_LINUX_INC_MEMALLOCLINUX_H_ */

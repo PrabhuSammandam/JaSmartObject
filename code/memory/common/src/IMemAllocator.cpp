@@ -12,6 +12,10 @@
 #include "port/linux/inc/MemAllocLinux.h"
 #endif
 
+#ifdef _OS_WINDOWS_
+#include "port/windows/inc/MemAllocWindows.h"
+#endif /* _OS_WINDOWS_ */
+
 namespace ja_iot {
 namespace memory {
 
