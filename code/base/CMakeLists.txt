@@ -1,6 +1,0 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.9)
-PROJECT(base)
-
-INCLUDE_DIRECTORIES(inc export)
-
-ADD_LIBRARY(base STATIC common/src/Hash.cpp)

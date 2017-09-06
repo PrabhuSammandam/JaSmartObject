@@ -5,11 +5,9 @@
  *      Author: psammand
  */
 
-#ifndef BASE_EXPORT_PTRARRAY_H_
-#define BASE_EXPORT_PTRARRAY_H_
+#ifndef __PTR_ARRAY_H__
+#define __PTR_ARRAY_H__
 
-
-// #include "cstdint"
 #include <functional>
 #include <stddef.h>
 
@@ -200,7 +198,4 @@ class StaticPtrArray : public PtrArray<T>
 }
 }
 
-
-
-
-#endif /* BASE_EXPORT_PTRARRAY_H_ */
+#endif /* __PTR_ARRAY_H__ */

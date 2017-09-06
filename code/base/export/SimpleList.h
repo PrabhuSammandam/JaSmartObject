@@ -12,13 +12,6 @@
 
 namespace ja_iot {
 namespace base {
-class SimpleListBase {
-public:
-  SimpleListBase();
-  virtual ~SimpleListBase() {}
-
-private:
-};
 
 template <typename T, uint16_t capacity> class SimpleList {
 private:

@@ -5,83 +5,95 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_EXPORT_SIMPLEMSGQ_H_
-#define OSAL_EXPORT_SIMPLEMSGQ_H_
+#ifndef __PTR_MSG_Q_H__
+#define __PTR_MSG_Q_H__
 
 #include "cstdint"
 #include "MsgQ.h"
 
-namespace ja_iot
-{
-namespace base
-{
+namespace ja_iot {
+namespace base {
+
+/***
+ * Message queue for only pointers with fixed no of messages. It enqueues and dequeues only pointer types.
+ * It is derived from the MsgQ class. The MsgQ class is the base class which provides
+ * the interface for queue operations.
+ *
+ * Why this class ?
+ *
+ * In standard C++ STL there is no option to give the statically allocated memory for containers.
+ * This class is used to define the statically allocated memory for the containers and this container is used
+ * by the clients with the MsgQ base class interface.
+ */
 template<uint16_t noOfMsg>
 class PtrMsgQ : public MsgQ
 {
-public:
+  public:
+
     PtrMsgQ ()
     {
     }
+
     ~PtrMsgQ ()
     {
     }
 
     bool IsFull() override
     {
-        if( ( back + 1 ) % noOfMsg == front )
-        {
-            return ( true );
-        }
-        else
-        {
-            return ( false );
-        }
+      if( ( back + 1 ) % noOfMsg == front )
+      {
+        return ( true );
+      }
+      else
+      {
+        return ( false );
+      }
     }
     bool IsEmpty() override
     {
-        if( back == front )        // is empty
-        {
-            return ( true );
-        }
-        else
-        {
-            return ( false );         // is not empty
-        }
+      if( back == front )          // is empty
+      {
+        return ( true );
+      }
+      else
+      {
+        return ( false );             // is not empty
+      }
     }
 
     void* Dequeue() override
     {
-        void *val = nullptr;
+      void *val = nullptr;
 
-        if( !IsEmpty() )
-        {
-            val   = _msgList[front];
-            front = ( front + 1 ) % noOfMsg;
-        }
+      if( !IsEmpty() )
+      {
+        val   = _msgList[front];
+        front = ( front + 1 ) % noOfMsg;
+      }
 
-        return ( val );
+      return ( val );
     }
 
     bool Enqueue( void *msg ) override
     {
-        bool b{ false };
+      bool b{ false };
 
-        if( !IsFull() )
-        {
-            _msgList[back] = msg;
-            back           = ( back + 1 ) % noOfMsg;
-            b              = true;
-        }
+      if( !IsFull() )
+      {
+        _msgList[back] = msg;
+        back           = ( back + 1 ) % noOfMsg;
+        b              = true;
+      }
 
-        return ( b );
+      return ( b );
     }
 
-private:
-    void        *_msgList[noOfMsg];
-    uint16_t    front = 0;
-    uint16_t    back  = 0;
+  private:
+    void *     _msgList[noOfMsg];
+    uint16_t   front = 0;
+    uint16_t   back  = 0;
 };
 }
 }
 
-#endif /* OSAL_EXPORT_SIMPLEMSGQ_H_ */
+#endif /* __PTR_MSG_Q_H__ */
