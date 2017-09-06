@@ -23,13 +23,15 @@
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.debug.1613119528" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.debug"/>
 							<builder buildPath="${workspace_loc:/libmemory}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.109413205" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug.607466857" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug">
-								<option id="gnu.both.asm.option.include.paths.1148676342" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<option id="gnu.both.asm.option.include.paths.1148676342" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1058544227" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug.660510732" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug.660510732" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug">
+								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.347498498" outputPrefix="" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
+							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.1234228313" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug">
 								<option id="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level.1681211384" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level.73349062" name="Debug Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
@@ -37,7 +39,7 @@
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.296926351" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.1213503140" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.1213503140" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>
@@ -49,7 +51,7 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1249459388" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
-								<option id="gnu.c.compiler.option.include.paths.1590032089" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.1590032089" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>
@@ -85,7 +87,7 @@
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.release.1659708241" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.release"/>
 							<builder buildPath="${workspace_loc:/libmemory}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.1627491350" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release.2092072329" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release">
-								<option id="gnu.both.asm.option.include.paths.1122621343" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+								<option id="gnu.both.asm.option.include.paths.1122621343" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>
@@ -98,7 +100,7 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1644135582" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.include.paths.107014610" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.cpp.compiler.option.include.paths.107014610" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>
@@ -110,7 +112,7 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.988612980" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
-								<option id="gnu.c.compiler.option.include.paths.1289824775" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.1289824775" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 								</option>

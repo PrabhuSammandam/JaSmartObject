@@ -29,7 +29,7 @@
 #include <stddef.h>
 #include <Task.h>
 #include <TransportType.h>
-#include <windows/inc/PrimitiveDataTypes.h>
+//#include <windows/inc/PrimitiveDataTypes.h>
 #include <winerror.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
