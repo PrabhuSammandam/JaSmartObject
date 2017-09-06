@@ -20,42 +20,59 @@ OsalMgr * OsalMgr::Inst()
 
 Mutex * OsalMgr::AllocMutex()
 {
-  return ( gs_osal_builder->AllocateMutex() );
+  if( gs_osal_builder != nullptr )
+  {
+    return ( gs_osal_builder->AllocateMutex() );
+  }
+
+  return ( nullptr );
 }
 
 void OsalMgr::FreeMutex( Mutex *mutex )
 {
-  gs_osal_builder->FreeMutex( mutex );
+  if( gs_osal_builder != nullptr )
+  {
+    gs_osal_builder->FreeMutex( mutex );
+  }
 }
 
 Condition * OsalMgr::AllocCondition()
 {
-  return ( gs_osal_builder->CreateCondition() );
+  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->CreateCondition() : nullptr );
 }
 
 void OsalMgr::FreeCondition( Condition *condition )
 {
-  gs_osal_builder->FreeCondition( condition );
+  if( gs_osal_builder != nullptr )
+  {
+    gs_osal_builder->FreeCondition( condition );
+  }
 }
 
 Task * OsalMgr::AllocTask()
 {
-  return ( gs_osal_builder->AllocateTask() );
+  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->AllocateTask() : nullptr );
 }
 
 void OsalMgr::FreeTask( Task *task )
 {
-  gs_osal_builder->FreeTask( task );
+  if( gs_osal_builder != nullptr )
+  {
+    gs_osal_builder->FreeTask( task );
+  }
 }
 
 Semaphore * OsalMgr::alloc_semaphore()
 {
-  return ( gs_osal_builder->alloc_semaphore() );
+  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->alloc_semaphore() : nullptr );
 }
 
 void OsalMgr::free_semaphore( Semaphore *semaphore )
 {
-  gs_osal_builder->free_semaphore( semaphore );
+  if( gs_osal_builder != nullptr )
+  {
+    gs_osal_builder->free_semaphore( semaphore );
+  }
 }
 
 OsalMgr::OsalMgr ()
@@ -64,8 +81,19 @@ OsalMgr::OsalMgr ()
 
 void OsalMgr::Init()
 {
+  if( is_inited_ == true )
+  {
+    return;
+  }
+
   gs_osal_builder = OSAL_GetBuilder();
-  gs_osal_builder->Init();
+
+  if( gs_osal_builder != nullptr )
+  {
+    gs_osal_builder->Init();
+  }
+
+  is_inited_ = true;
 }
 }
 }

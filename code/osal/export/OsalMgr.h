@@ -40,6 +40,7 @@ class OsalMgr
 
     OsalMgr ();
     static OsalMgr   _instance;
+    bool             is_inited_ = false;
 };
 }
 }

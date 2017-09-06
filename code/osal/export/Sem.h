@@ -19,7 +19,7 @@ class Semaphore
 
     Semaphore () {}
 
-    virtual ~Semaphore ();
+    virtual ~Semaphore (){}
 
     virtual OsalError Init( uint32_t initial_count,  uint32_t access_count ) = 0;
     virtual OsalError Uninit()                      = 0;

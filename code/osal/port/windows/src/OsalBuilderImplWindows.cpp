@@ -11,18 +11,21 @@
 #include "port/windows/inc/MutexImplWindows.h"
 #include "port/windows/inc/ConditionImplWindows.h"
 #include "port/windows/inc/TaskImplWindows.h"
+#include "port/windows/inc/SemaphoreImplWindows.h"
 #include "SimpleList.h"
 #include "ScopedMutex.h"
 
 namespace ja_iot {
 namespace osal {
-constexpr u16 MAX_NO_OF_MUTEX     = 10;
-constexpr u16 MAX_NO_OF_CONDITION = 10;
-constexpr u16 MAX_NO_OF_TASKS     = 10;
+constexpr u16 MAX_NO_OF_MUTEX      = 10;
+constexpr u16 MAX_NO_OF_CONDITION  = 10;
+constexpr u16 MAX_NO_OF_TASKS      = 10;
+constexpr u16 MAX_NO_OF_SEMAPHORES = 10;
 
 static OsalBuilderImplWindows _gsOsalBuilderImplWindows{};
 
 static ja_iot::base::SimpleList<MutexImplWindows, MAX_NO_OF_MUTEX> _gsMutexList{};
+static ja_iot::base::SimpleList<SemaphoreImplWindows, MAX_NO_OF_SEMAPHORES> _gs_semaphore_list{};
 static ja_iot::base::SimpleList<ConditionImplWindows, MAX_NO_OF_CONDITION> _gsConditionList{};
 static ja_iot::base::SimpleList<TaskImplWindows, MAX_NO_OF_TASKS> _gsTaskList{};
 
@@ -40,9 +43,9 @@ void OsalBuilderImplWindows::Init()
 {
   _accessMutex = _gsMutexList.Alloc();
 
-  if(_accessMutex != nullptr)
+  if( _accessMutex != nullptr )
   {
-	  _accessMutex->Init();
+    _accessMutex->Init();
   }
 }
 
@@ -60,8 +63,11 @@ void OsalBuilderImplWindows::FreeMutex( Mutex *mutex )
 {
   mutex->Uninit();
 
-  ScopedMutex scoped_mutex( _accessMutex );
-  _gsMutexList.Free( (MutexImplWindows *) mutex );
+  if( mutex != nullptr )
+  {
+    ScopedMutex scoped_mutex( _accessMutex );
+    _gsMutexList.Free( (MutexImplWindows *) mutex );
+  }
 }
 
 Condition * OsalBuilderImplWindows::CreateCondition()
@@ -78,8 +84,11 @@ void OsalBuilderImplWindows::FreeCondition( Condition *condition )
 {
   condition->Uninit();
 
-  ScopedMutex scoped_mutex( _accessMutex );
-  _gsConditionList.Free( (ConditionImplWindows *) condition );
+  if( condition != nullptr )
+  {
+    ScopedMutex scoped_mutex( _accessMutex );
+    _gsConditionList.Free( (ConditionImplWindows *) condition );
+  }
 }
 
 OsalBuilder* OSAL_GetBuilder()
@@ -100,17 +109,30 @@ void OsalBuilderImplWindows::FreeTask( Task *task )
 {
   ScopedMutex scoped_mutex( _accessMutex );
 
-  _gsTaskList.Free( (TaskImplWindows *) task );
+  if( task != nullptr )
+  {
+    _gsTaskList.Free( (TaskImplWindows *) task );
+  }
 }
 
-Semaphore* OsalBuilderImplWindows::alloc_semaphore() {
-	return nullptr;
+Semaphore * OsalBuilderImplWindows::alloc_semaphore()
+{
+  ScopedMutex scoped_mutex( _accessMutex );
+  auto        semaphore = _gs_semaphore_list.Alloc();
+
+  return ( semaphore );
 }
 
-void OsalBuilderImplWindows::free_semaphore(Semaphore* semaphore) {
+void OsalBuilderImplWindows::free_semaphore( Semaphore *semaphore )
+{
+  ScopedMutex scoped_mutex( _accessMutex );
+
+  if( semaphore != nullptr )
+  {
+    _gs_semaphore_list.Free( (SemaphoreImplWindows *) semaphore );
+  }
+}
+}
 }
 
-}
-}
-
-#endif //_OS_WINDOWS_
+#endif // _OS_WINDOWS_
