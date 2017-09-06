@@ -67,10 +67,12 @@ Mutex * OsalBuilderImplLinux::AllocateMutex()
 
 void OsalBuilderImplLinux::FreeMutex( Mutex *mutex )
 {
-  mutex->Uninit();
-
-  ScopedMutex scoped_mutex( access_mutex );
-  gs_mutex_list.Free( (MutexImplLinux *) mutex );
+  if( mutex != nullptr )
+  {
+    mutex->Uninit();
+    ScopedMutex scoped_mutex( access_mutex );
+    gs_mutex_list.Free( (MutexImplLinux *) mutex );
+  }
 }
 
 Condition * OsalBuilderImplLinux::CreateCondition()
@@ -94,9 +96,12 @@ Task * OsalBuilderImplLinux::AllocateTask()
 
 void OsalBuilderImplLinux::FreeTask( Task *task )
 {
-  ScopedMutex scoped_mutex( this->access_mutex );
+  if( task != nullptr )
+  {
+    ScopedMutex scoped_mutex( this->access_mutex );
 
-  gs_task_list.Free( (TaskImplLinux *) task );
+    gs_task_list.Free( (TaskImplLinux *) task );
+  }
 }
 
 Semaphore * OsalBuilderImplLinux::alloc_semaphore()
@@ -109,10 +114,11 @@ Semaphore * OsalBuilderImplLinux::alloc_semaphore()
 
 void OsalBuilderImplLinux::free_semaphore( Semaphore *semaphore )
 {
-	semaphore->Uninit();
-
-	ScopedMutex scoped_mutex( access_mutex );
-	gs_semaphore_list.Free( (SemaphoreImplLinux*) semaphore);
+  if( semaphore )
+  {
+    ScopedMutex scoped_mutex( access_mutex );
+    gs_semaphore_list.Free( (SemaphoreImplLinux *) semaphore );
+  }
 }
 }  // namespace osal
 }  // namespace ja_iot

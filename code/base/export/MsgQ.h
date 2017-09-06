@@ -8,11 +8,15 @@
 #ifndef OSAL_EXPORT_MSGQ_H_
 #define OSAL_EXPORT_MSGQ_H_
 
+#include <cstdint>
+
 namespace ja_iot {
 namespace base {
 class MsgQ {
 public:
   virtual ~MsgQ() {}
+
+  virtual uint16_t GetCapacity() = 0;
 
   virtual bool IsFull() = 0;
   virtual bool IsEmpty() = 0;

@@ -13,7 +13,6 @@
 
 namespace ja_iot {
 namespace base {
-
 /***
  * Message queue for only pointers with fixed no of messages. It enqueues and dequeues only pointer types.
  * It is derived from the MsgQ class. The MsgQ class is the base class which provides
@@ -36,6 +35,11 @@ class PtrMsgQ : public MsgQ
 
     ~PtrMsgQ ()
     {
+    }
+
+    uint16_t GetCapacity() override
+    {
+      return ( noOfMsg );
     }
 
     bool IsFull() override

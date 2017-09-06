@@ -15,27 +15,28 @@
 #include <OsalError.h>
 
 namespace ja_iot {
-
 namespace osal {
+class MutexImplLinux : public Mutex
+{
+  public:
 
-class MutexImplLinux: public Mutex {
-public:
-	MutexImplLinux();
-	virtual ~MutexImplLinux();
+    MutexImplLinux ();
 
-	OsalError Init() override;
-	OsalError Uninit() override;
+    virtual ~MutexImplLinux ();
 
-	OsalError Lock() override;
-	OsalError Unlock() override;
+    OsalError Init() override;
+    OsalError Uninit() override;
 
-	pthread_mutex_t* GetMutexImpl() {
-		return (&mutex_impl_);
-	}
+    OsalError Lock() override;
+    OsalError Unlock() override;
 
-private:
-	pthread_mutex_t mutex_impl_ = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_t* GetMutexImpl()
+    {
+      return ( &mutex_impl_ );
+    }
 
+  private:
+    pthread_mutex_t   mutex_impl_ = PTHREAD_MUTEX_INITIALIZER;
 };
 }
 }  // namespace ja_iot

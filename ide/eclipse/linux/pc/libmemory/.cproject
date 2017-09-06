@@ -24,7 +24,9 @@
 						<toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.1561424323" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.lib.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.lib.debug.1784125288" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.lib.debug"/>
 							<builder buildPath="${workspace_loc:/libmemory}/Debug" id="cdt.managedbuild.target.gnu.builder.lib.debug.1053249502" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.lib.debug"/>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.759877198" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.759877198" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug">
+								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.826950013" outputPrefix="" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
+							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.716626865" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug">
 								<option id="gnu.cpp.compiler.lib.debug.option.optimization.level.1683963881" name="Optimization Level" superClass="gnu.cpp.compiler.lib.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.lib.debug.option.debugging.level.363695789" name="Debug Level" superClass="gnu.cpp.compiler.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
@@ -33,7 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.224300645" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.332701869" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.332701869" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1816332429" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -45,7 +47,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1153330820" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1153330820" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.48859913" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -99,7 +101,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1537464877" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1537464877" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2043754192" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -111,7 +113,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.499731656" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.499731656" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2003593945" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>

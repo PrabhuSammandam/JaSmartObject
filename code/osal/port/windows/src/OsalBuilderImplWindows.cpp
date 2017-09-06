@@ -107,10 +107,9 @@ Task * OsalBuilderImplWindows::AllocateTask()
 
 void OsalBuilderImplWindows::FreeTask( Task *task )
 {
-  ScopedMutex scoped_mutex( _accessMutex );
-
   if( task != nullptr )
   {
+  ScopedMutex scoped_mutex( _accessMutex );
     _gsTaskList.Free( (TaskImplWindows *) task );
   }
 }
@@ -125,10 +124,9 @@ Semaphore * OsalBuilderImplWindows::alloc_semaphore()
 
 void OsalBuilderImplWindows::free_semaphore( Semaphore *semaphore )
 {
-  ScopedMutex scoped_mutex( _accessMutex );
-
   if( semaphore != nullptr )
   {
+    ScopedMutex scoped_mutex( _accessMutex );
     _gs_semaphore_list.Free( (SemaphoreImplWindows *) semaphore );
   }
 }
