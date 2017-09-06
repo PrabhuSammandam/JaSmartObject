@@ -24,7 +24,7 @@ public:
 	SemaphoreImplLinux();
 	virtual ~SemaphoreImplLinux();
 
-	OsalError Init(uint32_t access_count) override;
+	OsalError Init(uint32_t initial_count, uint32_t access_count) override;
 	OsalError Uninit() override;
 
 	OsalError Wait() override;

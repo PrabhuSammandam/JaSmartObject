@@ -19,11 +19,11 @@ SemaphoreImplLinux::~SemaphoreImplLinux ()
 {
 }
 
-OsalError SemaphoreImplLinux::Init( uint32_t access_count )
+OsalError SemaphoreImplLinux::Init(uint32_t initial_count, uint32_t access_count )
 {
   int ret_status;
 
-  ret_status = sem_init( &semaphore_handle_, 0, access_count );
+  ret_status = sem_init( &semaphore_handle_, initial_count, access_count );
 
   if( ret_status != 0 )
   {
