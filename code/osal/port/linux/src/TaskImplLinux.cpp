@@ -19,7 +19,7 @@ TaskImplLinux::~TaskImplLinux ()
 
 OsalError TaskImplLinux::PortCreateTask()
 {
-  int ret_status = pthread_create( &this->task_handle_, nullptr, task_base_function, task_argument_ );
+  int ret_status = pthread_create( &this->task_handle_, nullptr, task_base_function, this );
 
   if( ret_status != 0 )
   {
@@ -32,6 +32,20 @@ OsalError TaskImplLinux::PortCreateTask()
 OsalError TaskImplLinux::PortDeleteTask()
 {
   this->task_handle_ = 0;
+
+  return ( OsalError::OK );
+}
+
+OsalError TaskImplLinux::Wait()
+{
+  int ret_status;
+
+  ret_status = pthread_join( task_handle_, NULL );
+
+  if( ret_status != 0 )
+  {
+    return ( OsalError::ERR );
+  }
 
   return ( OsalError::OK );
 }
