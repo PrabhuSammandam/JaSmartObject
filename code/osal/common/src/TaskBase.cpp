@@ -6,7 +6,6 @@
  */
 
 #include <common/inc/TaskBase.h>
-#include <handleapi.h>
 #include <MsgQ.h>
 #include <Mutex.h>
 #include <OsalError.h>

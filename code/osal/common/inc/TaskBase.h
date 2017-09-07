@@ -39,7 +39,7 @@ class TaskBase : public Task
     virtual OsalError PortCreateTask() = 0;
     virtual OsalError PortDeleteTask() = 0;
 
-  private:
+  protected:
     Mutex *              msg_q_mutex_      = nullptr;
     Semaphore *          msg_q_semaphore_  = nullptr;
     uint32_t             task_priority_    = 0;
