@@ -10,7 +10,7 @@
 #include "port/windows/inc/OsalBuilderImplWindows.h"
 #include "port/windows/inc/MutexImplWindows.h"
 #include "port/windows/inc/ConditionImplWindows.h"
-#include "port/windows/inc/TaskImplWindows.h"
+#include <port/windows/inc/TaskImplWindows.h>
 #include "port/windows/inc/SemaphoreImplWindows.h"
 #include "SimpleList.h"
 #include "ScopedMutex.h"
@@ -27,7 +27,7 @@ static OsalBuilderImplWindows _gsOsalBuilderImplWindows{};
 static ja_iot::base::SimpleList<MutexImplWindows, MAX_NO_OF_MUTEX> _gsMutexList{};
 static ja_iot::base::SimpleList<SemaphoreImplWindows, MAX_NO_OF_SEMAPHORES> _gs_semaphore_list{};
 static ja_iot::base::SimpleList<ConditionImplWindows, MAX_NO_OF_CONDITION> _gsConditionList{};
-static ja_iot::base::SimpleList<TaskImplWindows, MAX_NO_OF_TASKS> _gsTaskList{};
+static ja_iot::base::SimpleList<TaskImplWindowsSem, MAX_NO_OF_TASKS> _gsTaskList{};
 
 OsalBuilderImplWindows::OsalBuilderImplWindows ()
 {
@@ -110,7 +110,7 @@ void OsalBuilderImplWindows::FreeTask( Task *task )
   if( task != nullptr )
   {
   ScopedMutex scoped_mutex( _accessMutex );
-    _gsTaskList.Free( (TaskImplWindows *) task );
+    _gsTaskList.Free( (TaskImplWindowsSem *) task );
   }
 }
 

@@ -147,6 +147,11 @@ OsalError TaskImplLinux::Stop()
 
 OsalError TaskImplLinux::Destroy()
 {
+  if( !is_to_stop_ )
+  {
+    return ( OsalError::ERR );
+  }
+
   if( msg_q_ != nullptr )
   {
     if( msg_q_mutex_ != nullptr )
@@ -178,6 +183,14 @@ OsalError TaskImplLinux::Destroy()
   }
 
   msg_q_mutex_ = nullptr;
+
+  if( msg_q_semaphore_ != nullptr )
+  {
+	  msg_q_semaphore_->Uninit();
+    OsalMgr::Inst()->free_semaphore( msg_q_semaphore_ );
+  }
+
+  msg_q_semaphore_ = nullptr;
 
   task_handle_ = 0;
 
