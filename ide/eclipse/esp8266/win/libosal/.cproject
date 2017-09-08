@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<macros>
+					<stringMacro name="ESP8266_COMPILER_ROOT" type="VALUE_TEXT" value="D:\SysGCC\esp8266\bin"/>
+					<stringMacro name="ESP8266_SDK_PATH" type="VALUE_TEXT" value="D:\esp8266\FromGit\ESP8266_RTOS_SDK"/>
+					<stringMacro name="ESP8266_SDK_TOOL_PATH" type="VALUE_TEXT" value="D:\Program Files\esp8266\utils"/>
+				</macros>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/esp8266_win_libosal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/esp8266_win_libosal/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="osal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="osal" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892" name="Debug" parent="cdt.managedbuild.config.gnu.cross.lib.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1744348102" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="xtensa-lx106-elf-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.572388678" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="${ESP8266_COMPILER_ROOT}" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.2041935216" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/esp8266_win_libosal}/Debug" id="cdt.managedbuild.builder.gnu.cross.1852433134" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1439963223" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1584804186" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1604379174" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1729274804" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/extra_include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/driver_lib/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/espressif&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip/ipv4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip/ipv6&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1236232879" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
+									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
+									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
+									<listOptionValue builtIn="false" value="FREERTOS_ARCH_ESP8266"/>
+									<listOptionValue builtIn="false" value="__ets__"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2082141960" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1103639397" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1006851785" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1588407844" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1412705212" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1114625392" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/espressif&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/extra_include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/driver_lib/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip/ipv4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_SDK_PATH}/include/lwip/ipv6&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.197027208" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
+									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
+									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
+									<listOptionValue builtIn="false" value="__STDC_VERSION__=201112L"/>
+									<listOptionValue builtIn="false" value="FREERTOS_ARCH_ESP8266"/>
+									<listOptionValue builtIn="false" value="__ets__"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.127978485" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.364011197" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1097482327" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.990254144" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.629317796" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.234632556" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1573997210" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.56187129" name="/" resourcePath="osal/port/windows">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1512624760" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893.785668780" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.1649827893"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.572388678.1617874516" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path.572388678"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.492655464" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.1439963223">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1697589201" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.788838386" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1103639397">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1851817119" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.669754450" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.364011197"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.418882471" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.1097482327"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1482928927" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.990254144"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1774946912" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.629317796">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.362184724" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="osal/port/windows|osal/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.release.1070357500">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.release.1070357500" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<macros>
+					<stringMacro name="ESP8266_COMPILER_ROOT" type="VALUE_TEXT" value=""/>
+					<stringMacro name="ESP8266_SDK_PATH" type="VALUE_TEXT" value="D:\esp8266\FromGit\ESP8266_RTOS_SDK"/>
+					<stringMacro name="ESP8266_SDK_TOOL_PATH" type="VALUE_TEXT" value="D:\Program Files\esp8266\utils"/>
+				</macros>
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/esp8266_win_libosal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/esp8266_win_libosal/Release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="esp8266_win_libosal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.release.1070357500" name="Release" parent="cdt.managedbuild.config.gnu.cross.lib.release">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.release.1070357500." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.release.1153763752" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.release">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1026996377" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="xtensa-lx106-elf-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.636838334" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="${ESP8266_COMPILER_ROOT}" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1330302993" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/esp8266_win_libosal}/Release" id="cdt.managedbuild.builder.gnu.cross.1172324378" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.798059222" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1560139519" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1242201678" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.516090379" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.662019038" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.160379226" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1111196376" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1305175365" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.2037634797" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.5327907" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1610724656" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1715689154" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1231032688" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.758393259" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.1301629538" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/memory/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1582872815" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="esp8266_win_libosal.cdt.managedbuild.target.gnu.cross.lib.725799341" name="Static Library" projectType="cdt.managedbuild.target.gnu.cross.lib"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.;cdt.managedbuild.tool.gnu.cross.c.compiler.1439963223;cdt.managedbuild.tool.gnu.c.compiler.input.2082141960">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.release.1070357500;cdt.managedbuild.config.gnu.cross.lib.release.1070357500.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.160379226;cdt.managedbuild.tool.gnu.cpp.compiler.input.5327907">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.release.1070357500;cdt.managedbuild.config.gnu.cross.lib.release.1070357500.;cdt.managedbuild.tool.gnu.cross.c.compiler.798059222;cdt.managedbuild.tool.gnu.c.compiler.input.662019038">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1103639397;cdt.managedbuild.tool.gnu.cpp.compiler.input.127978485">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/esp8266_win_libosal"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/esp8266_win_libosal"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+</cproject>
