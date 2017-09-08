@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>libbase_test</name>
+	<name>win_pc_libbase_test</name>
 	<comment></comment>
 	<projects>
 		<project>libbase</project>
