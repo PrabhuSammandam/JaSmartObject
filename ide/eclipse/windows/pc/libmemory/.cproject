@@ -5,9 +5,9 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.debug.1859527959" moduleId="org.eclipse.cdt.core.settings" name="Debug">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libmemory"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libmemory/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libmemory" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libmemory"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libmemory/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="memory" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -17,20 +17,20 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.lib.debug.1859527959" name="Debug" parent="cdt.managedbuild.config.gnu.mingw.lib.debug">
+				<configuration artifactExtension="a" artifactName="memory" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.lib.debug.1859527959" name="Debug" parent="cdt.managedbuild.config.gnu.mingw.lib.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.mingw.lib.debug.1859527959." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.lib.debug.735047599" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.lib.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.debug.1613119528" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.debug"/>
-							<builder buildPath="${workspace_loc:/libmemory}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.109413205" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<builder buildPath="${workspace_loc:/win_pc_libmemory}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.109413205" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug.607466857" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug">
 								<option id="gnu.both.asm.option.include.paths.1148676342" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1058544227" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug.660510732" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug">
-								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.347498498" outputPrefix="" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
+								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.347498498" outputPrefix="lib" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.1234228313" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug">
 								<option id="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level.1681211384" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -40,8 +40,8 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.296926351" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1213503140" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.130733357" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -52,8 +52,8 @@
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.1590032089" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1978590836" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -69,9 +69,9 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.release.1249343713" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libmemory"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libmemory/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libmemory" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libmemory"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libmemory/Release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="win_pc_libmemory" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -85,11 +85,11 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.mingw.lib.release.1249343713." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.lib.release.1491996417" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.lib.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.release.1659708241" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.release"/>
-							<builder buildPath="${workspace_loc:/libmemory}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.1627491350" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<builder buildPath="${workspace_loc:/win_pc_libmemory}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.1627491350" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release.2092072329" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release">
 								<option id="gnu.both.asm.option.include.paths.1122621343" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.437882263" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -101,8 +101,8 @@
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.107014610" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.860272416" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -113,8 +113,8 @@
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.1289824775" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1064777598" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -128,7 +128,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="libmemory.cdt.managedbuild.target.gnu.mingw.lib.714998877" name="Static Library" projectType="cdt.managedbuild.target.gnu.mingw.lib"/>
+		<project id="win_pc_libmemory.cdt.managedbuild.target.gnu.mingw.lib.714998877" name="Static Library" projectType="cdt.managedbuild.target.gnu.mingw.lib"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>

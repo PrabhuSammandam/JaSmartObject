@@ -1,0 +1,11 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.cross.lib.debug.1266939465/ESP8266_COMPILER_ROOT/delimiter=;
+environment/project/cdt.managedbuild.config.gnu.cross.lib.debug.1266939465/ESP8266_COMPILER_ROOT/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.lib.debug.1266939465/ESP8266_COMPILER_ROOT/value=D\:\\SysGCC\\esp8266\\bin
+environment/project/cdt.managedbuild.config.gnu.cross.lib.debug.1266939465/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.lib.debug.1266939465/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.cross.lib.release.292333210/ESP8266_COMPILER_ROOT/delimiter=;
+environment/project/cdt.managedbuild.config.gnu.cross.lib.release.292333210/ESP8266_COMPILER_ROOT/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.lib.release.292333210/ESP8266_COMPILER_ROOT/value=D\:\\SysGCC\\esp8266\\bin
+environment/project/cdt.managedbuild.config.gnu.cross.lib.release.292333210/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.lib.release.292333210/appendContributed=true
