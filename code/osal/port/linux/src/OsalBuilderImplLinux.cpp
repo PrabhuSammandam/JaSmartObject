@@ -27,7 +27,6 @@ static OsalBuilderImplLinux gs_osal_builder_impl_linux{};
 
 static ja_iot::base::SimpleList<MutexImplLinux, MAX_NO_OF_MUTEX> gs_mutex_list{};
 static ja_iot::base::SimpleList<SemaphoreImplLinux, MAX_NO_OF_SEMAPHORES> gs_semaphore_list{};
-// static ja_iot::base::SimpleList<ConditionImplWindows, MAX_NO_OF_CONDITION> _gsConditionList{};
 static ja_iot::base::SimpleList<TaskImplLinux, MAX_NO_OF_TASKS> gs_task_list{};
 
 OsalBuilder* OSAL_GetBuilder()

@@ -25,7 +25,13 @@ class TaskBase : public Task
 {
   public:
 
-    TaskBase () {}
+    TaskBase ()
+    {
+      for( int i = 0; i < kTASK_NAME_MAX_LENGTH; ++i )
+      {
+        task_name_[i] = 0;
+      }
+    }
 
     virtual ~TaskBase () {}
 
@@ -50,6 +56,7 @@ class TaskBase : public Task
     ITaskMsgHandler *    task_msg_handler_ = nullptr;
     bool                 is_msg_q_enabled_ = false;
     void *               task_argument_    = nullptr;
+    uint8_t              task_name_[kTASK_NAME_MAX_LENGTH];
 };
 }
 }

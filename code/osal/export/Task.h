@@ -15,6 +15,8 @@
 
 namespace ja_iot {
 namespace osal {
+constexpr uint8_t kTASK_NAME_MAX_LENGTH = 8;
+
 class ITaskRoutine
 {
   public:
