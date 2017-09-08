@@ -41,9 +41,6 @@
 								<option id="gnu.cpp.compiler.option.dialect.std.759687483" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.199536934" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
@@ -61,9 +58,6 @@
 								<option id="gnu.c.compiler.mingw.lib.debug.option.debugging.level.182171681" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1356959431" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
