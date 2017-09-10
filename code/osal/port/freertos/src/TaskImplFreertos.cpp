@@ -6,10 +6,17 @@
  */
 #ifdef _OS_FREERTOS_
 
+#include <stdio.h>
 #include <port/freertos/inc/TaskImplFreertos.h>
 #include <OsalError.h>
 #include "OsalMgr.h"
 #include "ScopedMutex.h"
+
+#ifdef _DEBUG_
+#define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#else
+#define dbg( format, ... )
+#endif
 
 namespace ja_iot {
 namespace osal {
@@ -25,10 +32,13 @@ TaskImplFreertos::~TaskImplFreertos ()
 
 OsalError TaskImplFreertos::PortCreateTask()
 {
-  if( xTaskCreate( task_base_function, (const signed char *) &task_name_[0], stack_size_, this, task_priority_, &task_handle_ ) == pdPASS )
+  if( xTaskCreate( task_base_function, (const signed char *) &task_name_[0], stack_size_, this, task_priority_, &task_handle_ ) == pdFALSE )
   {
+    dbg( "%s=> Failed to created task\n", __FUNCTION__ );
     return ( OsalError::ERR );
   }
+
+  dbg( "%s=> Created task successfully\n", __FUNCTION__ );
 
   return ( OsalError::OK );
 }

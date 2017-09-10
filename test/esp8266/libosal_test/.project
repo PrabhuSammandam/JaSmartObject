@@ -3,6 +3,7 @@
 	<name>esp8266_win_libosal_test</name>
 	<comment></comment>
 	<projects>
+		<project>esp8266_win_libosal</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

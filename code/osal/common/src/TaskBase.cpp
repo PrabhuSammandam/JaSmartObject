@@ -5,6 +5,7 @@
  *      Author: psammand
  */
 
+#include <stdio.h>
 #include <common/inc/TaskBase.h>
 #include <MsgQ.h>
 #include <Mutex.h>
@@ -12,6 +13,12 @@
 #include <OsalMgr.h>
 #include <ScopedMutex.h>
 #include <Sem.h>
+
+#ifdef _DEBUG_
+#define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#else
+#define dbg( format, ... )
+#endif
 
 namespace ja_iot {
 namespace osal {
@@ -60,6 +67,8 @@ OsalError TaskBase::InitWithMsgQ( uint8_t *taskName, uint32_t taskPriority, uint
 
 failed:
 
+  dbg( "%s=> Failed to init task\n", __FUNCTION__ );
+
   if( msg_q_semaphore_ != nullptr )
   {
     if( is_msg_q_sem_inited == true )
@@ -97,6 +106,7 @@ OsalError TaskBase::Start()
 
   if( ( is_msg_q_enabled_ == true ) && ( is_to_stop_ == true ) )
   {
+    dbg( "%s=>Creating msg q task\n", __FUNCTION__ );
     ScopedMutex scoped_mutex( msg_q_mutex_ );
     is_to_stop_ = false;
     status      = PortCreateTask();
@@ -105,6 +115,8 @@ OsalError TaskBase::Start()
     {
       is_to_stop_ = true;
     }
+
+    dbg( "%s=>Created task succesfully\n", __FUNCTION__ );
   }
   else
   {
@@ -189,12 +201,15 @@ OsalError TaskBase::SendMsg( void *msgMem )
     return ( OsalError::INVALID_ARGS );
   }
 
+  dbg( "%s=>ENTER\n", __FUNCTION__ );
+
   ScopedMutex scoped_mutex( msg_q_mutex_ );
 
   if( msg_q_->Enqueue( msgMem ) == true )
   {
     msg_q_semaphore_->Post();
 
+    dbg( "%s=>Msg sent successfully, msg_q_sem %p\n", __FUNCTION__, msg_q_semaphore_ );
     return ( OsalError::OK );
   }
 
@@ -208,6 +223,7 @@ void TaskBase::Run()
   {
     while( is_to_stop_ == false )
     {
+      dbg( "%s=>**********************************going to wait******************\n", __FUNCTION__ );
       msg_q_semaphore_->Wait();
 
       msg_q_mutex_->Lock();
@@ -226,6 +242,7 @@ void TaskBase::Run()
 
       if( new_msg != nullptr )
       {
+        dbg( "%s=>Calling task handler\n", __FUNCTION__ );
         task_msg_handler_->HandleMsg( new_msg );
         task_msg_handler_->DeleteMsg( new_msg );
       }

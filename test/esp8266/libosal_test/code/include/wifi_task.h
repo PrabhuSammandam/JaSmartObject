@@ -8,6 +8,10 @@
 #ifndef CODE_INCLUDE_WIFI_TASK_H_
 #define CODE_INCLUDE_WIFI_TASK_H_
 
+#include "export/Task.h"
+#include "export/Mutex.h"
+#include "SimpleList.h"
+
 namespace ja_iot {
 namespace osal {
 class Task;
@@ -46,8 +50,12 @@ class WifiTask
 {
   public:
     bool create_task();
-    bool send_msg( const WifiTaskMsg &msg );
+    bool send_msg( WifiTaskMsg *msg );
     bool send_msg( WifiTaskMsgType msg_type, void *msg_param );
+
+  private:
+    void handle_msg( WifiTaskMsg *msg );
+    void delete_msg( WifiTaskMsg *msg );
 
   private:
     class WifiTaskMsgHandler : public ja_iot::osal::ITaskMsgHandler
@@ -58,16 +66,19 @@ class WifiTask
       public:
         void HandleMsg( void *msg ) override
         {
-        	host_->handle_msg((WifiTaskMsg*)msg);
+          host_->handle_msg( (WifiTaskMsg *) msg );
         }
         void DeleteMsg( void *msg ) override
         {
-        	host_->delete_msg((WifiTaskMsg*)msg);
+          host_->delete_msg( (WifiTaskMsg *) msg );
         }
     };
 
   private:
-    ja_iot::osal::Task * wifi_task_ = nullptr;
+    //ja_iot::base::SimpleList<WifiTaskMsg, WIFI_TASK_MSG_Q_LENGTH>   msg_list_;
+    WifiTaskMsgHandler                                              wifi_task_msg_handler_;
+    ja_iot::osal::Task *                                            wifi_task_    = nullptr;
+    ja_iot::osal::Mutex *                                           access_mutex_ = nullptr;
 };
 
 #endif /* CODE_INCLUDE_WIFI_TASK_H_ */
