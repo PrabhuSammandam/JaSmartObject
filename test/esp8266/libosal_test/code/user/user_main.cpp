@@ -24,6 +24,15 @@
 
 #include "esp_common.h"
 
+const char* const FlashSizeMap[] = { "512 KB (256 KB + 256 KB)",     // 0x00
+                                     "256 KB",                       // 0x01
+                                     "1024 KB (512 KB + 512 KB)",    // 0x02
+                                     "2048 KB (512 KB + 512 KB)",     // 0x03
+                                     "4096 KB (512 KB + 512 KB)",     // 0x04
+                                     "2048 KB (1024 KB + 1024 KB)",   // 0x05
+                                     "4096 KB (1024 KB + 1024 KB)",   // 0x06
+        };
+
 /******************************************************************************
  * FunctionName : user_rf_cal_sector_set
  * Description  : SDK just reversed 4 sectors, used for rf init data and paramters.
@@ -36,7 +45,7 @@
  * Parameters   : none
  * Returns      : rf cal sector
 *******************************************************************************/
-uint32 user_rf_cal_sector_set(void)
+extern "C" uint32 user_rf_cal_sector_set(void)
 {
     flash_size_map size_map = system_get_flash_size_map();
     uint32 rf_cal_sec = 0;
@@ -73,14 +82,27 @@ uint32 user_rf_cal_sector_set(void)
     return rf_cal_sec;
 }
 
+void print_system_info()
+{
+	printf("==== System info: ====");
+	printf("SDK version:%s rom %d", system_get_sdk_version(), system_upgrade_userbin_check());
+	printf("Time = %d", system_get_time());
+	printf("Chip id = 0x%x", system_get_chip_id());
+	printf("CPU freq = %d MHz", system_get_cpu_freq());
+	printf("Flash size map = %s", FlashSizeMap[system_get_flash_size_map()]);
+	printf("Free heap size = %d", system_get_free_heap_size());
+	printf("==== End System info ====");
+}
+
+
 /******************************************************************************
  * FunctionName : user_init
  * Description  : entry of user application, init user function here
  * Parameters   : none
  * Returns      : none
 *******************************************************************************/
-void user_init(void)
+extern "C" void user_init(void)
 {
-    printf("SDK version:%s\n", system_get_sdk_version());
+	print_system_info();
 }
 
