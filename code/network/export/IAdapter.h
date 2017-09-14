@@ -18,6 +18,9 @@ namespace ja_iot {
 namespace network {
 using ErrCode = ja_iot::base::ErrCode;
 
+/***
+ * Enum that defines the types of adapter event.
+ */
 enum class AdapterEventType
 {
   kNone,
@@ -76,13 +79,13 @@ class AdapterEvent
     }
 
   private:
-    bool               is_enabled_   = false;
-    bool               is_connected_ = false;
-    Endpoint *         end_point_    = nullptr;
-    uint8_t *          data_         = nullptr;
-    uint16_t           data_length_  = 0;
-    ErrCode            error_code_   = ErrCode::OK;
-    AdapterType        adapter_type_ = AdapterType::IP;
+    bool               is_enabled_         = false;
+    bool               is_connected_       = false;
+    Endpoint *         end_point_          = nullptr;
+    uint8_t *          data_               = nullptr;
+    uint16_t           data_length_        = 0;
+    ErrCode            error_code_         = ErrCode::OK;
+    AdapterType        adapter_type_       = AdapterType::IP;
     AdapterEventType   adapter_event_type_ = AdapterEventType::kNone;
 };
 
@@ -116,9 +119,9 @@ class IAdapter
     virtual ErrCode StartListening() = 0;
     virtual ErrCode StopListening()  = 0;
 
-    virtual int32_t SendUnicastData( Endpoint const &end_point, const uint8_t *data, uint16_t data_length ) = 0;
+    virtual int32_t SendUnicastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) = 0;
 
-    virtual int32_t SendMulticastData( Endpoint const &end_point, const uint8_t *data, uint16_t data_length ) = 0;
+    virtual int32_t SendMulticastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) = 0;
 
     virtual void ReadData() = 0;
 

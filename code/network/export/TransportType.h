@@ -14,9 +14,9 @@ namespace ja_iot {
 namespace network {
 constexpr uint16_t MAX_NO_OF_ADAPTER_TYPES = 6;
 
-enum class AdapterType
+enum AdapterType
 {
-  DEFAULT       = 0x00,
+  TYPE_DEFAULT       = 0x00,
   IP            = 0x01,
   TCP           = 0x02,
   NFC           = 0x04,
@@ -26,9 +26,9 @@ enum class AdapterType
   ALL           = 0xFF,
 };
 
-enum class NetworkFlag
+enum NetworkFlag
 {
-  DEFAULT               = 0,
+  FLAG_DEFAULT               = 0,
   SCOPE_INTERFACE_LOCAL = 1,
   SCOPE_LINK_LOCAL      = 2,
   SCOPE_REALM_LOCAL     = 3,

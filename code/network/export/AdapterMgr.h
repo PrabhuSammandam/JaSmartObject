@@ -16,16 +16,15 @@
 #include "TransportType.h"
 #include "IAdapter.h"
 #include "PtrArray.h"
+#include "IpAdapterConfig.h"
 
-constexpr uint16_t MAX_NO_OF_NETWORK_HANDLERS = 5;
-constexpr uint8_t  MAX_NO_ADAPTERS            = 5;
+constexpr uint16_t ADAPTER_MGR_MAX_NO_OF_NETWORK_HANDLERS = 5;
+constexpr uint8_t  ADAPTER_MGR_MAX_NO_ADAPTERS            = 5;
 
 using ErrCode = ja_iot::base::ErrCode;
 
 namespace ja_iot {
 namespace network {
-class AdapterManagerImplData;
-
 class IAdapterManagerDataHandler
 {
   public:
@@ -63,8 +62,8 @@ class AdapterManager
     ErrCode StopServers();
 
     ErrCode ReadData();
-    ErrCode SendUnicastData( Endpoint const &end_point, const uint8_t *data, uint16_t data_length );
-    ErrCode SendMulticastData( Endpoint const &endPoint, const uint8_t *data, uint16_t data_length );
+    ErrCode SendUnicastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length );
+    ErrCode SendMulticastData( Endpoint &endPoint, const uint8_t *data, uint16_t data_length );
 
     void SetAdapterDataHandler( IAdapterManagerDataHandler *adapter_mgr_data_handler ) { data_handler_ = adapter_mgr_data_handler; }
 
@@ -74,6 +73,8 @@ class AdapterManager
     void                     SetPlatformFactory( INetworkPlatformFactory *platform_factory ) { platform_factory_ = platform_factory; }
     INetworkPlatformFactory* GetPlatformFactory() { return ( platform_factory_ ); }
 
+    IpAdapterConfig* get_ip_adapter_config() { return ( &ip_adapter_config_ ); }
+
   private:
 
     AdapterManager ();
@@ -82,14 +83,12 @@ class AdapterManager
 
   private:
 
-    AdapterManager( const AdapterManager & )               = delete;
-    AdapterManager & operator = ( const AdapterManager & ) = delete;
+    AdapterManager( const AdapterManager & )               = delete;// prevent copy constructor
+    AdapterManager & operator = ( const AdapterManager & ) = delete;// prevent assignment operator
 
-    ErrCode InitAdapter( AdapterType req_adapter_type, AdapterType to_init_adapter_type );
-
-    void handle_adapter_event( AdapterEvent *p_adapter_event );
-
-    IAdapter* GetAdapterForType( AdapterType adapterType );
+    ErrCode   init_adapter( AdapterType req_adapter_type, AdapterType to_init_adapter_type );
+    void      handle_adapter_event( AdapterEvent *p_adapter_event );
+    IAdapter* get_adapter_for_type( AdapterType adapter_type );
 
     class AdapterEventHandler : public IAdapterEventHandler
     {
@@ -104,15 +103,15 @@ class AdapterManager
         AdapterManager * adapter_mgr_;
     };
 
-    AdapterEventHandler adapter_handler_{ this };
-    IAdapterManagerDataHandler *data_handler_{ nullptr };
-    ja_iot::base::StaticPtrArray<IAdapterManagerNetworkHandler *, MAX_NO_OF_NETWORK_HANDLERS> network_handlers_list_{};
-    ja_iot::base::StaticPtrArray<ja_iot::network::IAdapter *, MAX_NO_ADAPTERS> adapters_list_{};
-    uint16_t selected_adapters_{ (uint16_t) AdapterType::DEFAULT };
-
-    INetworkPlatformFactory *platform_factory_{ nullptr };
-
+    IpAdapterConfig         ip_adapter_config_;
     static AdapterManager * p_instance_;
+    AdapterEventHandler adapter_handler_{ this };
+    IAdapterManagerDataHandler * data_handler_      = nullptr;
+    INetworkPlatformFactory *    platform_factory_  = nullptr;
+    uint16_t                     selected_adapters_ = (uint16_t) AdapterType::TYPE_DEFAULT;
+
+    ja_iot::base::StaticPtrArray<IAdapterManagerNetworkHandler *, ADAPTER_MGR_MAX_NO_OF_NETWORK_HANDLERS> network_handlers_list_{};
+    ja_iot::base::StaticPtrArray<ja_iot::network::IAdapter *, ADAPTER_MGR_MAX_NO_ADAPTERS> adapters_list_{};
 };
 }
 }

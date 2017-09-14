@@ -8,8 +8,9 @@
 #ifndef __PTR_ARRAY_H__
 #define __PTR_ARRAY_H__
 
-#include <functional>
+//#include <functional>
 #include <stddef.h>
+#include <cstdint>
 
 namespace ja_iot {
 namespace base {
@@ -117,6 +118,8 @@ class PtrArray
       return ( _list[index] );
     }
 
+#if 0
+
     template<typename P>
     class PtrArrayIterator : public std::iterator<std::random_access_iterator_tag, P>
     {
@@ -183,6 +186,7 @@ class PtrArray
 
     const_iterator cbegin() { return ( const_iterator( &_list[0] ) ); }
     const_iterator cend() { return ( const_iterator( &_list[_capacity] ) ); }
+#endif
 };
 
 template<typename T, uint16_t capacity = 10>

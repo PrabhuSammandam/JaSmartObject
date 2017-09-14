@@ -41,8 +41,8 @@ class Endpoint
     bool SetIpv6AddrByScope( NetworkFlag ipv6_scope );
 
   private:
-    AdapterType   adapter_type_                  = AdapterType::DEFAULT;
-    NetworkFlag   network_flags_                 = NetworkFlag::DEFAULT;
+    AdapterType   adapter_type_                  = AdapterType::TYPE_DEFAULT;
+    NetworkFlag   network_flags_                 = NetworkFlag::FLAG_DEFAULT;
     uint16_t      port_                          = 0;
     uint32_t      if_index_                      = 0;
     uint8_t       addr_[kEndpointAddressMaxSize] = { 0 };

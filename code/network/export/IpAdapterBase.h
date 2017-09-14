@@ -29,9 +29,9 @@ class IpAdapterQMsg
   public:
 
     Endpoint   end_point_;
-    uint8_t *_data{ nullptr };
-    uint16_t _dataLength{ 0 };
-    bool is_multicast{ false };
+    uint8_t *  _data        = nullptr;
+    uint16_t   _dataLength  = 0;
+    bool       is_multicast = false;
 };
 
 class IpAdapterBase : public IAdapter
@@ -54,8 +54,8 @@ class IpAdapterBase : public IAdapter
     ErrCode StartListening() override;
     ErrCode StopListening() override;
 
-    int32_t SendUnicastData( Endpoint const &end_point, const uint8_t *data, uint16_t data_length ) override;
-    int32_t SendMulticastData( Endpoint const &end_point, const uint8_t *data, uint16_t data_length ) override;
+    int32_t SendUnicastData( Endpoint  &end_point, const uint8_t *data, uint16_t data_length ) override;
+    int32_t SendMulticastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) override;
 
     AdapterType GetType() override { return ( AdapterType::IP ); }
 
@@ -87,7 +87,7 @@ class IpAdapterBase : public IAdapter
     virtual void    DoInitFastShutdownMechanism() {}
     virtual void    DoInitAddressChangeNotifyMechanism() {}
     virtual void    DoUnInitAddressChangeNotifyMechanism() {}
-    virtual ErrCode DoHandleInterfaceEvent( InterfaceEvent *interface_event ) {return ( ErrCode::OK );}
+    virtual ErrCode DoHandleInterfaceEvent( InterfaceEvent *interface_event ) { return ( ErrCode::OK ); }
 
   protected:
     ErrCode CreateAndStartReceiveTask();
@@ -105,12 +105,14 @@ class IpAdapterBase : public IAdapter
     ErrCode CreateAndStartSendingThread();
     void    ReceiveDataRoutine() { DoHandleReceive(); }
     ErrCode CreateSockets();
-    ErrCode OpenIPV6Sockets();
-    ErrCode OpenIPV4Sockets();
+    ErrCode OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec );
+    ErrCode OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec );
     ErrCode OpenSocket( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port = 0 );
     ErrCode OpenSocket2( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port );
     void    ApplyMulticastAtInterfaceByAddress( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index );
     ErrCode HandleInterfaceEvent( InterfaceEvent *interface_event );
+
+    IUdpSocket *get_socket(IpAddrFamily ip_addr_family, bool is_multicast = false, bool is_secure = false);
 
     IpAdapterQMsg* CreateNewSendMsg( Endpoint const &end_point, const uint8_t *data, uint16_t data_length, bool is_multicast = false );
 
@@ -140,7 +142,7 @@ class IpAdapterBase : public IAdapter
         void Run( void *arg ) { host_->ReceiveDataRoutine(); }
 
       private:
-        IpAdapterBase   *host_;
+        IpAdapterBase * host_;
     };
 
     class InterfaceEventHandler : public IInterfaceEventHandler
@@ -152,46 +154,41 @@ class IpAdapterBase : public IAdapter
         ErrCode HandleInterfaceEvent( InterfaceEvent *interface_event ) override { return ( host_->HandleInterfaceEvent( interface_event ) ); }
 
       private:
-        IpAdapterBase   *host_;
+        IpAdapterBase * host_;
     };
 
   protected:
 
-    bool is_started_{ false };
-    bool is_terminated_{ true };
+    bool      is_started_     = false;
+    bool      is_terminated_  = true;
     int32_t   select_timeout_ = -1;
-    bool is_ipv6_enabled_{ false };
-    bool is_ipv4_enabled_{ false };
 
-    uint16_t ipv4_unicast_port_{ 0 };
-    uint16_t ipv4_unicast_secure_port_{ 0 };
-    uint16_t ipv6_unicast_port_{ 0 };
-    uint16_t ipv6_unicast_secure_port_{ 0 };
+    uint16_t   ipv4_unicast_port_        = 0;
+    uint16_t   ipv4_unicast_secure_port_ = 0;
+    uint16_t   ipv6_unicast_port_        = 0;
+    uint16_t   ipv6_unicast_secure_port_ = 0;
 
-    IUdpSocket *ipv4_unicast_socket_{ nullptr };
-    IUdpSocket *ipv4_unicast_secure_socket_{ nullptr };
+    IUdpSocket * ipv4_unicast_socket_          = nullptr;
+    IUdpSocket * ipv4_unicast_secure_socket_   = nullptr;
+    IUdpSocket * ipv4_multicast_socket_        = nullptr;
+    IUdpSocket * ipv4_multicast_secure_socket_ = nullptr;
+    IUdpSocket * ipv6_unicast_socket_          = nullptr;
+    IUdpSocket * ipv6_unicast_secure_socket_   = nullptr;
+    IUdpSocket * ipv6_multicast_socket_        = nullptr;
+    IUdpSocket * ipv6_multicast_secure_socket_ = nullptr;
 
-    IUdpSocket *ipv4_multicast_socket_{ nullptr };
-    IUdpSocket *ipv4_multicast_secure_socket_{ nullptr };
+    ja_iot::osal::Task * sender_task_ = nullptr;
+    IpSendTaskMsgHandler sender_task_msg_q_handler_{ this };
+    ja_iot::osal::Mutex * sender_task_mutex_ = nullptr;
 
-    IUdpSocket *ipv6_unicast_socket_{ nullptr };
-    IUdpSocket *ipv6_unicast_secure_socket_{ nullptr };
-
-    IUdpSocket *ipv6_multicast_socket_{ nullptr };
-    IUdpSocket *ipv6_multicast_secure_socket_{ nullptr };
-
-    IpSendTaskMsgHandler _ipSendTaskMsgHandler{ this };
-    IAdapterEventHandler *_adapterHandler{ nullptr };
-
-    ja_iot::osal::Task *_msgSendtask{ nullptr };
-    ja_iot::osal::Task *receive_task_{ nullptr };
-
+    ja_iot::osal::Task * receiver_task_ = nullptr;
     IpReceiveTaskRoutine receive_task_routine_{ this };
+
+    IAdapterEventHandler * _adapterHandler = nullptr;
     InterfaceEventHandler if_event_handler_{ this };
 
-    ja_iot::osal::Mutex *send_msg_q_mutex_{ nullptr };
-    ja_iot::base::SimpleList<IpAdapterQMsg, IP_ADAPTER_MSG_Q_CAPACITY> _ipAdapterMsgList{};
-    ja_iot::base::PtrMsgQ<IP_ADAPTER_MSG_Q_CAPACITY> _ipAdapterMsgQ{};
+    ja_iot::base::SimpleList<IpAdapterQMsg, IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_list_{};
+    ja_iot::base::PtrMsgQ<IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_{};
 };
 }
 }

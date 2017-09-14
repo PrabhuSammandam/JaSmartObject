@@ -44,19 +44,14 @@ class IUdpSocket
 
     virtual SocketError SelectMulticastInterface( IpAddress &group_address, uint32_t if_index ) = 0;
 
-    virtual SocketError EnableMulticastLoopback()  = 0;
-    virtual SocketError DisableMulticastLoopback() = 0;
+    virtual SocketError EnableMulticastLoopback(bool is_enabled)  = 0;
+    virtual SocketError EnableReuseAddr(bool is_enabled)  = 0;
+    virtual SocketError EnableIpv6Only(bool is_enabled)  = 0;
+    virtual SocketError EnablePacketInfo(bool is_enabled)  = 0;
 
-    virtual SocketError EnableReuseAddr()  = 0;
-    virtual SocketError DisableReuseAddr() = 0;
+    virtual SocketError SetBlocking(bool is_blocked) = 0;
 
-    virtual SocketError EnableIpv6Only()  = 0;
-    virtual SocketError DisableIpv6Only() = 0;
-
-    virtual SocketError EnablePacketInfo()  = 0;
-    virtual SocketError DisablePacketInfo() = 0;
-
-    virtual SocketError ReceiveData( IpAddress &remote_addr, uint8_t *data, uint16_t &data_length ) = 0;
+    virtual SocketError ReceiveData( IpAddress &remote_addr, uint16_t &port, uint8_t *data, int16_t &data_length ) = 0;
 
     /**
      * Send the data through this socket. The remote address need to be passed.

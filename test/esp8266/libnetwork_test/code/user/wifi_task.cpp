@@ -14,14 +14,20 @@
 #include <string.h>
 #include <ScopedMutex.h>
 #include <wifi_task.h>
+#include <adapter_task.h>
 
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
 
 #define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#define DBG_INFO( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#define DBG_WARN( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#define DBG_ERROR( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+#define DBG_FATAL( format, ... ) printf( format "\n", ## __VA_ARGS__ )
 
 static void wifi_task_cb( System_Event_t *evt );
 
+AdapterTask gs_adapter_task;
 extern WifiTask                 gs_wifi_task;
 PtrMsgQ<WIFI_TASK_MSG_Q_LENGTH> wifi_task_msg_q_;
 
@@ -29,43 +35,53 @@ bool WifiTask::create_task()
 {
   OsalError osal_status;
 
-  dbg( "WifiTask::create_task=>Creating task\n" );
+  DBG_INFO( "WifiTask::create_task:%d# ENTER", __LINE__ );
   wifi_task_ = OsalMgr::Inst()->AllocTask();
 
   if( wifi_task_ == nullptr )
   {
-    dbg( "Failed to create WIFI_TASK" );
+    DBG_ERROR( "WifiTask::create_task:%d# AllocTask FAILED", __LINE__ );
     return ( false );
   }
 
-  dbg( "WifiTask::create_task=>Creating mutex\n");
   access_mutex_ = OsalMgr::Inst()->AllocMutex();
 
   if( access_mutex_ == nullptr )
   {
-    dbg( "Failed to create access mutex" );
+    DBG_ERROR( "WifiTask::create_task:%d# AllocMutex FAILED", __LINE__ );
     return ( false );
   }
+
+  access_mutex_->Lock();
 
   TaskMsgQParam task_msg_q_param;
 
   task_msg_q_param.msgQ           = &wifi_task_msg_q_;
   task_msg_q_param.taskMsgHandler = &wifi_task_msg_handler_;
 
-  dbg( "WifiTask::create_task=>Initing task\n");
   osal_status = wifi_task_->InitWithMsgQ( (uint8_t *) WIFI_TASK_NAME, WIFI_TASK_PRIORITY, WIFI_TASK_STACK_LENGTH, &task_msg_q_param, this );
 
   if( osal_status != OsalError::OK )
   {
-    dbg( "Failed to init task" );
+    DBG_ERROR( "WifiTask::create_task:%d# Task Init FAILED", __LINE__ );
     return ( false );
   }
 
   wifi_task_->Start();
 
-  dbg( "WifiTask::create_task=>Connecting as station\n");
+  access_mutex_->Unlock();
+
+  DBG_ERROR( "WifiTask::create_task:%d# connecting as station", __LINE__ );
   wifi_set_event_handler_cb( wifi_task_cb );
   wifi_set_opmode( STATION_MODE );
+
+  struct station_config config;
+  bzero(&config, sizeof(struct station_config));
+//  sprintf((char*)config.ssid, (char*)"Cisco17377");
+  sprintf((char*)config.ssid, (char*)"JinjuAmla");
+  sprintf((char*)config.password, (char*)"Jinju124Amla");
+  wifi_station_set_config(&config);
+
   wifi_station_connect();
 
   return ( true );
@@ -79,19 +95,17 @@ bool WifiTask::send_msg( WifiTaskMsg *msg )
 
   if( new_msg == nullptr )
   {
-    dbg( "Failed to alloc msg" );
+    DBG_ERROR( "WifiTask::send_msg:%d# Alloc Msg FAILED", __LINE__ );
     return ( false );
   }
 
   memcpy( new_msg, (const void *) msg, sizeof( WifiTaskMsg ) );
 
-  dbg( "%s=>Sending msg", __FUNCTION__ );
-
   OsalError osal_status = wifi_task_->SendMsg( new_msg );
 
   if( osal_status != OsalError::OK )
   {
-    dbg( "Failed to send msg" );
+    DBG_ERROR( "WifiTask::send_msg:%d# Task SendMsg FAILED", __LINE__ );
     return ( false );
   }
 
@@ -111,6 +125,12 @@ bool WifiTask::send_msg( WifiTaskMsgType msg_type, void *msg_param )
 void WifiTask::handle_msg( WifiTaskMsg *msg )
 {
   dbg( "Got msg, type %d", (int) msg->msgType );
+
+  if(WifiTaskMsgType::STATION_GOT_IP == msg->msgType)
+  {
+	  DBG_INFO("WifiTask::handle_msg:%d# Starting adapter_task", __LINE__);
+	  gs_adapter_task.create_task();
+  }
 }
 
 void WifiTask::delete_msg( WifiTaskMsg *msg )
@@ -125,7 +145,7 @@ static void wifi_task_cb( System_Event_t *evt )
 {
   WifiTaskMsg msg{};
 
-  dbg( "WIFI cb event [%x]", evt->event_id );
+  DBG_INFO("wifi_task_cb:%d# Callback event[%d]", __LINE__, evt->event_id);
 
   switch( evt->event_id )
   {
@@ -160,7 +180,7 @@ static void wifi_task_cb( System_Event_t *evt )
       msg.msgType = WifiTaskMsgType::STATION_GOT_IP;
       msg.msgData = NULL;
 
-      dbg( "%s=>Sending msg", __FUNCTION__ );
+      DBG_INFO("wifi_task_cb:%d# Sending msg to WiFi Task", __LINE__);
       gs_wifi_task.send_msg( &msg );
     }
     break;

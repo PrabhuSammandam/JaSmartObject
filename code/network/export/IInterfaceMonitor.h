@@ -61,7 +61,7 @@ public:
 
 private:
   InterfaceEventType interface_event_type_;
-  AdapterType adapter_type_ = AdapterType::DEFAULT;
+  AdapterType adapter_type_ = AdapterType::TYPE_DEFAULT;
   InterfaceStatusFlag interface_status_flag_ = InterfaceStatusFlag::DOWN;
 };
 
