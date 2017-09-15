@@ -29,7 +29,7 @@
 #include <stddef.h>
 #include <Task.h>
 #include <TransportType.h>
-//#include <windows/inc/PrimitiveDataTypes.h>
+// #include <windows/inc/PrimitiveDataTypes.h>
 #include <winerror.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
@@ -44,6 +44,8 @@
 #include <IInterfaceMonitor.h>
 #include <PtrArray.h>
 #include <INetworkPlatformFactory.h>
+#include <IpAdapterConfig.h>
+#include <AdapterMgr.h>
 
 using namespace ja_iot::osal;
 
@@ -73,20 +75,21 @@ ErrCode IpAdapterImplWindows::DoPreIntialize()
 
 ErrCode IpAdapterImplWindows::DoPostStartServer()
 {
-  GUID                  GuidWSARecvMsg = WSAID_WSARECVMSG;
-  DWORD                 copied         = 0;
-  UdpSocketImplWindows *udp_socket     = nullptr;
+  GUID                  GuidWSARecvMsg    = WSAID_WSARECVMSG;
+  DWORD                 copied            = 0;
+  UdpSocketImplWindows *udp_socket        = nullptr;
+  auto                  ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
 
-  if( !is_ipv4_enabled_ && !is_ipv6_enabled_ )
+  if( !ip_adapter_config->is_ipv4_enabled() && !ip_adapter_config->is_ipv6_enabled() )
   {
     return ( ErrCode::ERR );
   }
 
-  if( is_ipv4_enabled_ )
+  if( ip_adapter_config->is_ipv4_enabled() )
   {
     udp_socket = (UdpSocketImplWindows *) ipv4_unicast_socket_;
   }
-  else if( is_ipv6_enabled_ )
+  else if( ip_adapter_config->is_ipv6_enabled() )
   {
     udp_socket = (UdpSocketImplWindows *) ipv6_unicast_socket_;
   }
@@ -120,6 +123,10 @@ void IpAdapterImplWindows::DoInitFastShutdownMechanism()
   }
 }
 
+/***
+ * In windows platform there are many sockets opened and because of that threads are used.
+ * In threaded environment this api is not used.
+ */
 void IpAdapterImplWindows::ReadData()
 {
 }
@@ -174,6 +181,7 @@ void IpAdapterImplWindows::DoHandleReceive()
   {
     DWORD ret_status = WSAWaitForMultipleEvents( wsa_events_count_, wsa_events_array_, FALSE, WSA_INFINITE, FALSE );
 
+    /* check the events within the range i.e 0 to max events count */
     if( !( ( ret_status >= WSA_WAIT_EVENT_0 ) && ( ret_status < ( WSA_WAIT_EVENT_0 + wsa_events_count_ ) ) ) )
     {
       continue;
@@ -194,21 +202,25 @@ void IpAdapterImplWindows::DoHandleReceive()
 
         if( ( wsa_event_index >= 0 ) && ( wsa_event_index < wsa_events_count_ ) )
         {
+          /* reset the received event */
           if( false == WSAResetEvent( wsa_events_array_[wsa_event_index] ) )
           {
           }
 
+          /* check for the address change event is received */
           if( ( addr_change_event_ != WSA_INVALID_EVENT ) && ( wsa_events_array_[wsa_event_index] == addr_change_event_ ) )
           {
             HandleAddressChangeEvent();
             break;
           }
 
+          /* check for the shutdown event is received */
           if( ( shutdown_event_ != WSA_INVALID_EVENT ) && ( wsa_events_array_[wsa_event_index] == shutdown_event_ ) )
           {
             break;
           }
 
+          /* if it comes here then it is socket only */
           auto network_flag = GetNetworkFlagForSocket( socket_fd_array_[wsa_event_index] );
 
           HandleReceivedSocketData( socket_fd_array_[wsa_event_index], (NetworkFlag) network_flag );
@@ -236,26 +248,21 @@ void IpAdapterImplWindows::DoHandleReceive()
 
 void IpAdapterImplWindows::AddSocketToEventArray( UdpSocketImplWindows *udp_socket )
 {
-  if( udp_socket != nullptr )
+  if( ( udp_socket != nullptr ) && ( udp_socket->getSocket() != INVALID_SOCKET ) )
   {
-    auto socket_fd = udp_socket->getSocket();
+    auto wsa_new_event = WSACreateEvent();
 
-    if( socket_fd != INVALID_SOCKET )
+    if( WSA_INVALID_EVENT != wsa_new_event )
     {
-      auto wsa_new_event = WSACreateEvent();
-
-      if( WSA_INVALID_EVENT != wsa_new_event )
+      if( WSAEventSelect( udp_socket->getSocket(), wsa_new_event, FD_READ ) != 0 )
       {
-        if( WSAEventSelect( socket_fd, wsa_new_event, FD_READ ) != 0 )
-        {
-          WSACloseEvent( wsa_new_event );
-        }
-        else
-        {
-          wsa_events_array_[wsa_events_count_] = wsa_new_event;
-          socket_fd_array_[wsa_events_count_]  = socket_fd;
-          wsa_events_count_++;
-        }
+        WSACloseEvent( wsa_new_event );
+      }
+      else
+      {
+        wsa_events_array_[wsa_events_count_] = wsa_new_event;
+        socket_fd_array_[wsa_events_count_]  = udp_socket->getSocket();
+        wsa_events_count_++;
       }
     }
   }
@@ -268,6 +275,7 @@ ErrCode IpAdapterImplWindows::DoHandleInterfaceEvent( InterfaceEvent *interface_
     return ( ErrCode::OK );
   }
 
+  /* notify about the interface change*/
   if( interface_event->getInterfaceEventType() == InterfaceEventType::kInterfaceModified )
   {
     WSASetEvent( addr_change_event_ );
@@ -287,8 +295,10 @@ void IpAdapterImplWindows::HandleAddressChangeEvent()
 
     if( if_addr_array.Count() > 0 )
     {
-      for( auto &if_addr : if_addr_array )
+      for( int i = 0; i < if_addr_array.Count(); i++ )
       {
+        auto if_addr = if_addr_array.GetItem( i );
+
         if( if_addr != nullptr )
         {
           if( if_addr->getFamily() == IpAddrFamily::IPV4 )
@@ -308,7 +318,6 @@ void IpAdapterImplWindows::HandleAddressChangeEvent()
 
 void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFlag network_flag )
 {
-  uint8_t recvBuffer[COAP_MAX_PDU_SIZE] = { 0 };
   int level{ 0 };
   int msg_type{ 0 };
   int namelen{ 0 };
@@ -342,8 +351,10 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
   WSABUF iov{};
   WSAMSG msg{};
 
+  uint8_t *recvBuffer = new uint8_t[COAP_MAX_PDU_SIZE];
+
   iov.len = sizeof( recvBuffer );
-  iov.buf = (char *) &recvBuffer[0];
+  iov.buf = (char *) recvBuffer;
 
   msg.name          = (PSOCKADDR) &packet_src_addr;
   msg.namelen       = namelen;
@@ -357,6 +368,7 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
 
   if( SOCKET_ERROR == ret )
   {
+    delete recvBuffer;
     return;
   }
 
@@ -370,20 +382,24 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
 
   if( !pktinfo )
   {
+    delete recvBuffer;
     return;
   }
 
   unsigned char ascii_addr[70];
+  uint16_t      port;
 
   if( packet_src_addr.ss_family == AF_INET )
   {
     struct sockaddr_in *p_ipv4_addr = (struct sockaddr_in *) &packet_src_addr;
     inet_ntop( AF_INET, (void *) &p_ipv4_addr->sin_addr, (char *) &ascii_addr[0], sizeof( ascii_addr ) );
+    port = p_ipv4_addr->sin_port;
   }
   else
   {
     struct sockaddr_in6 *p_ipv6_addr = (struct sockaddr_in6 *) &packet_src_addr;
     inet_ntop( AF_INET6, (void *) &p_ipv6_addr->sin6_addr, (char *) &ascii_addr[0], sizeof( ascii_addr ) );
+    port = p_ipv6_addr->sin6_port;
   }
 
   printf( "Received packet from %s\n", &ascii_addr[0] );
@@ -395,17 +411,19 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
   endpoint.setAdapterType( AdapterType::IP );
   endpoint.setNetworkFlags( network_flag );
   endpoint.setIfIndex( if_index );
+  endpoint.setPort( port );
   // TODO
   // need to set the received address in endpoint
 
   if( _adapterHandler )
   {
-	  AdapterEvent adapter_event(AdapterEventType::kPacketReceived);
-	  adapter_event.set_end_point(&endpoint);
-	  adapter_event.set_data(recvBuffer);
-	  adapter_event.set_data_length(recvLen);
+    AdapterEvent adapter_event( AdapterEventType::kPacketReceived );
+    adapter_event.set_end_point( &endpoint );
+    adapter_event.set_data( recvBuffer );
+    adapter_event.set_data_length( recvLen );
+    adapter_event.set_adapter_type( AdapterType::IP );
 
-    _adapterHandler->handle_adapter_event(&adapter_event);
+    _adapterHandler->handle_adapter_event( &adapter_event );
   }
 }
 
@@ -445,15 +463,16 @@ uint16_t IpAdapterImplWindows::GetNetworkFlagForSocket( SOCKET socket_fd )
   }
   else
   {
-    return ( (uint16_t) ( NetworkFlag::DEFAULT ) );
+    return ( (uint16_t) ( NetworkFlag::FLAG_DEFAULT ) );
   }
 }
 
-// ஒவ்வொரு port இக்கும் இந்த function ஐ செயல்படுத்த வேண்டும்.
+// à®’à®µà¯�à®µà¯Šà®°à¯� port à®‡à®•à¯�à®•à¯�à®®à¯� à®‡à®¨à¯�à®¤ function à®� à®šà¯†à®¯à®²à¯�à®ªà®Ÿà¯�à®¤à¯�à®¤ à®µà¯‡à®£à¯�à®Ÿà¯�à®®à¯�.
 void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
 {
-  auto network_flag = ip_adapter_q_msg->end_point_.getNetworkFlags();
-  auto is_secure    = IsBitSetInNetworkFlag( network_flag, NetworkFlag::SECURE );
+  auto network_flag      = ip_adapter_q_msg->end_point_.getNetworkFlags();
+  auto is_secure         = IsBitSetInNetworkFlag( network_flag, NetworkFlag::SECURE );
+  auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
 
   if( ip_adapter_q_msg->is_multicast )
   {
@@ -468,12 +487,14 @@ void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
 
       if( if_addr_array.Count() > 0 )
       {
-        if( is_ipv4_enabled_ && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV4 ) )
+        if( ip_adapter_config->is_ipv4_enabled() && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV4 ) )
         {
           IpAddress ip_addr{ 224, 0, 1, 187 };
 
-          for( auto &if_addr : if_addr_array )
+          for( int i = 0; i < if_addr_array.Count(); i++ )
           {
+            auto if_addr = if_addr_array.GetItem( i );
+
             if( ( if_addr != nullptr ) && ( if_addr->getFamily() == IpAddrFamily::IPV4 ) )
             {
               ipv4_unicast_socket_->SelectMulticastInterface( ip_addr, if_addr->getIndex() );
@@ -482,14 +503,16 @@ void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
           }
         }
 
-        if( is_ipv6_enabled_ && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV6 ) )
+        if( ip_adapter_config->is_ipv6_enabled() && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV6 ) )
         {
           if( ip_adapter_q_msg->end_point_.SetIpv6AddrByScope( ip_adapter_q_msg->end_point_.getNetworkFlags() ) )
           {
             IpAddress ip_addr{ IpAddrFamily::IPv6 };
 
-            for( auto &if_addr : if_addr_array )
+            for( int i = 0; i < if_addr_array.Count(); i++ )
             {
+              auto if_addr = if_addr_array.GetItem( i );
+
               if( ( if_addr != nullptr ) && ( if_addr->getFamily() == IpAddrFamily::IPv6 ) )
               {
                 ipv6_unicast_socket_->SelectMulticastInterface( ip_addr, if_addr->getIndex() );
@@ -510,14 +533,14 @@ void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
       ip_adapter_q_msg->end_point_.setPort( is_secure ? COAP_SECURE_PORT : COAP_PORT );
     }
 
-    if( is_ipv4_enabled_ && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV4 ) )
+    if( ip_adapter_config->is_ipv4_enabled() && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV4 ) )
     {
       udp_socket = ( is_secure ) ? (UdpSocketImplWindows *) ipv4_unicast_secure_socket_ : (UdpSocketImplWindows *) ipv4_unicast_socket_;
 
       SendData( udp_socket, ip_adapter_q_msg->end_point_, ip_adapter_q_msg->_data, ip_adapter_q_msg->_dataLength );
     }
 
-    if( is_ipv6_enabled_ && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV6 ) )
+    if( ip_adapter_config->is_ipv6_enabled() && IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV6 ) )
     {
       udp_socket = ( is_secure ) ? (UdpSocketImplWindows *) ipv6_unicast_secure_socket_ : (UdpSocketImplWindows *) ipv6_unicast_socket_;
 
@@ -545,16 +568,16 @@ static void convert_ascii_addr_to_ip_addr( const char *ascii_addr, IpAddress &ip
     {
       struct sockaddr_in6 *sock_addr = (struct sockaddr_in6 *) addr_info_list[0].ai_addr;
 
-      memcpy( ip_addr.GetAddr(), &sock_addr->sin6_addr, sizeof( struct in6_addr ) );
-      ip_addr.setAddrFamily( IpAddrFamily::IPv6 );
-      ip_addr.setScopeId( sock_addr->sin6_scope_id );
+      memcpy( ip_addr.get_addr(), &sock_addr->sin6_addr, sizeof( struct in6_addr ) );
+      ip_addr.set_addr_family( IpAddrFamily::IPv6 );
+      ip_addr.set_scope_id( sock_addr->sin6_scope_id );
     }
     else
     {
       struct sockaddr_in *ipv4_addr = (struct sockaddr_in *) addr_info_list[0].ai_addr;
 
-      memcpy( ip_addr.GetAddr(), &ipv4_addr->sin_addr, sizeof( struct in_addr ) );
-      ip_addr.setAddrFamily( IpAddrFamily::IPV4 );
+      memcpy( ip_addr.get_addr(), &ipv4_addr->sin_addr, sizeof( struct in_addr ) );
+      ip_addr.set_addr_family( IpAddrFamily::IPV4 );
     }
   }
 

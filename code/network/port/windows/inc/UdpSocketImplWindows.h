@@ -30,20 +30,15 @@ class UdpSocketImplWindows : public IUdpSocket
 
     SocketError SelectMulticastInterface( IpAddress &group_address, uint32_t if_index )  override;
 
-    SocketError EnableMulticastLoopback()  override;
-    SocketError DisableMulticastLoopback() override;
-
-    SocketError ReceiveData( IpAddress &remote_addr, uint8_t *data, uint16_t &data_length );
+    SocketError ReceiveData( IpAddress &remote_addr, uint16_t &port, uint8_t *data, int16_t &data_length ) override;
     SocketError SendData( IpAddress &remote_addr, uint16_t port, uint8_t *data, uint16_t data_length ) override;
 
-    SocketError EnableReuseAddr()  override;
-    SocketError DisableReuseAddr() override;
+    SocketError EnableMulticastLoopback(bool is_enabled)  override;
+    SocketError EnableReuseAddr(bool is_enabled)  override;
+    SocketError EnableIpv6Only(bool is_enabled)  override;
+    SocketError EnablePacketInfo(bool is_enabled)  override;
 
-    SocketError EnableIpv6Only()  override;
-    SocketError DisableIpv6Only() override;
-
-    SocketError EnablePacketInfo()  override;
-    SocketError DisablePacketInfo() override;
+    SocketError SetBlocking(bool is_blocked)override;
 
     uint16_t GetLocalPort() override;
 

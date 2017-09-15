@@ -20,33 +20,39 @@ static InterfaceMonitorImplWindows gs_if_monitor_windows{};
 static IpAdapterImplWindows gs_ip_adapter_windows{};
 #endif /*_IP_ADAPTER_*/
 
-ja_iot::network::WindowsPlatformFactory::WindowsPlatformFactory() {}
-
-IInterfaceMonitor *
-ja_iot::network::WindowsPlatformFactory::GetInterfaceMonitor() {
-  return (&gs_if_monitor_windows);
+ja_iot::network::WindowsPlatformFactory::WindowsPlatformFactory ()
+{
 }
 
-IAdapter *
-ja_iot::network::WindowsPlatformFactory::GetAdapter(AdapterType adapter_type) {
+IInterfaceMonitor * ja_iot::network::WindowsPlatformFactory::GetInterfaceMonitor()
+{
+  return ( &gs_if_monitor_windows );
+}
+
+IAdapter * ja_iot::network::WindowsPlatformFactory::GetAdapter( AdapterType adapter_type )
+{
 #ifdef _IP_ADAPTER_
 
-  if (adapter_type == AdapterType::IP) {
-    return (&gs_ip_adapter_windows);
+  if( adapter_type == AdapterType::IP )
+  {
+    return ( &gs_ip_adapter_windows );
   }
 
 #endif
 
-  return (nullptr);
+  return ( nullptr );
 }
 
-IUdpSocket *WindowsPlatformFactory::AllocSocket() {
-  return (new UdpSocketImplWindows{});
+IUdpSocket * WindowsPlatformFactory::AllocSocket()
+{
+  return ( new UdpSocketImplWindows{} );
 }
 
-void WindowsPlatformFactory::FreeSocket(IUdpSocket *socket) {
-  if (socket != nullptr) {
-    auto win_socket = (UdpSocketImplWindows *)socket;
+void WindowsPlatformFactory::FreeSocket( IUdpSocket *socket )
+{
+  if( socket != nullptr )
+  {
+    auto win_socket = (UdpSocketImplWindows *) socket;
     delete win_socket;
   }
 }

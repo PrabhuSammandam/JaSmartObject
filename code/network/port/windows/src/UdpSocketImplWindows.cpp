@@ -38,7 +38,7 @@ SocketError UdpSocketImplWindows::OpenSocket( IpAddrFamily ip_addr_family )
 
 SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, uint16_t port )
 {
-  if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != ip_address.GetAddrFamily() ) )
+  if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != ip_address.get_addr_family() ) )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
@@ -52,7 +52,7 @@ SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, uint16_t po
 
     ipv4_sock_addr.sin_family           = AF_INET;
     ipv4_sock_addr.sin_port             = htons( port );
-    ipv4_sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.AsU32() );             // already taken care about network byte order
+    ipv4_sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.as_u32() );             // already taken care about network byte order
 
     p_sock_addr  = (const sockaddr *) &ipv4_sock_addr;
     sockaddr_len = sizeof( struct sockaddr_in );
@@ -63,7 +63,7 @@ SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, uint16_t po
 
     ipv6_sock_addr.sin6_family = AF_INET6;
     ipv6_sock_addr.sin6_port   = htons( port );
-    memcpy( &ipv6_sock_addr.sin6_addr, ip_address.GetAddr(), sizeof( ipv6_sock_addr.sin6_addr ) );
+    memcpy( &ipv6_sock_addr.sin6_addr, ip_address.get_addr(), sizeof( ipv6_sock_addr.sin6_addr ) );
 
     p_sock_addr  = (const sockaddr *) &ipv6_sock_addr;
     sockaddr_len = sizeof( struct sockaddr_in6 );
@@ -101,14 +101,14 @@ SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &group_address, 
   {
     struct ip_mreq mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.AsU32() );
+    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
     mreq.imr_interface.s_addr = htonl( if_index );
 
     auto ret_status = setsockopt( socket_fd_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq ) );
 
     if( ret_status )
     {
-//      auto error = WSAGetLastError();
+      // auto error = WSAGetLastError();
       return ( SocketError::OPTION_SET_FAILED );
     }
   }
@@ -116,7 +116,7 @@ SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &group_address, 
   {
     struct ipv6_mreq mreq {};
 
-    memcpy( &mreq.ipv6mr_multiaddr, group_address.GetAddr(), sizeof( mreq.ipv6mr_multiaddr ) );
+    memcpy( &mreq.ipv6mr_multiaddr, group_address.get_addr(), sizeof( mreq.ipv6mr_multiaddr ) );
     mreq.ipv6mr_interface = if_index;
 
     if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_JOIN_GROUP, (const char *) &mreq, sizeof( mreq ) ) )
@@ -139,7 +139,7 @@ SocketError UdpSocketImplWindows::LeaveMulticastGroup( IpAddress &group_address,
   {
     struct ip_mreq mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.AsU32() );
+    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
     mreq.imr_interface.s_addr = htonl( if_index );
 
     if( setsockopt( socket_fd_, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *) &mreq, sizeof( mreq ) ) )
@@ -152,7 +152,7 @@ SocketError UdpSocketImplWindows::LeaveMulticastGroup( IpAddress &group_address,
     struct ipv6_mreq mreq {};
 
     mreq.ipv6mr_interface = if_index;
-    memcpy( &mreq.ipv6mr_multiaddr, group_address.GetAddr(), sizeof( mreq.ipv6mr_multiaddr ) );
+    memcpy( &mreq.ipv6mr_multiaddr, group_address.get_addr(), sizeof( mreq.ipv6mr_multiaddr ) );
 
     if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_LEAVE_GROUP, (const char *) &mreq, sizeof( mreq ) ) )
     {
@@ -174,7 +174,7 @@ SocketError UdpSocketImplWindows::SelectMulticastInterface( IpAddress &group_add
   {
     struct ip_mreq mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.AsU32() );
+    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
     mreq.imr_interface.s_addr = htonl( if_index );
 
     if( setsockopt( socket_fd_, IPPROTO_IP, IP_MULTICAST_IF, (const char *) &mreq, sizeof( mreq ) ) )
@@ -195,7 +195,7 @@ SocketError UdpSocketImplWindows::SelectMulticastInterface( IpAddress &group_add
   return ( SocketError::ERR );
 }
 
-SocketError UdpSocketImplWindows::EnableMulticastLoopback()
+SocketError UdpSocketImplWindows::EnableMulticastLoopback( bool is_enabled )
 {
   if( socket_fd_ == INVALID_SOCKET )
   {
@@ -203,7 +203,7 @@ SocketError UdpSocketImplWindows::EnableMulticastLoopback()
   }
 
   auto level = ( ip_addr_family_ == IpAddrFamily::IPV4 ) ? IPPROTO_IP : IPPROTO_IPV6;
-  int on{ 1 };
+  int  on    = ( is_enabled ) ? 1 : 0;
 
   if( setsockopt( socket_fd_, level, IP_MULTICAST_LOOP, (const char *) &on, sizeof( on ) ) )
   {
@@ -213,25 +213,7 @@ SocketError UdpSocketImplWindows::EnableMulticastLoopback()
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::DisableMulticastLoopback()
-{
-  if( socket_fd_ == INVALID_SOCKET )
-  {
-    return ( SocketError::ERR );
-  }
-
-  auto level = ( ip_addr_family_ == IpAddrFamily::IPV4 ) ? IPPROTO_IP : IPPROTO_IPV6;
-  int on{ 0 };
-
-  if( setsockopt( socket_fd_, level, IP_MULTICAST_LOOP, (const char *) &on, sizeof( on ) ) )
-  {
-    return ( SocketError::OPTION_SET_FAILED );
-  }
-
-  return ( SocketError::OK );
-}
-
-SocketError UdpSocketImplWindows::ReceiveData( IpAddress &remote_addr, uint8_t *data, uint16_t &data_length )
+SocketError UdpSocketImplWindows::ReceiveData( IpAddress &remote_addr, uint16_t &port, uint8_t *data, int16_t &data_length )
 {
   SocketError ret_status = SocketError::OK;
 
@@ -265,13 +247,13 @@ SocketError UdpSocketImplWindows::SendData( IpAddress &ip_address, uint16_t port
   const sockaddr *p_sock_addr{ nullptr };
   int sockaddr_len{ 0 };
 
-  if( ip_address.GetAddrFamily() == IpAddrFamily::IPV4 )
+  if( ip_address.get_addr_family() == IpAddrFamily::IPV4 )
   {
     struct sockaddr_in sock_addr = { 0 };
 
     sock_addr.sin_family           = AF_INET;
     sock_addr.sin_port             = htons( port );
-    sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.AsU32() );     // already taken care about network byte order
+    sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.as_u32() );     // already taken care about network byte order
 
     p_sock_addr  = (const sockaddr *) &sock_addr;
     sockaddr_len = sizeof( struct sockaddr_in );
@@ -282,7 +264,7 @@ SocketError UdpSocketImplWindows::SendData( IpAddress &ip_address, uint16_t port
 
     sock_addr6.sin6_family = AF_INET6;
     sock_addr6.sin6_port   = htons( port );
-    memcpy( &sock_addr6.sin6_addr, ip_address.GetAddr(),
+    memcpy( &sock_addr6.sin6_addr, ip_address.get_addr(),
       sizeof( sock_addr6.sin6_addr ) );
 
     p_sock_addr  = (const sockaddr *) &sock_addr6;
@@ -326,14 +308,14 @@ SocketError UdpSocketImplWindows::SendData( IpAddress &ip_address, uint16_t port
   return ( ret_status );
 }
 
-SocketError UdpSocketImplWindows::EnableReuseAddr()
+SocketError UdpSocketImplWindows::EnableReuseAddr( bool is_enabled )
 {
   if( socket_fd_ == INVALID_SOCKET )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = 1;
+  int on = ( is_enabled ) ? 1 : 0;
 
   if( setsockopt( socket_fd_, SOL_SOCKET, SO_REUSEADDR, (const char *) &on, sizeof( on ) ) )
   {
@@ -343,31 +325,14 @@ SocketError UdpSocketImplWindows::EnableReuseAddr()
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::DisableReuseAddr()
-{
-  if( socket_fd_ == INVALID_SOCKET )
-  {
-    return ( SocketError::SOCKET_NOT_VALID );
-  }
-
-  int on = 0;
-
-  if( setsockopt( socket_fd_, SOL_SOCKET, SO_REUSEADDR, (const char *) &on, sizeof( on ) ) )
-  {
-    return ( SocketError::OPTION_SET_FAILED );
-  }
-
-  return ( SocketError::OK );
-}
-
-SocketError UdpSocketImplWindows::EnableIpv6Only()
+SocketError UdpSocketImplWindows::EnableIpv6Only( bool is_enabled )
 {
   if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != IpAddrFamily::IPv6 ) )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = 1;
+  int on = ( is_enabled ) ? 1 : 0;
 
   if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &on, sizeof( on ) ) )
   {
@@ -377,58 +342,14 @@ SocketError UdpSocketImplWindows::EnableIpv6Only()
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::DisableIpv6Only()
-{
-  if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != IpAddrFamily::IPv6 ) )
-  {
-    return ( SocketError::ERR );
-  }
-
-  int on = 0;
-
-  if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &on, sizeof( on ) ) )
-  {
-    return ( SocketError::OPTION_SET_FAILED );
-  }
-
-  return ( SocketError::OK );
-}
-
-SocketError UdpSocketImplWindows::EnablePacketInfo()
+SocketError UdpSocketImplWindows::EnablePacketInfo( bool is_enabled )
 {
   if( socket_fd_ == INVALID_SOCKET )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = 1;
-
-  if( ip_addr_family_ == IpAddrFamily::IPv6 )
-  {
-    if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_PKTINFO, (const char *) &on, sizeof( on ) ) )
-    {
-      return ( SocketError::OPTION_SET_FAILED );
-    }
-  }
-  else
-  {
-    if( setsockopt( socket_fd_, IPPROTO_IP, IP_PKTINFO, (const char *) &on, sizeof( on ) ) )
-    {
-      return ( SocketError::OPTION_SET_FAILED );
-    }
-  }
-
-  return ( SocketError::OK );
-}
-
-SocketError UdpSocketImplWindows::DisablePacketInfo()
-{
-  if( socket_fd_ == INVALID_SOCKET )
-  {
-    return ( SocketError::SOCKET_NOT_VALID );
-  }
-
-  int on = 0;
+  int on = ( is_enabled ) ? 1 : 0;
 
   if( ip_addr_family_ == IpAddrFamily::IPv6 )
   {
@@ -468,7 +389,7 @@ uint16_t UdpSocketImplWindows::GetLocalPort()
 
   if( sa.ss_family == AF_INET6 )
   {
-    binded_port  = ( ( (struct sockaddr_in6 *) &sa )->sin6_port );
+    binded_port = ( ( (struct sockaddr_in6 *) &sa )->sin6_port );
   }
   else
   {
@@ -476,6 +397,11 @@ uint16_t UdpSocketImplWindows::GetLocalPort()
   }
 
   return ( ntohs( binded_port ) );
+}
+
+SocketError UdpSocketImplWindows::SetBlocking( bool is_blocked )
+{
+  return ( SocketError::OK );
 }
 
 IpAddrFamily UdpSocketImplWindows::GetAddrFamily()

@@ -95,8 +95,10 @@ ErrCode InterfaceMonitorImplWindows::GetInterfaceAddrList( InterfaceAddressPtrAr
 
   if( pimpl_->curr_if_addr_ptr_list_.Count() > 0 )
   {
-    for( auto &if_addr : pimpl_->curr_if_addr_ptr_list_ )
+    for( int i = 0; i < pimpl_->curr_if_addr_ptr_list_.Count(); i++ )
     {
+      auto if_addr = pimpl_->curr_if_addr_ptr_list_.GetItem( i );
+
       if( if_addr != nullptr )
       {
         if( skip_if_down && ( ( if_addr->getFlags() & IFF_UP ) != IFF_UP ) )
@@ -121,11 +123,15 @@ ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtr
 
   if( pimpl_->new_if_addr_ptr_list_.Count() > 0 )
   {
-    for( auto &if_addr : pimpl_->new_if_addr_ptr_list_ )
+    for( int i = 0; i < pimpl_->new_if_addr_ptr_list_.Count(); i++ )
     {
+      auto if_addr = pimpl_->new_if_addr_ptr_list_.GetItem( i );
+
       if( if_addr != nullptr )
       {
         newly_found_if_addr_ptr_list.Add( new InterfaceAddress{ *if_addr } );
+
+        /* free the interface address */
         pimpl_->if_addr_store_.Free( if_addr );
       }
     }
@@ -167,7 +173,6 @@ void InterfaceMonitorImplWindows::RemoveInterfaceEventHandler( IInterfaceEventHa
   }
 }
 
-
 void InterfaceMonitorImplWindowsData::notify_if_state_changed( InterfaceStatusFlag interface_status )
 {
   if( if_event_handler_ptr_array_.Count() > 0 )
@@ -175,8 +180,10 @@ void InterfaceMonitorImplWindowsData::notify_if_state_changed( InterfaceStatusFl
     InterfaceEvent interface_event{ InterfaceEventType::kInterfaceStateChanged };
     interface_event.setInterfaceStatusFlag( interface_status );
 
-    for( auto &if_modified_handler : if_event_handler_ptr_array_ )
+    for( int i = 0; i < if_event_handler_ptr_array_.Count(); i++ )
     {
+      auto if_modified_handler = if_event_handler_ptr_array_.GetItem( i );
+
       if( if_modified_handler != nullptr )
       {
         if_modified_handler->HandleInterfaceEvent( &interface_event );
@@ -192,8 +199,10 @@ void InterfaceMonitorImplWindowsData::notify_if_modified()
     InterfaceEvent interface_event{ InterfaceEventType::kInterfaceModified };
     interface_event.setAdapterType( AdapterType::IP );
 
-    for( auto &if_modified_handler : if_event_handler_ptr_array_ )
+    for( int i = 0; i < if_event_handler_ptr_array_.Count(); i++ )
     {
+      auto if_modified_handler = if_event_handler_ptr_array_.GetItem( i );
+
       if( if_modified_handler != nullptr )
       {
         if_modified_handler->HandleInterfaceEvent( &interface_event );
@@ -306,7 +315,7 @@ inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_
 
   for( IP_ADAPTER_ADDRESSES *p_cur_adapter_addr = p_adapters_list; p_cur_adapter_addr != nullptr; p_cur_adapter_addr = p_cur_adapter_addr->Next )
   {
-    printf( "adapter address index %u, type %u OperStatus %d \n", (uint32_t)p_cur_adapter_addr->IfIndex, (uint32_t)p_cur_adapter_addr->IfType, p_cur_adapter_addr->OperStatus );
+    printf( "adapter address index %u, type %u OperStatus %d \n", (uint32_t) p_cur_adapter_addr->IfIndex, (uint32_t) p_cur_adapter_addr->IfType, p_cur_adapter_addr->OperStatus );
 
     if( ( ( index > 0 ) && ( p_cur_adapter_addr->IfIndex != index ) ) || ( p_cur_adapter_addr->IfType & IF_TYPE_SOFTWARE_LOOPBACK ) || ( ( p_cur_adapter_addr->OperStatus & IfOperStatusUp ) == 0 ) )
     {
@@ -405,8 +414,10 @@ inline void InterfaceMonitorImplWindowsData::reset()
 {
   if( new_if_addr_ptr_list_.Count() > 0 )
   {
-    for( auto &if_addr : new_if_addr_ptr_list_ )
+    for( int i = 0; i < new_if_addr_ptr_list_.Count(); i++ )
     {
+      auto if_addr = new_if_addr_ptr_list_.GetItem( i );
+
       if( if_addr != nullptr )
       {
         if_addr_store_.Free( if_addr );
@@ -418,8 +429,10 @@ inline void InterfaceMonitorImplWindowsData::reset()
 
   if( curr_if_addr_ptr_list_.Count() > 0 )
   {
-    for( auto &if_addr : curr_if_addr_ptr_list_ )
+    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
     {
+      auto if_addr = curr_if_addr_ptr_list_.GetItem( i );
+
       if( if_addr != nullptr )
       {
         if_addr_store_.Free( if_addr );
@@ -538,8 +551,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
   if( curr_if_addr_ptr_list_.Count() > 0 )
   {
     /* copy the old interface addresses to temp */
-    for( auto curr_if : curr_if_addr_ptr_list_ )
+    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
     {
+      auto curr_if = curr_if_addr_ptr_list_.GetItem( i );
+
       if( curr_if == nullptr )
       {
         continue;
@@ -565,8 +580,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
   // check for the old address mising
   if( temp_old_if_addr_list.Count() > 0 )
   {
-    for( auto &old_if : temp_old_if_addr_list )
+    for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
     {
+      auto old_if = temp_old_if_addr_list.GetItem( i );
+
       if( old_if == nullptr )
       {
         continue;
@@ -576,8 +593,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
 
       if( curr_if_addr_ptr_list_.Count() > 0 )
       {
-        for( auto &new_if : curr_if_addr_ptr_list_ )
+        for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
         {
+          auto new_if = curr_if_addr_ptr_list_.GetItem( i );
+
           if( new_if == nullptr )
           {
             continue;
@@ -605,8 +624,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
   // check for any new address addition
   if( curr_if_addr_ptr_list_.Count() > 0 )
   {
-    for( auto new_if : curr_if_addr_ptr_list_ )
+    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
     {
+      auto new_if = curr_if_addr_ptr_list_.GetItem( i );
+
       if( new_if == nullptr )
       {
         continue;
@@ -616,8 +637,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
 
       if( temp_old_if_addr_list.Count() > 0 )
       {
-        for( auto &oldAddr : temp_old_if_addr_list )
+        for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
         {
+          auto oldAddr = temp_old_if_addr_list.GetItem( i );
+
           if( oldAddr == nullptr )
           {
             continue;
@@ -648,8 +671,10 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
 
   if( temp_old_if_addr_list.Count() > 0 )
   {
-    for( auto &oldAddr : temp_old_if_addr_list )
+    for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
     {
+      auto oldAddr = temp_old_if_addr_list.GetItem( i );
+
       if( oldAddr == nullptr )
       {
         continue;

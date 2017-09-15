@@ -39,44 +39,29 @@ class AdapterEvent
 
     AdapterType get_adapter_type() const { return ( adapter_type_ ); }
 
-    void set_adapter_type( AdapterType adapter_type )
-    {
-      adapter_type_ = adapter_type;
-    }
+    void set_adapter_type( AdapterType adapter_type ) { adapter_type_ = adapter_type; }
 
     uint8_t* get_data() const { return ( data_ ); }
-
-    void set_data( uint8_t *data ) { data_ = data; }
+    void     set_data( uint8_t *data ) { data_ = data; }
 
     uint16_t get_data_length() const { return ( data_length_ ); }
-
-    void set_data_length( uint16_t data_length ) { data_length_ = data_length; }
+    void     set_data_length( uint16_t data_length ) { data_length_ = data_length; }
 
     const Endpoint* get_end_point() const { return ( end_point_ ); }
-
-    void set_end_point( Endpoint *end_point ) { end_point_ = end_point; }
+    void            set_end_point( Endpoint *end_point ) { end_point_ = end_point; }
 
     ErrCode get_error_code() const { return ( error_code_ ); }
-
-    void set_error_code( ErrCode error_code ) { error_code_ = error_code; }
+    void    set_error_code( ErrCode error_code ) { error_code_ = error_code; }
 
     bool is_connected() const { return ( is_connected_ ); }
-
     void set_is_connected( bool is_connected ) { is_connected_ = is_connected; }
 
     bool is_enabled() const { return ( is_enabled_ ); }
-
     void set_is_enabled( bool is_enabled ) { is_enabled_ = is_enabled; }
 
-    AdapterEventType get_adapter_event_type() const
-    {
-      return ( adapter_event_type_ );
-    }
+    AdapterEventType get_adapter_event_type() const { return ( adapter_event_type_ ); }
 
-    void set_adapter_event_type( AdapterEventType adapter_event_type )
-    {
-      adapter_event_type_ = adapter_event_type;
-    }
+    void set_adapter_event_type( AdapterEventType adapter_event_type ) { adapter_event_type_ = adapter_event_type; }
 
   private:
     bool               is_enabled_         = false;
