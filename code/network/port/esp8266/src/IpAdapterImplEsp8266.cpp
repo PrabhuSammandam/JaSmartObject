@@ -265,33 +265,54 @@ int32_t IpAdapterImplEsp8266::SendMulticastData( Endpoint &end_point, const uint
   return ( send_bytes );
 }
 
+void IpAdapterImplEsp8266::send_packet_received_adapter_event( uint8_t *received_data, int16_t data_length, uint16_t port, IpAddress remote_addr, bool is_mcast )
+{
+  if( p_adapter_handler_ != nullptr )
+  {
+    uint8_t *data = new uint8_t[data_length];
+
+    memcpy( (void *) ( data ), (void *) received_data, data_length );
+    Endpoint end_point;
+    AdapterEvent adapter_event{ AdapterEventType::kPacketReceived };
+    end_point.setPort( port );
+    end_point.setAdapterType( AdapterType::IP );
+    end_point.setNetworkFlags( (NetworkFlag) ( ( is_mcast ) ? ( NetworkFlag::IPV4 | NetworkFlag::MULTICAST ) : NetworkFlag::IPV4 ) );
+    /* TODO set the addr in endpoint */
+    adapter_event.set_data( data );
+    adapter_event.set_data_length( data_length );
+    adapter_event.set_adapter_type( AdapterType::IP );
+    adapter_event.set_end_point( &end_point );
+    p_adapter_handler_->handle_adapter_event( &adapter_event );
+  }
+}
+
 void IpAdapterImplEsp8266::ReadData()
 {
   // DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# ENTER", __LINE__ );
 
   IpAddress remote_addr;
-  auto      data        = new uint8_t[100];
-  int16_t   data_length = 100;
+  int16_t   data_length = COAP_MAX_PDU_SIZE;
   uint16_t  port;
   uint8_t   addr_buff[16];
 
-  ipv4_ucast_socket_->ReceiveData( remote_addr, port, &data[0], data_length );
+  ipv4_ucast_socket_->ReceiveData( remote_addr, port, &receive_buffer_[0], data_length );
 
   if( data_length > 0 )
   {
-    remote_addr.to_string( addr_buff, sizeof(addr_buff) );
+    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, false );
+    remote_addr.to_string( addr_buff, sizeof( addr_buff ) );
     DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# Received unicast from %s port %d data length %d", __LINE__, addr_buff, port, data_length );
   }
 
-  ipv4_mcast_socket_->ReceiveData( remote_addr, port, &data[0], data_length );
+  ipv4_mcast_socket_->ReceiveData( remote_addr, port, &receive_buffer_[0], data_length );
 
   if( data_length > 0 )
   {
-    remote_addr.to_string( addr_buff, sizeof(addr_buff) );
+    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, true );
+    remote_addr.to_string( addr_buff, sizeof( addr_buff ) );
     DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# Received multicast from %s port %d data length %d", __LINE__, addr_buff, port, data_length );
   }
 
-  delete data;
   // DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# EXIT", __LINE__ );
 }
 

@@ -22,7 +22,6 @@ constexpr const char *const IPV6_MULTICAST_ADDRESS_SITE_LOCAL         = "ff05::1
 constexpr const char *const IPV6_MULTICAST_ADDRESS_ORGANIZATION_LOCAL = "ff08::158";
 constexpr const char *const IPV6_MULTICAST_ADDRESS_GLOBAL             = "ff0e::158";
 
-constexpr uint16_t          COAP_MAX_PDU_SIZE = 1400;
 }
 }
 

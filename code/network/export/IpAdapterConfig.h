@@ -8,9 +8,9 @@
 #ifndef NETWORK_EXPORT_IPADAPTERCONFIG_H_
 #define NETWORK_EXPORT_IPADAPTERCONFIG_H_
 
+#include <config_network.h>
 #include <cstdint>
 #include <konstants.h>
-#include <network_config.h>
 
 namespace ja_iot {
 namespace network {

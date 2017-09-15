@@ -20,6 +20,7 @@ enum class ErrCode
     OUT_OF_MEM,
     NULL_VALUE,
 	SEND_DATA_FAILED,
+	NOT_INITIALIZED,
 
 	SOCKET_INVALID
 };
