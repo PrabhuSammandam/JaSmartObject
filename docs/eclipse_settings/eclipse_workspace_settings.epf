@@ -1,0 +1,37 @@
+#Sun Sep 17 10:24:28 IST 2017
+\!/=
+/instance/org.eclipse.cdt.ui/c_keyword=172,11,2
+/instance/org.eclipse.cdt.ui/c_keyword_bold=false
+/instance/org.eclipse.cdt.ui/c_numbers=255,0,0
+/instance/org.eclipse.cdt.ui/c_type_bold=false
+/instance/org.eclipse.cdt.ui/content_assist_disabled_computers=org.eclipse.cdt.ui.textProposalCategory\u0000org.eclipse.cdt.ui.parserProposalCategory\u0000
+/instance/org.eclipse.cdt.ui/pp_directive_bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.enum.color=0,0,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.enum.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.enumerator.color=128,0,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.externalSDK.bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.function.bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.function.color=0,0,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.function.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.functionDeclaration.bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.functionDeclaration.color=0,0,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.globalVariable.color=128,0,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.globalVariable.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.localVariable.color=128,128,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.localVariable.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.localVariableDeclaration.color=128,128,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.localVariableDeclaration.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.method.color=0,128,0
+/instance/org.eclipse.cdt.ui/semanticHighlighting.method.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.methodDeclaration.color=0,64,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.parameterVariable.color=128,0,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.parameterVariable.enabled=true
+/instance/org.eclipse.cdt.ui/semanticHighlighting.staticMethod.color=128,0,128
+/instance/org.eclipse.cdt.ui/semanticHighlighting.templateParameter.bold=false
+/instance/org.eclipse.cdt.ui/semanticHighlighting.variablePassedByNonconstRef.enabled=true
+/instance/org.eclipse.cdt.ui/sourceHoverBackgroundColor=255,255,225
+/instance/org.eclipse.cdt.ui/spelling_locale_initialized=true
+/instance/org.eclipse.ui.workbench/org.eclipse.ui.commands=<?xml version\="1.0" encoding\="UTF-8"?>\r\n<org.eclipse.ui.commands>\r\n<keyBinding commandId\="org.eclipse.ui.window.nextEditor" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+\\"/>\r\n<keyBinding commandId\="org.eclipse.ui.edit.text.showInformation" contextId\="org.eclipse.ui.textEditorScope" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="ALT+\\"/>\r\n<keyBinding commandId\="org.eclipse.ui.navigate.openResource" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+X CTRL+F"/>\r\n<keyBinding commandId\="org.eclipse.ui.window.previousEditor" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+SHIFT+\\"/>\r\n<keyBinding commandId\="org.eclipse.ui.project.buildProject" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+B B"/>\r\n<keyBinding commandId\="org.eclipse.ui.file.close" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+X K"/>\r\n<keyBinding commandId\="org.eclipse.ui.edit.cut" contextId\="org.eclipse.ui.contexts.dialogAndWindow" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+W"/>\r\n<keyBinding commandId\="org.eclipse.ui.project.cleanAction" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+B C"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.dialogAndWindow" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+X"/>\r\n<keyBinding commandId\="org.eclipse.ui.window.nextView" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+]"/>\r\n<keyBinding contextId\="org.eclipse.ui.textEditorScope" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="F2"/>\r\n<keyBinding commandId\="org.eclipse.ui.window.previousView" contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+SHIFT+]"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+W"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+F7"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+SHIFT+F7"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+F6"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+SHIFT+F6"/>\r\n<keyBinding contextId\="org.eclipse.ui.contexts.window" keyConfigurationId\="org.eclipse.ui.defaultAcceleratorConfiguration" keySequence\="CTRL+SHIFT+R"/>\r\n</org.eclipse.ui.commands>
+@org.eclipse.cdt.ui=6.2.0.201707130901
+@org.eclipse.ui.workbench=3.110.0.v20170612-1255
+file_export_version=3.0
