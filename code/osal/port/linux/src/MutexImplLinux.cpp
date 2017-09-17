@@ -7,7 +7,7 @@
 
 #ifdef _OS_LINUX_
 
-#include "port/linux/inc/MutexImplLinux.h"
+#include <port/linux/inc/MutexImplLinux.h>
 
 namespace ja_iot {
 namespace osal {

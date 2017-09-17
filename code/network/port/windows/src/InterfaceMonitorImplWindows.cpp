@@ -199,8 +199,6 @@ ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtr
   DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# EXIT status %d", __LINE__, (int)ret_status );
 
   return ( ret_status );
-
-  return ( ErrCode::OK );
 }
 
 void InterfaceMonitorImplWindows::AddInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )
