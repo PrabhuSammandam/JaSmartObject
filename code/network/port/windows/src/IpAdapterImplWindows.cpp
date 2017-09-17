@@ -38,7 +38,7 @@
 
 #include <winsock2.h>
 #include "IpAdapterBase.h"
-#include "AdapterProxy.h"
+//#include "AdapterProxy.h"
 #include "port/windows/inc/IpAdapterImplWindows.h"
 #include "OsalMgr.h"
 #include <IInterfaceMonitor.h>
@@ -46,6 +46,7 @@
 #include <INetworkPlatformFactory.h>
 #include <IpAdapterConfig.h>
 #include <AdapterMgr.h>
+#include <common/inc/logging_network.h>
 
 using namespace ja_iot::osal;
 
@@ -61,16 +62,24 @@ IpAdapterImplWindows::~IpAdapterImplWindows ()
 
 ErrCode IpAdapterImplWindows::DoPreIntialize()
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "IpAdapterImplWindows::DoPreIntialize:%d# ENTER", __LINE__ );
+
   WSADATA wsa_data{};
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsa_data ) != 0 )
   {
-    return ( ErrCode::ERR );
+    DBG_ERROR( "IpAdapterImplWindows::DoPreIntialize:%d# WSAStartup FAILED", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
   select_timeout_ = 1;   // 1 second
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "IpAdapterImplWindows::DoPreIntialize:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode IpAdapterImplWindows::DoPostStartServer()
@@ -104,16 +113,26 @@ ErrCode IpAdapterImplWindows::DoPostStartServer()
 
 ErrCode IpAdapterImplWindows::DoPreStopServer()
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "IpAdapterImplWindows::DoPreStopServer:%d# ENTER", __LINE__ );
+
   // receive thread will stop immediately.
   if( !WSASetEvent( shutdown_event_ ) )
   {
+    DBG_ERROR( "IpAdapterImplWindows::DoPreStopServer:%d# FAILED to signal the shutdown event", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "IpAdapterImplWindows::DoPreStopServer:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 void IpAdapterImplWindows::DoInitFastShutdownMechanism()
 {
+  DBG_INFO( "IpAdapterImplWindows::DoInitFastShutdownMechanism:%d# ENTER", __LINE__ );
   // create the event for fast shutdown notification
   shutdown_event_ = WSACreateEvent();
 
@@ -121,6 +140,8 @@ void IpAdapterImplWindows::DoInitFastShutdownMechanism()
   {
     select_timeout_ = -1;
   }
+
+  DBG_INFO( "IpAdapterImplWindows::DoInitFastShutdownMechanism:%d# EXIT", __LINE__ );
 }
 
 /***
@@ -129,6 +150,7 @@ void IpAdapterImplWindows::DoInitFastShutdownMechanism()
  */
 void IpAdapterImplWindows::ReadData()
 {
+  DBG_ERROR( "IpAdapterImplWindows::ReadData:%d# ERROR ReadData should not be called for WINDOWS platform", __LINE__ );
 }
 
 void IpAdapterImplWindows::DoInitAddressChangeNotifyMechanism()
@@ -179,15 +201,17 @@ void IpAdapterImplWindows::DoHandleReceive()
 
   while( !is_terminated_ )
   {
-    DWORD ret_status = WSAWaitForMultipleEvents( wsa_events_count_, wsa_events_array_, FALSE, WSA_INFINITE, FALSE );
+    DWORD received_event_hndl = WSAWaitForMultipleEvents( wsa_events_count_, wsa_events_array_, FALSE, WSA_INFINITE, FALSE );
 
     /* check the events within the range i.e 0 to max events count */
-    if( !( ( ret_status >= WSA_WAIT_EVENT_0 ) && ( ret_status < ( WSA_WAIT_EVENT_0 + wsa_events_count_ ) ) ) )
+    if( !( ( received_event_hndl >= WSA_WAIT_EVENT_0 ) && ( received_event_hndl < ( WSA_WAIT_EVENT_0 + wsa_events_count_ ) ) ) )
     {
       continue;
     }
 
-    switch( ret_status )
+    DBG_INFO( "IpAdapterImplWindows::DoHandleReceive:%d# received event hndl[%d]", __LINE__, (int) received_event_hndl );
+
+    switch( received_event_hndl )
     {
       case WSA_WAIT_FAILED:
       case WSA_WAIT_IO_COMPLETION:
@@ -198,7 +222,9 @@ void IpAdapterImplWindows::DoHandleReceive()
 
       default:
       {
-        wsa_event_index = ret_status - WSA_WAIT_EVENT_0;
+        wsa_event_index = received_event_hndl - WSA_WAIT_EVENT_0;
+
+        DBG_INFO( "IpAdapterImplWindows::DoHandleReceive:%d# received event index[%d]", __LINE__, (int) wsa_event_index );
 
         if( ( wsa_event_index >= 0 ) && ( wsa_event_index < wsa_events_count_ ) )
         {
@@ -210,6 +236,7 @@ void IpAdapterImplWindows::DoHandleReceive()
           /* check for the address change event is received */
           if( ( addr_change_event_ != WSA_INVALID_EVENT ) && ( wsa_events_array_[wsa_event_index] == addr_change_event_ ) )
           {
+            DBG_INFO( "IpAdapterImplWindows::DoHandleReceive:%d# received addr change event", __LINE__ );
             HandleAddressChangeEvent();
             break;
           }
@@ -217,11 +244,14 @@ void IpAdapterImplWindows::DoHandleReceive()
           /* check for the shutdown event is received */
           if( ( shutdown_event_ != WSA_INVALID_EVENT ) && ( wsa_events_array_[wsa_event_index] == shutdown_event_ ) )
           {
+            DBG_INFO( "IpAdapterImplWindows::DoHandleReceive:%d# received shutdown event", __LINE__ );
             break;
           }
 
           /* if it comes here then it is socket only */
           auto network_flag = GetNetworkFlagForSocket( socket_fd_array_[wsa_event_index] );
+
+          DBG_INFO( "IpAdapterImplWindows::DoHandleReceive:%d# received socket event at socket[%d], nw_flag[%x]", __LINE__, (int) socket_fd_array_[wsa_event_index], (int) network_flag );
 
           HandleReceivedSocketData( socket_fd_array_[wsa_event_index], (NetworkFlag) network_flag );
         }
@@ -248,6 +278,8 @@ void IpAdapterImplWindows::DoHandleReceive()
 
 void IpAdapterImplWindows::AddSocketToEventArray( UdpSocketImplWindows *udp_socket )
 {
+  DBG_INFO( "IpAdapterImplWindows::AddSocketToEventArray:%d# ENTER udp_socket[%p]", __LINE__, udp_socket );
+
   if( ( udp_socket != nullptr ) && ( udp_socket->getSocket() != INVALID_SOCKET ) )
   {
     auto wsa_new_event = WSACreateEvent();
@@ -266,14 +298,24 @@ void IpAdapterImplWindows::AddSocketToEventArray( UdpSocketImplWindows *udp_sock
       }
     }
   }
+  else
+  {
+    DBG_ERROR( "IpAdapterImplWindows::AddSocketToEventArray:%d# FAILED invalid args passed", __LINE__ );
+  }
+
+  DBG_INFO( "IpAdapterImplWindows::AddSocketToEventArray:%d# EXIT", __LINE__ );
 }
 
 ErrCode IpAdapterImplWindows::DoHandleInterfaceEvent( InterfaceEvent *interface_event )
 {
+  DBG_INFO( "IpAdapterImplWindows::DoHandleInterfaceEvent:%d# ENTER interface_event[%p]", __LINE__, interface_event );
+
   if( interface_event == nullptr )
   {
-    return ( ErrCode::OK );
+    goto exit_label_;
   }
+
+  DBG_INFO( "IpAdapterImplWindows::DoHandleInterfaceEvent:%d# notify the interface modified", __LINE__ );
 
   /* notify about the interface change*/
   if( interface_event->getInterfaceEventType() == InterfaceEventType::kInterfaceModified )
@@ -281,17 +323,23 @@ ErrCode IpAdapterImplWindows::DoHandleInterfaceEvent( InterfaceEvent *interface_
     WSASetEvent( addr_change_event_ );
   }
 
+exit_label_:
+  DBG_INFO( "IpAdapterImplWindows::DoHandleInterfaceEvent:%d# EXIT", __LINE__ );
+
   return ( ErrCode::OK );
 }
 
 void IpAdapterImplWindows::HandleAddressChangeEvent()
 {
+  DBG_INFO( "IpAdapterImplWindows::HandleAddressChangeEvent:%d# ENTER", __LINE__ );
   auto interface_monitor = INetworkPlatformFactory::GetCurrFactory()->GetInterfaceMonitor();
 
   if( interface_monitor )
   {
     ja_iot::base::StaticPtrArray<InterfaceAddress *, 10> if_addr_array{};
     interface_monitor->GetNewlyFoundInterface( if_addr_array );
+
+    DBG_INFO( "IpAdapterImplWindows::HandleAddressChangeEvent:%d# new if_addr count[%d]", __LINE__, if_addr_array.Count() );
 
     if( if_addr_array.Count() > 0 )
     {
@@ -303,29 +351,37 @@ void IpAdapterImplWindows::HandleAddressChangeEvent()
         {
           if( if_addr->getFamily() == IpAddrFamily::IPV4 )
           {
-            StartIpv4MulticastAtInterface( if_addr->getIndex() );
+            start_ipv4_mcast_at_interface( if_addr->getIndex() );
           }
 
           if( if_addr->getFamily() == IpAddrFamily::IPv6 )
           {
-            StartIpv6MulticastAtInterface( if_addr->getIndex() );
+            start_ipv6_mcast_at_interface( if_addr->getIndex() );
           }
         }
       }
     }
   }
+  else
+  {
+    DBG_INFO( "IpAdapterImplWindows::HandleAddressChangeEvent:%d# interface monitor NULL", __LINE__ );
+  }
+
+  DBG_INFO( "IpAdapterImplWindows::HandleAddressChangeEvent:%d# EXIT", __LINE__ );
 }
 
 void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFlag network_flag )
 {
-  int level{ 0 };
-  int msg_type{ 0 };
-  int namelen{ 0 };
+  int                     level          = 0;
+  int                     msg_type       = 0;
+  int                     namelen        = 0;
   bool                    is_ipv6_packet = IsBitSetInNetworkFlag( network_flag, NetworkFlag::IPV6 );
   unsigned char *         pktinfo        = NULL;
   struct sockaddr_storage packet_src_addr {};
 
   packet_src_addr.ss_family = 0;
+
+  DBG_INFO("IpAdapterImplWindows::HandleReceivedSocketData:%d# ENTER socket[%d], nw_flag[%x]", __LINE__, (int)socket_fd, (int)network_flag);
 
   union control
   {
@@ -368,6 +424,7 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
 
   if( SOCKET_ERROR == ret )
   {
+	  DBG_ERROR("IpAdapterImplWindows::HandleReceivedSocketData:%d# socket error returned from socket_read", __LINE__);
     delete recvBuffer;
     return;
   }
@@ -382,6 +439,7 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
 
   if( !pktinfo )
   {
+	  DBG_ERROR("IpAdapterImplWindows::HandleReceivedSocketData:%d# no packet info received", __LINE__);
     delete recvBuffer;
     return;
   }
@@ -402,7 +460,7 @@ void IpAdapterImplWindows::HandleReceivedSocketData( SOCKET socket_fd, NetworkFl
     port = p_ipv6_addr->sin6_port;
   }
 
-  printf( "Received packet from %s\n", &ascii_addr[0] );
+  DBG_INFO("IpAdapterImplWindows::HandleReceivedSocketData:%d# received packet from %s", __LINE__, &ascii_addr[0]);
 
   auto if_index = ( is_ipv6_packet ) ? ( (struct in6_pktinfo *) pktinfo )->ipi6_ifindex : ( (struct in_pktinfo *) pktinfo )->ipi_ifindex;
 
@@ -467,9 +525,16 @@ uint16_t IpAdapterImplWindows::GetNetworkFlagForSocket( SOCKET socket_fd )
   }
 }
 
-// à®’à®µà¯�à®µà¯Šà®°à¯� port à®‡à®•à¯�à®•à¯�à®®à¯� à®‡à®¨à¯�à®¤ function à®� à®šà¯†à®¯à®²à¯�à®ªà®Ÿà¯�à®¤à¯�à®¤ à®µà¯‡à®£à¯�à®Ÿà¯�à®®à¯�.
 void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
 {
+  DBG_INFO( "IpAdapterImplWindows::DoHandleSendMsg:%d# ENTER data[%p], data_len[%d], mcast[%d], port[%d], adapter[%x], if_index[%d], nw_flag[%x]", __LINE__, ip_adapter_q_msg->_data,
+    ip_adapter_q_msg->_dataLength,
+    ip_adapter_q_msg->is_multicast,
+    ip_adapter_q_msg->end_point_.getPort(),
+    ip_adapter_q_msg->end_point_.getAdapterType(),
+    ip_adapter_q_msg->end_point_.getIfIndex(),
+    ip_adapter_q_msg->end_point_.getNetworkFlags() );
+
   auto network_flag      = ip_adapter_q_msg->end_point_.getNetworkFlags();
   auto is_secure         = IsBitSetInNetworkFlag( network_flag, NetworkFlag::SECURE );
   auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
@@ -522,6 +587,14 @@ void IpAdapterImplWindows::DoHandleSendMsg( IpAdapterQMsg *ip_adapter_q_msg )
           }
         }
       }
+      else
+      {
+        DBG_WARN( "IpAdapterImplWindows::DoHandleSendMsg:%d# no interfaces to send data", __LINE__ );
+      }
+    }
+    else
+    {
+      DBG_ERROR( "IpAdapterImplWindows::DoHandleSendMsg:%d# if_monitor NULL", __LINE__ );
     }
   }
   else // it is unicast

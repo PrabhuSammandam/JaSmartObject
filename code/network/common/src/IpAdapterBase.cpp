@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <common/inc/logging_network.h>
 #include <AdapterMgr.h>
+#include <IpAdapterConfig.h>
 
 using namespace ja_iot::osal;
 
@@ -28,15 +29,17 @@ IpAdapterBase::~IpAdapterBase ()
 
 ErrCode IpAdapterBase::Initialize()
 {
+  ErrCode ret_status = ErrCode::OK;
+
   DBG_INFO( "IpAdapterBase::Initialize:%d# ENTER", __LINE__ );
 
   /* call platform specific initialize */
-  ErrCode ret_status = DoPreIntialize();
+  ret_status = DoPreIntialize();
 
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::Initialize:%d# DoPreIntialize() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   ret_status = InitInternal();
@@ -44,7 +47,7 @@ ErrCode IpAdapterBase::Initialize()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::Initialize:%d# InitInternal() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   sender_task_mutex_ = OsalMgr::Inst()->AllocMutex();
@@ -52,7 +55,7 @@ ErrCode IpAdapterBase::Initialize()
   if( sender_task_mutex_ == nullptr )
   {
     DBG_ERROR( "IpAdapterBase::Initialize:%d# SendMsgQ mutex creation FAILED", __LINE__ );
-    return ( ErrCode::ERR );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
   /* call platform specific post initialize */
@@ -61,27 +64,35 @@ ErrCode IpAdapterBase::Initialize()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::Initialize:%d# DoPostIntialize() FAILED", __LINE__ );
+    goto exit_label_;
   }
 
-  DBG_INFO( "IpAdapterBase::Initialize:%d# EXIT %d", __LINE__, (int)ret_status );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::Initialize:%d# EXIT %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }
 
 ErrCode IpAdapterBase::Terminate()
 {
-  ErrCode ret_status = DoPreTerminate();
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "IpAdapterBase::Terminate:%d# ENTER", __LINE__ );
+
+  ret_status = DoPreTerminate();
 
   if( ret_status != ErrCode::OK )
   {
-    return ( ret_status );
+    DBG_ERROR( "IpAdapterBase::Terminate:%d# DoPreTerminate() FAILED", __LINE__ );
+    goto exit_label_;
   }
 
   ret_status = TerminateInternal();
 
   if( ret_status != ErrCode::OK )
   {
-    return ( ret_status );
+    DBG_ERROR( "IpAdapterBase::Terminate:%d# TerminateInternal() FAILED", __LINE__ );
+    goto exit_label_;
   }
 
   if( sender_task_ != nullptr )
@@ -99,6 +110,14 @@ ErrCode IpAdapterBase::Terminate()
 
   ret_status = DoPostTerminate();
 
+  if( ret_status != ErrCode::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::Terminate:%d# DoPostTerminate() FAILED", __LINE__ );
+    goto exit_label_;
+  }
+
+exit_label_:
+  DBG_INFO( "IpAdapterBase::Terminate:%d# EXIT status %d", __LINE__, (int) ret_status );
   return ( ret_status );
 }
 
@@ -130,7 +149,7 @@ ErrCode IpAdapterBase::StartAdapter()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StartAdapter:%d# StartInterfaceMonitor() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   /* start the sending thread*/
@@ -139,7 +158,7 @@ ErrCode IpAdapterBase::StartAdapter()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StartAdapter:%d# CreateAndStartSendingThread() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   ret_status = StartServer();
@@ -147,56 +166,85 @@ ErrCode IpAdapterBase::StartAdapter()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StartAdapter:%d# StartServer() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
-  DBG_INFO( "IpAdapterBase::StartAdapter:%d# EXIT status %d", __LINE__, (int)ret_status );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::StartAdapter:%d# EXIT status %d", __LINE__, (int) ret_status );
 
   return ( ErrCode::OK );
 }
 
 ErrCode IpAdapterBase::StopAdapter()
 {
-  sender_task_->Stop();
+  ErrCode ret_status = ErrCode::OK;
 
-  StopInterfaceMonitor();
-  StopServer();
+  DBG_INFO( "IpAdapterBase::StopAdapter:%d# ENTER", __LINE__ );
 
-  return ( ErrCode::OK );
+  if( sender_task_->Stop() != OsalError::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::StopAdapter:%d# FAILED to stop the sender task", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
+  }
+
+  ret_status = StopInterfaceMonitor();
+
+  if( ret_status != ErrCode::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::StopAdapter:%d# StopInterfaceMonitor() FAILED ", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
+  }
+
+  ret_status = StopServer();
+
+  if( ret_status != ErrCode::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::StopAdapter:%d# StopServer() FAILED ", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
+  }
+
+exit_label_:
+  DBG_INFO( "IpAdapterBase::StopAdapter:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 void IpAdapterBase::HandleMsg( IpAdapterQMsg *msg )
 {
-  if( msg == nullptr )
+  if( msg != nullptr )
   {
-    return;
+    DoHandleSendMsg( msg );
   }
-
-  DoHandleSendMsg( msg );
 }
 
 ErrCode IpAdapterBase::CreateAndStartSendingThread()
 {
+  ErrCode ret_status    = ErrCode::OK;
+  auto    osalRetStatus = OsalError::OK;
+  TaskMsgQParam taskMsgQParam{};
+
+  DBG_INFO( "IpAdapterBase::CreateAndStartSendingThread:%d# ENTER", __LINE__ );
+
   sender_task_ = OsalMgr::Inst()->AllocTask();
 
   if( sender_task_ == nullptr )
   {
-    return ( ErrCode::OUT_OF_MEM );
+    DBG_ERROR( "IpAdapterBase::CreateAndStartSendingThread:%d# FAILED to alloc sender_task", __LINE__ );
+    ret_status = ErrCode::OUT_OF_MEM; goto exit_label_;
   }
-
-  TaskMsgQParam taskMsgQParam{};
 
   taskMsgQParam.msgQ           = &ip_adapter_msg_q_;
   taskMsgQParam.taskMsgHandler = &sender_task_msg_q_handler_;
 
-  auto osalRetStatus = sender_task_->InitWithMsgQ( (uint8_t *) "IpTask", 0, 0, &taskMsgQParam, nullptr );
+  osalRetStatus = sender_task_->InitWithMsgQ( (uint8_t *) "IpTask", 0, 0, &taskMsgQParam, nullptr );
 
   if( osalRetStatus != OsalError::OK )
   {
     sender_task_->Destroy();
     OsalMgr::Inst()->FreeTask( sender_task_ );
     sender_task_ = nullptr;
-    return ( ErrCode::ERR );
+    DBG_ERROR( "IpAdapterBase::CreateAndStartSendingThread:%d# FAILED to init sender_task", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
   osalRetStatus = sender_task_->Start();
@@ -206,10 +254,14 @@ ErrCode IpAdapterBase::CreateAndStartSendingThread()
     sender_task_->Destroy();
     OsalMgr::Inst()->FreeTask( sender_task_ );
     sender_task_ = nullptr;
-    return ( ErrCode::ERR );
+    DBG_ERROR( "IpAdapterBase::CreateAndStartSendingThread:%d# FAILED to start sender_task", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::CreateAndStartSendingThread:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 IpAdapterQMsg * IpAdapterBase::CreateNewSendMsg( const Endpoint &end_point, const uint8_t *data, uint16_t data_length, bool is_multicast )
@@ -245,14 +297,20 @@ IpAdapterQMsg * IpAdapterBase::CreateNewSendMsg( const Endpoint &end_point, cons
 
 ErrCode IpAdapterBase::CreateAndStartReceiveTask()
 {
+  ErrCode ret_status      = ErrCode::OK;
+  auto    osal_ret_status = OsalError::OK;
+
+  DBG_INFO( "IpAdapterBase::CreateAndStartReceiveTask:%d# ENTER", __LINE__ );
+
   receiver_task_ = OsalMgr::Inst()->AllocTask();
 
   if( receiver_task_ == nullptr )
   {
-    return ( ErrCode::OUT_OF_MEM );
+    DBG_ERROR( "IpAdapterBase::CreateAndStartReceiveTask:%d# FAILED to alloc receiver_task", __LINE__ );
+    ret_status = ErrCode::OUT_OF_MEM; goto exit_label_;
   }
 
-  auto osal_ret_status = receiver_task_->Init( (uint8_t *) "IpTask", 0, 0, &receive_task_routine_, this );
+  osal_ret_status = receiver_task_->Init( (uint8_t *) "IpTask", 0, 0, &receive_task_routine_, this );
 
   if( osal_ret_status != OsalError::OK )
   {
@@ -260,7 +318,8 @@ ErrCode IpAdapterBase::CreateAndStartReceiveTask()
     OsalMgr::Inst()->FreeTask( receiver_task_ );
     receiver_task_ = nullptr;
 
-    return ( ErrCode::ERR );
+    DBG_ERROR( "IpAdapterBase::CreateAndStartReceiveTask:%d# FAILED to init receiver_task", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
   osal_ret_status = receiver_task_->Start();
@@ -270,10 +329,15 @@ ErrCode IpAdapterBase::CreateAndStartReceiveTask()
     receiver_task_->Destroy();
     OsalMgr::Inst()->FreeTask( receiver_task_ );
     receiver_task_ = nullptr;
-    return ( ErrCode::ERR );
+
+    DBG_ERROR( "IpAdapterBase::CreateAndStartReceiveTask:%d# FAILED to start receiver_task", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::CreateAndStartReceiveTask:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 IUdpSocket * IpAdapterBase::get_socket( IpAddrFamily ip_addr_family, bool is_multicast, bool is_secure )
@@ -317,42 +381,69 @@ IUdpSocket * IpAdapterBase::get_socket( IpAddrFamily ip_addr_family, bool is_mul
  *                      -> interface = 2
  * */
 
-void IpAdapterBase::StartIpv4MulticastAtInterface( uint32_t if_index )
+void IpAdapterBase::start_ipv4_mcast_at_interface( uint32_t if_index )
 {
   IpAddress ipv4_multicast_addr{ 224, 0, 1, 187 };
 
-  ApplyMulticastAtInterfaceByAddress( ipv4_multicast_socket_, ipv4_multicast_addr, if_index );
-  ApplyMulticastAtInterfaceByAddress( ipv4_multicast_secure_socket_, ipv4_multicast_addr, if_index );
+  DBG_INFO( "IpAdapterBase::start_ipv4_mcast_at_interface:%d# ENTER if_index[%d]", __LINE__, if_index );
+
+  join_mcast_group( ipv4_multicast_socket_, ipv4_multicast_addr, if_index );
+  join_mcast_group( ipv4_multicast_secure_socket_, ipv4_multicast_addr, if_index );
+
+  DBG_INFO( "IpAdapterBase::start_ipv4_mcast_at_interface:%d# EXIT", __LINE__ );
 }
 
-void IpAdapterBase::StartIpv6MulticastAtInterface( uint32_t if_index )
+void IpAdapterBase::start_ipv6_mcast_at_interface( uint32_t if_index )
 {
   IpAddress ipv6_address{ Ipv6AddrScope::LINK, 0x158 };
 
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_socket_, ipv6_address, if_index );
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_secure_socket_, ipv6_address, if_index );
+  DBG_INFO( "IpAdapterBase::start_ipv6_mcast_at_interface:%d# ENTER if_index[%d]", __LINE__, if_index );
+
+  join_mcast_group( ipv6_multicast_socket_, ipv6_address, if_index );
+  join_mcast_group( ipv6_multicast_secure_socket_, ipv6_address, if_index );
 
   ipv6_address.set_addr_by_scope( Ipv6AddrScope::REALM, 0x158 );
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_socket_, ipv6_address, if_index );
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_secure_socket_, ipv6_address, if_index );
+  join_mcast_group( ipv6_multicast_socket_, ipv6_address, if_index );
+  join_mcast_group( ipv6_multicast_secure_socket_, ipv6_address, if_index );
 
   ipv6_address.set_addr_by_scope( Ipv6AddrScope::SITE, 0x158 );
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_socket_, ipv6_address, if_index );
-  ApplyMulticastAtInterfaceByAddress( ipv6_multicast_secure_socket_, ipv6_address, if_index );
+  join_mcast_group( ipv6_multicast_socket_, ipv6_address, if_index );
+  join_mcast_group( ipv6_multicast_secure_socket_, ipv6_address, if_index );
+
+  DBG_INFO( "IpAdapterBase::start_ipv4_mcast_at_interface:%d# EXIT", __LINE__ );
 }
 
-void IpAdapterBase::ApplyMulticastAtInterfaceByAddress( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index )
+void IpAdapterBase::join_mcast_group( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index )
 {
-  if( udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index ) != SocketError::OK )
-  {
-    udp_socket->LeaveMulticastGroup( ip_multicast_addr, if_index );
+  DBG_INFO( "IpAdapterBase::join_mcast_group:%d# ENTER udp_socket[%p], if_index[%d]", __LINE__, udp_socket, if_index );
 
-    udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index );
+  if( udp_socket != nullptr )
+  {
+#ifdef _NETWORK_DEBUG_
+    uint8_t ascii_addr[46];
+
+    ip_multicast_addr.to_string( &ascii_addr[0], 46 );
+
+    DBG_INFO( "IpAdapterBase::join_mcast_group:%d# Joinig multicast group for addr %s at if_index[%d]", __LINE__, &ascii_addr[0], if_index );
+#endif /* _NETWORK_DEBUG_ */
+
+    if( udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index ) != SocketError::OK )
+    {
+      udp_socket->LeaveMulticastGroup( ip_multicast_addr, if_index );
+
+      udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index );
+    }
+  }
+  else
+  {
+    DBG_ERROR( "IpAdapterBase::join_mcast_group:%d# udp_socket NULL", __LINE__ );
   }
 }
 
 void IpAdapterBase::DeleteMsg( IpAdapterQMsg *msg )
 {
+  DBG_INFO( "IpAdapterBase::DeleteMsg:%d# ENTER msg[%p]", __LINE__, msg );
+
   DoDeleteMsg( msg );
 
   if( msg->_data != nullptr )
@@ -363,25 +454,32 @@ void IpAdapterBase::DeleteMsg( IpAdapterQMsg *msg )
   sender_task_mutex_->Lock();
   ip_adapter_msg_q_list_.Free( msg );
   sender_task_mutex_->Unlock();
+
+  DBG_INFO( "IpAdapterBase::DeleteMsg:%d# EXIT", __LINE__ );
 }
 
 ErrCode IpAdapterBase::InitInternal()
 {
+  ErrCode ret_status = ErrCode::OK;
+
   DBG_INFO( "IpAdapterBase::InitInternal:%d# ENTER", __LINE__ );
-  ErrCode ret_status = CreateSockets();
+
+  ret_status = CreateSockets();
 
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::InitInternal:%d# CreateSockets() FAILED", __LINE__ );
   }
 
-  DBG_INFO( "IpAdapterBase::InitInternal:%d# EXIT", __LINE__ );
+  DBG_INFO( "IpAdapterBase::InitInternal:%d# EXIT status %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }
 
 ErrCode IpAdapterBase::TerminateInternal()
 {
+  DBG_INFO( "IpAdapterBase::TerminateInternal:%d# ENTER", __LINE__ );
+
   ipv4_unicast_socket_->CloseSocket();
   ipv4_unicast_secure_socket_->CloseSocket();
 
@@ -396,45 +494,53 @@ ErrCode IpAdapterBase::TerminateInternal()
 
   DoUnInitAddressChangeNotifyMechanism();
 
+  DBG_INFO( "IpAdapterBase::TerminateInternal:%d# EXIT", __LINE__ );
+
   return ( ErrCode::OK );
 }
 
 int32_t IpAdapterBase::SendUnicastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length )
 {
-  if( ( data == nullptr ) || ( data_length == 0 ) )
-  {
-    return ( -1 );
-  }
-
-  auto new_msg_to_send = CreateNewSendMsg( end_point, data, data_length );
-
-  if( new_msg_to_send == nullptr )
-  {
-    return ( -1 );
-  }
-
-  sender_task_->SendMsg( new_msg_to_send );
-
-  return ( data_length );
+  return ( post_data_to_send_task( end_point, data, data_length, false ) );
 }
 
 int32_t IpAdapterBase::SendMulticastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length )
 {
+  return ( post_data_to_send_task( end_point, data, data_length, true ) );
+}
+
+int32_t IpAdapterBase::post_data_to_send_task( Endpoint &end_point, const uint8_t *data, uint16_t data_length, bool is_mcast )
+{
+  int32_t        sent_bytes      = -1;
+  IpAdapterQMsg *new_msg_to_send = nullptr;
+
+  DBG_INFO( "IpAdapterBase::SendUnicastData:%d# ENTER port[%d], data[%p], data_length[%d], mcast[%d]", __LINE__, end_point.getPort(), data, data_length, is_mcast );
+
   if( ( data == nullptr ) || ( data_length == 0 ) )
   {
-    return ( -1 );
+    DBG_ERROR( "IpAdapterBase::SendUnicastData:%d# invalid data or data length 0", __LINE__ );
+    sent_bytes = -1; goto exit_label_;
   }
 
-  auto new_msg_to_send = CreateNewSendMsg( end_point, data, data_length, true );
+  new_msg_to_send = CreateNewSendMsg( end_point, data, data_length, is_mcast );
 
   if( new_msg_to_send == nullptr )
   {
-    return ( -1 );
+    DBG_ERROR( "IpAdapterBase::SendUnicastData:%d# FAILED to create new message", __LINE__ );
+    sent_bytes = -1; goto exit_label_;
   }
 
-  sender_task_->SendMsg( new_msg_to_send );
+  if( sender_task_->SendMsg( new_msg_to_send ) != OsalError::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::SendUnicastData:%d# FAILED to send msg", __LINE__ );
+    sent_bytes = -1; goto exit_label_;
+  }
 
-  return ( data_length );
+exit_label_:
+
+  DBG_INFO( "IpAdapterBase::SendUnicastData:%d# EXIT bytes_send %d", __LINE__, sent_bytes );
+
+  return ( sent_bytes );
 }
 
 ErrCode IpAdapterBase::StartServer()
@@ -447,51 +553,79 @@ ErrCode IpAdapterBase::StartServer()
 
   DBG_INFO( "IpAdapterBase::StartServer:%d# ENTER", __LINE__ );
 
-  ErrCode ret_status = DoPreStartServer();
+  ErrCode          ret_status        = ErrCode::OK;
+  IpAdapterConfig *ip_adapter_config = nullptr;
+
+  ret_status = DoPreStartServer();
 
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StartServer:%d# DoPreStartServer() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
-  auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
+  ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
 
   if( ip_adapter_config->is_ipv6_enabled() )
   {
-//    OpenIPV6Sockets();
+    ret_status = OpenIPV6Sockets( true, true, true );
+
+    if( ret_status != ErrCode::OK )
+    {
+      DBG_ERROR( "IpAdapterBase::StartServer:%d# OpenIPV6Sockets() FAILED", __LINE__ );
+      goto exit_label_;
+    }
   }
 
   if( ip_adapter_config->is_ipv4_enabled() )
   {
-//    OpenIPV4Sockets();
+    ret_status = OpenIPV4Sockets( true, true, true );
+
+    if( ret_status != ErrCode::OK )
+    {
+      DBG_ERROR( "IpAdapterBase::StartServer:%d# OpenIPV4Sockets() FAILED", __LINE__ );
+      goto exit_label_;
+    }
   }
 
+  DBG_INFO( "IpAdapterBase::StartServer:%d# calling InitFastShutdownMechanism()", __LINE__ );
   InitFastShutdownMechanism();
 
+  DBG_INFO( "IpAdapterBase::StartServer:%d# calling InitAddressChangeNotifyMechanism()", __LINE__ );
   InitAddressChangeNotifyMechanism();
 
   ret_status = DoPostStartServer();
 
   if( ret_status != ErrCode::OK )
   {
-    return ( ret_status );
+    DBG_ERROR( "IpAdapterBase::StartServer:%d# DoPostStartServer() FAILED", __LINE__ );
+    goto exit_label_;
   }
 
   ret_status = StartListening();
 
   if( ret_status != ErrCode::OK )
   {
-    return ( ret_status );
+    DBG_ERROR( "IpAdapterBase::StartServer:%d# StartListening() FAILED", __LINE__ );
+    goto exit_label_;
   }
 
   is_terminated_ = false;
 
-  IpAdapterBase::CreateAndStartReceiveTask();
+  ret_status = IpAdapterBase::CreateAndStartReceiveTask();
+
+  if( ret_status != ErrCode::OK )
+  {
+    DBG_ERROR( "IpAdapterBase::StartServer:%d# CreateAndStartReceiveTask() FAILED", __LINE__ );
+    goto exit_label_;
+  }
 
   is_started_ = true;
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::StartServer:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::StopServer()
@@ -500,12 +634,14 @@ ErrCode IpAdapterBase::StopServer()
   is_terminated_ = true;
   is_started_    = false;
 
-  ErrCode ret_status = DoPreStopServer();
+  ErrCode ret_status = ErrCode::OK;
+
+  ret_status = DoPreStopServer();
 
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StopServer:%d# DoPreStopServer() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   ret_status = DoPostStopServer();
@@ -513,10 +649,12 @@ ErrCode IpAdapterBase::StopServer()
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::StopServer:%d# DoPostStopServer() FAILED", __LINE__ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
-  DBG_INFO( "IpAdapterBase::StopServer:%d# EXIT", __LINE__ );
+exit_label_:
+
+  DBG_INFO( "IpAdapterBase::StopServer:%d# EXIT status %d", __LINE__, (int) ret_status );
   return ( ret_status );
 }
 
@@ -528,23 +666,22 @@ ErrCode IpAdapterBase::StartListening()
     return ( ErrCode::OK );
   }
 
-  DBG_INFO( "IpAdapterBase::StartListening:%d# ENTER", __LINE__ );
+  ErrCode            ret_status        = ErrCode::OK;
+  IInterfaceMonitor *interface_monitor = INetworkPlatformFactory::GetCurrFactory()->GetInterfaceMonitor();
+  IpAdapterConfig *  ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
+  ja_iot::base::StaticPtrArray<InterfaceAddress *, 10> if_addr_array{};
 
-  auto interface_monitor = INetworkPlatformFactory::GetCurrFactory()->GetInterfaceMonitor();
+  DBG_INFO( "IpAdapterBase::StartListening:%d# ENTER", __LINE__ );
 
   if( interface_monitor == nullptr )
   {
     DBG_ERROR( "IpAdapterBase::StartListening:%d# interface_monitor NULL", __LINE__ );
-    return ( ErrCode::OK );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
-
-  ja_iot::base::StaticPtrArray<InterfaceAddress *, 10> if_addr_array{};
 
   interface_monitor->GetInterfaceAddrList( if_addr_array );
 
   DBG_INFO( "IpAdapterBase::StartListening:%d# No of interfaces %d", __LINE__, if_addr_array.Count() );
-
-  auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
 
   for( int i = 0; i < if_addr_array.Count(); i++ )
   {
@@ -555,36 +692,38 @@ ErrCode IpAdapterBase::StartListening()
       if( ( if_addr->getFamily() == IpAddrFamily::IPV4 ) && ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_ENABLED ) )
       {
         DBG_INFO( "IpAdapterBase::StartListening:%d# Starting ipv4 mcast at interface [%d]", __LINE__, if_addr->getIndex() );
-        StartIpv4MulticastAtInterface( if_addr->getIndex() );
+        start_ipv4_mcast_at_interface( if_addr->getIndex() );
       }
 
       if( ( if_addr->getFamily() == IpAddrFamily::IPv6 ) && ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_ENABLED ) )
       {
         DBG_INFO( "IpAdapterBase::StartListening:%d# Starting ipv6 mcast at interface [%d]", __LINE__, if_addr->getIndex() );
-        StartIpv6MulticastAtInterface( if_addr->getIndex() );
+        start_ipv6_mcast_at_interface( if_addr->getIndex() );
       }
 
       delete if_addr;
     }
   }
 
-  DBG_INFO( "IpAdapterBase::StartListening:%d# EXIT", __LINE__ );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::StartListening:%d# EXIT status %d", __LINE__, (int) ret_status );
 
-  return ( ErrCode::OK );
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::StopListening()
 {
+  ErrCode ret_status = ErrCode::OK;
+
   DBG_INFO( "IpAdapterBase::StopListening:%d# ENTER", __LINE__ );
-  auto interface_monitor = INetworkPlatformFactory::GetCurrFactory()->GetInterfaceMonitor();
+  auto    interface_monitor = INetworkPlatformFactory::GetCurrFactory()->GetInterfaceMonitor();
+  ja_iot::base::StaticPtrArray<InterfaceAddress *, 10> if_addr_array{};
 
   if( interface_monitor == nullptr )
   {
     DBG_ERROR( "IpAdapterBase::StopListening:%d# interface_monitor NULL", __LINE__ );
-    return ( ErrCode::OK );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
-
-  ja_iot::base::StaticPtrArray<InterfaceAddress *, 10> if_addr_array{};
 
   interface_monitor->GetInterfaceAddrList( if_addr_array );
 
@@ -614,9 +753,10 @@ ErrCode IpAdapterBase::StopListening()
     }
   }
 
-  DBG_INFO( "IpAdapterBase::StopListening:%d# EXIT", __LINE__ );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::StopListening:%d# EXIT status %d", __LINE__, (int) ret_status );
 
-  return ( ErrCode::OK );
+  return ( ret_status );
 }
 
 void IpAdapterBase::InitFastShutdownMechanism()
@@ -631,6 +771,8 @@ void IpAdapterBase::InitAddressChangeNotifyMechanism()
 
 ErrCode IpAdapterBase::CreateSockets()
 {
+  ErrCode ret_status = ErrCode::OK;
+
   DBG_INFO( "IpAdapterBase::CreateSockets:%d# ENTER", __LINE__ );
 
   auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
@@ -638,143 +780,166 @@ ErrCode IpAdapterBase::CreateSockets()
   /* create IPV4 sockets only if it enabled*/
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV4 ucast socket", __LINE__ );
     ipv4_unicast_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv4_unicast_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv4_unicast_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_SECURE_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV4 ucast secure socket", __LINE__ );
     ipv4_unicast_secure_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv4_unicast_secure_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv4_unicast_secure_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV4 mcast socket", __LINE__ );
     ipv4_multicast_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv4_multicast_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv4_multicast_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_SECURE_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV4 mcast secure socket", __LINE__ );
     ipv4_multicast_secure_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv4_multicast_secure_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv4_multicast_secure_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   /* create IPV6 sockets only if it enabled*/
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV6 ucast socket", __LINE__ );
     ipv6_unicast_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv6_unicast_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv6_unicast_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_SECURE_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV6 ucast secure socket", __LINE__ );
     ipv6_unicast_secure_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv6_unicast_secure_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv6_unicast_secure_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV6 mcast socket", __LINE__ );
     ipv6_multicast_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv6_multicast_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv6_multicast_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
   if( ip_adapter_config->is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_SECURE_ENABLED ) )
   {
+    DBG_INFO( "IpAdapterBase::CreateSockets:%d# Alloc IPV6 mcast secure socket", __LINE__ );
     ipv6_multicast_secure_socket_ = INetworkPlatformFactory::GetCurrFactory()->AllocSocket();
 
     if( ipv6_multicast_secure_socket_ == nullptr )
     {
       DBG_ERROR( "IpAdapterBase::CreateSockets:%d# Failed to alloc socket for ipv6_multicast_secure_socket_", __LINE__ );
-      return ( ErrCode::ERR );
+      ret_status = ErrCode::ERR; goto exit_label_;
     }
   }
 
-  DBG_INFO( "IpAdapterBase::CreateSockets:%d# EXIT", __LINE__ );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::CreateSockets:%d# EXIT status %d", __LINE__, (int) ret_status );
 
-  return ( ErrCode::OK );
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::OpenSocket( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port )
 {
+  ErrCode ret_status = ErrCode::OK;
   IpAddress ip_addr{ ip_addr_family };
 
-  DBG_INFO( "IpAdapterBase::OpenSocket:%d# ENTER", __LINE__ );
+  DBG_INFO( "IpAdapterBase::OpenSocket:%d# ENTER family[%d], is_mcast[%d], udp_socket[%p] port[%d]", __LINE__, (int) ip_addr_family, is_multicast, udp_socket, port );
+
+  if( udp_socket == nullptr )
+  {
+    DBG_ERROR( "IpAdapterBase::OpenSocket:%d# Passed socket NULL", __LINE__ );
+    ret_status = ErrCode::INVALID_PARAMS; goto exit_label_;
+  }
+
+  DBG_INFO( "IpAdapterBase::OpenSocket:%d# opening socket", __LINE__ );
 
   if( udp_socket->OpenSocket( ip_addr_family ) != SocketError::OK )
   {
-    DBG_ERROR( "IpAdapterBase::OpenSocket:%d# Failed to open open with family[%d]", __LINE__, (int) ip_addr_family );
-    return ( ErrCode::ERR );
+    DBG_ERROR( "IpAdapterBase::OpenSocket:%d# Failed to open with family[%d]", __LINE__, (int) ip_addr_family );
+    ret_status = ErrCode::INVALID_PARAMS; goto exit_label_;
   }
 
-  if( udp_socket->EnablePacketInfo(true) != SocketError::OK )
+  DBG_INFO( "IpAdapterBase::OpenSocket:%d# enable_packet_info", __LINE__ );
+
+  if( udp_socket->EnablePacketInfo( true ) != SocketError::OK )
   {
     DBG_ERROR( "IpAdapterBase::OpenSocket:%d# EnablePacketInfo() FAILED", __LINE__ );
   }
 
   if( ip_addr_family == IpAddrFamily::IPv6 )
   {
-    udp_socket->EnableIpv6Only(true);
-    DBG_INFO( "IpAdapterBase::OpenSocket:%d# Calling EnableIpv6Only()", __LINE__ );
+    udp_socket->EnableIpv6Only( true );
+    DBG_INFO( "IpAdapterBase::OpenSocket:%d# enable_ipv6_only()", __LINE__ );
   }
 
   if( is_multicast && ( port != 0 ) )
   {
-    udp_socket->EnableReuseAddr(true);
-    DBG_INFO( "IpAdapterBase::OpenSocket:%d# Calling EnableReuseAddr()", __LINE__ );
+    udp_socket->EnableReuseAddr( true );
+    DBG_INFO( "IpAdapterBase::OpenSocket:%d# enable_reuse_addr()", __LINE__ );
   }
+
+  DBG_INFO( "IpAdapterBase::OpenSocket:%d# binding socket", __LINE__ );
 
   if( udp_socket->BindSocket( ip_addr, port ) != SocketError::OK )
   {
     DBG_ERROR( "IpAdapterBase::OpenSocket:%d# BindSocket FAILED with port[%d]", __LINE__, port );
     udp_socket->CloseSocket();
-
-    return ( ErrCode::ERR );
+    ret_status = ErrCode::INVALID_PARAMS; goto exit_label_;
   }
 
-  DBG_INFO( "IpAdapterBase::OpenSocket:%d# EXIT", __LINE__ );
+exit_label_:
 
-  return ( ErrCode::OK );
+  DBG_INFO( "IpAdapterBase::OpenSocket:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::OpenSocket2( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port )
 {
-  DBG_INFO( "IpAdapterBase::OpenSocket2:%d# ENTER", __LINE__ );
+  DBG_INFO( "IpAdapterBase::OpenSocket2:%d# ENTER family[%d], is_mcast[%d], udp_socket[%p] port[%d]", __LINE__, (int) ip_addr_family, is_multicast, udp_socket, port );
   ErrCode ret_status = OpenSocket( ip_addr_family, is_multicast, udp_socket, port );
 
   if( ret_status != ErrCode::OK )
@@ -786,7 +951,7 @@ ErrCode IpAdapterBase::OpenSocket2( IpAddrFamily ip_addr_family, bool is_multica
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenSocket2:%d# Failed to open socket after retrying with port[%d], family[%d], mcast[%d]", __LINE__, port, (int) ip_addr_family, is_multicast );
-      return ( ret_status );
+      goto exit_label_;
     }
   }
 
@@ -796,7 +961,9 @@ ErrCode IpAdapterBase::OpenSocket2( IpAddrFamily ip_addr_family, bool is_multica
     DBG_ERROR( "IpAdapterBase::OpenSocket2:%d# Opened socket with port[%d], family[%d], mcast[%d]", __LINE__, port, (int) ip_addr_family, is_multicast );
   }
 
-  DBG_INFO( "IpAdapterBase::OpenSocket2:%d# EXIT", __LINE__ );
+exit_label_:
+
+  DBG_INFO( "IpAdapterBase::OpenSocket2:%d# EXIT status %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }
@@ -807,14 +974,14 @@ ErrCode IpAdapterBase::OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bo
   auto     ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
   uint16_t port              = ip_adapter_config->getIpv6UnicastPort();
 
-  DBG_INFO( "IpAdapterBase::OpenIPV6Sockets:%d# ENTER", __LINE__ );
+  DBG_INFO( "IpAdapterBase::OpenIPV6Sockets:%d# ENTER ucast_secure_enabled[%d], mcast_enabled[%d], mcast_secure_enabled[%d]", __LINE__, open_ucast_sec, open_mcast, open_mcast_sec );
 
   ret_status = OpenSocket2( IpAddrFamily::IPv6, false, ipv6_unicast_socket_, port );
 
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::OpenIPV6Sockets:%d# Failed to open socket IPV6 unicast socket[%p], port[%d]", __LINE__, ipv6_unicast_socket_, ipv6_unicast_port_ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   /* update the system generated port number in config */
@@ -828,7 +995,7 @@ ErrCode IpAdapterBase::OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV6Sockets:%d# Failed to open socket IPV6 unicast socket[%p], port[%d]", __LINE__, ipv6_unicast_secure_socket_, ipv6_unicast_secure_port_ );
-      return ( ret_status );
+      goto exit_label_;
     }
 
     /* update the system generated port number in config */
@@ -842,7 +1009,7 @@ ErrCode IpAdapterBase::OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV6Sockets:%d# Failed to open socket IPV6 multicast socket[%p], port[%d]", __LINE__, ipv6_multicast_secure_socket_, COAP_SECURE_PORT );
-      return ( ret_status );
+      goto exit_label_;
     }
   }
 
@@ -853,20 +1020,21 @@ ErrCode IpAdapterBase::OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV6Sockets:%d# Failed to open socket IPV6 multicast socket[%p], port[%d]", __LINE__, ipv6_multicast_socket_, COAP_PORT );
-      return ( ret_status );
+      goto exit_label_;
     }
   }
 
-  DBG_INFO( "IpAdapterBase::OpenIPV6Sockets:%d# EXIT", __LINE__ );
+exit_label_:
+  DBG_INFO( "IpAdapterBase::OpenIPV6Sockets:%d# EXIT status %d", __LINE__, (int) ret_status );
 
-  return ( ErrCode::OK );
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec )
 {
   ErrCode ret_status = ErrCode::OK;
 
-  DBG_INFO( "IpAdapterBase::OpenIPV4Sockets:%d# ENTER", __LINE__ );
+  DBG_INFO( "IpAdapterBase::OpenIPV4Sockets:%d# ENTER ucast_secure_enabled[%d], mcast_enabled[%d], mcast_secure_enabled[%d]", __LINE__, open_ucast_sec, open_mcast, open_mcast_sec );
 
   auto     ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
   uint16_t port              = ip_adapter_config->getIpv4UnicastPort();
@@ -876,7 +1044,7 @@ ErrCode IpAdapterBase::OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bo
   if( ret_status != ErrCode::OK )
   {
     DBG_ERROR( "IpAdapterBase::OpenIPV4Sockets:%d# Failed to open socket IPV4 unicast socket[%p], port[%d]", __LINE__, ipv4_unicast_socket_, ipv4_unicast_port_ );
-    return ( ret_status );
+    goto exit_label_;
   }
 
   /* update the system generated port number in config */
@@ -890,7 +1058,7 @@ ErrCode IpAdapterBase::OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV4Sockets:%d# Failed to open socket IPV4 unicast secure socket[%p], port[%d]", __LINE__, ipv4_unicast_secure_socket_, ipv4_unicast_secure_port_ );
-      return ( ret_status );
+      goto exit_label_;
     }
 
     /* update the system generated port number in config */
@@ -904,7 +1072,7 @@ ErrCode IpAdapterBase::OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV4Sockets:%d# Failed to open socket IPV4 multicast socket[%p], port[%d]", __LINE__, ipv4_multicast_socket_, COAP_PORT );
-      return ( ret_status );
+      goto exit_label_;
     }
   }
 
@@ -915,20 +1083,22 @@ ErrCode IpAdapterBase::OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bo
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::OpenIPV4Sockets:%d# Failed to open socket IPV4 multicast secure socket[%p], port[%d]", __LINE__, ipv4_multicast_secure_socket_, COAP_SECURE_PORT );
-      return ( ret_status );
+      goto exit_label_;
     }
   }
 
-  DBG_INFO( "IpAdapterBase::OpenIPV4Sockets:%d# EXIT", __LINE__ );
+exit_label_:
 
-  return ( ErrCode::OK );
+  DBG_INFO( "IpAdapterBase::OpenIPV4Sockets:%d# EXIT status %d", __LINE__, (int) ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode IpAdapterBase::HandleInterfaceEvent( InterfaceEvent *interface_event )
 {
   ErrCode ret_status = ErrCode::OK;
 
-  DBG_INFO( "IpAdapterBase::HandleInterfaceEvent:%d# ENTER", __LINE__ );
+  DBG_INFO( "IpAdapterBase::HandleInterfaceEvent:%d# ENTER interface_event[%p]", __LINE__, interface_event );
 
   if( interface_event != nullptr )
   {
@@ -937,6 +1107,7 @@ ErrCode IpAdapterBase::HandleInterfaceEvent( InterfaceEvent *interface_event )
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "IpAdapterBase::HandleInterfaceEvent:%d# DoHandleInterfaceEvent FAILED", __LINE__ );
+      goto exit_label_;
     }
   }
   else
@@ -944,7 +1115,9 @@ ErrCode IpAdapterBase::HandleInterfaceEvent( InterfaceEvent *interface_event )
     DBG_WARN( "IpAdapterBase::HandleInterfaceEvent:%d# called with interface_event NULL", __LINE__ );
   }
 
-  DBG_INFO( "IpAdapterBase::HandleInterfaceEvent:%d# EXIT", __LINE__ );
+exit_label_:
+
+  DBG_INFO( "IpAdapterBase::HandleInterfaceEvent:%d# EXIT status %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }

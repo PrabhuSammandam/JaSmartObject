@@ -28,7 +28,7 @@ class INetworkPlatformFactory
   public:
 
     virtual ~INetworkPlatformFactory () {}
-    static INetworkPlatformFactory* GetFactory( NetworkPlatform platform );
+    static INetworkPlatformFactory* CreateFactory( NetworkPlatform platform );
     static INetworkPlatformFactory* GetCurrFactory() { return ( curr_factory_ ); }
     static void                     SetCurrFactory( INetworkPlatformFactory *curr_factory ) { curr_factory_ = curr_factory; }
 

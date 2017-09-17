@@ -91,8 +91,8 @@ class IpAdapterBase : public IAdapter
 
   protected:
     ErrCode CreateAndStartReceiveTask();
-    void    StartIpv4MulticastAtInterface( uint32_t if_index );
-    void    StartIpv6MulticastAtInterface( uint32_t if_index );
+    void    start_ipv4_mcast_at_interface( uint32_t if_index );
+    void    start_ipv6_mcast_at_interface( uint32_t if_index );
 
   private:
 
@@ -109,8 +109,9 @@ class IpAdapterBase : public IAdapter
     ErrCode OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec );
     ErrCode OpenSocket( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port = 0 );
     ErrCode OpenSocket2( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port );
-    void    ApplyMulticastAtInterfaceByAddress( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index );
+    void    join_mcast_group( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index );
     ErrCode HandleInterfaceEvent( InterfaceEvent *interface_event );
+    int32_t post_data_to_send_task( Endpoint  &end_point, const uint8_t *data, uint16_t data_length, bool is_mcast );
 
     IUdpSocket *get_socket(IpAddrFamily ip_addr_family, bool is_multicast = false, bool is_secure = false);
 

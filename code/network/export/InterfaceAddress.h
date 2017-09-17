@@ -36,6 +36,7 @@ class InterfaceAddress
     uint32_t     getIndex() const { return ( index_ ); }
     void         setIndex( uint32_t index ) { index_ = index; }
     void         set_addr( const char *addr );
+    char*		 get_addr(){return &address_[0];}
 
     InterfaceAddress & operator = ( const InterfaceAddress &other );
     bool operator               == ( const InterfaceAddress &other );

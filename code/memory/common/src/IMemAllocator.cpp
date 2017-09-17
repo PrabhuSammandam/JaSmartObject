@@ -58,7 +58,7 @@ MemAllocatorFactory::~MemAllocatorFactory ()
 {
 }
 
-IMemAllocator * MemAllocatorFactory::get( MemAlloctorType mem_allocator_type )
+IMemAllocator * MemAllocatorFactory::create_mem_allocator( MemAlloctorType mem_allocator_type )
 {
 #ifdef _OS_WINDOWS_
 

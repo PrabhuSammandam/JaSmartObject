@@ -9,7 +9,7 @@
 #include "AdapterMgr.h"
 #include "PtrArray.h"
 #include "IAdapter.h"
-#include "AdapterProxyStore.h"
+//#include "AdapterProxyStore.h"
 #include <common/inc/logging_network.h>
 
 using namespace ja_iot::network;

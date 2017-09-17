@@ -6,8 +6,8 @@
  */
 
 #include <stdio.h>
-#include <AdapterProxyStore.h>
-#include "AdapterProxy.h"
+#include <common/inc/AdapterProxyStore.h>
+#include "common/inc/AdapterProxy.h"
 #include "PtrArray.h"
 
 namespace ja_iot

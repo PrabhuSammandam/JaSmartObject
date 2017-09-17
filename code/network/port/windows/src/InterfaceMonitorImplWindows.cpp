@@ -18,6 +18,7 @@
 #include "OsalMgr.h"
 #include "port/windows/inc/InterfaceMonitorImplWindows.h"
 #include "SimpleList.h"
+#include <common/inc/logging_network.h>
 
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
@@ -68,30 +69,56 @@ InterfaceMonitorImplWindows::InterfaceMonitorImplWindows ()
 
 ErrCode InterfaceMonitorImplWindows::StartMonitor( AdapterType adapter_type )
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "InterfaceMonitorImplWindows::StartMonitor:%d# ENTER adapter_type[%x]", __LINE__, (int) adapter_type );
+
   pimpl_->access_mutex_ = OsalMgr::Inst()->AllocMutex();
+
+  if( pimpl_->access_mutex_ == nullptr )
+  {
+    DBG_ERROR( "InterfaceMonitorImplWindows::StartMonitor:%d# AllocMutex FAILED", __LINE__ );
+    ret_status = ErrCode::ERR; goto exit_label_;
+  }
+
   pimpl_->curr_if_addr_ptr_list_.Clear();
 
   if( !pimpl_->register_for_addr_change() )
   {
+    DBG_ERROR( "InterfaceMonitorImplWindows::StartMonitor:%d# FAILED to register for addr change", __LINE__ );
     pimpl_->reset();
-
-    return ( ErrCode::ERR );
+    ret_status = ErrCode::ERR; goto exit_label_;
   }
 
-  return ( ErrCode::OK );
+exit_label_:
+  DBG_INFO( "InterfaceMonitorImplWindows::StartMonitor:%d# EXIT status %d", __LINE__, (int)ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode InterfaceMonitorImplWindows::StopMonitor( AdapterType adapter_type )
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "InterfaceMonitorImplWindows::StopMonitor:%d# ENTER AdapterType %x", __LINE__, (int) adapter_type );
+
   pimpl_->unregister_for_addr_change();
   pimpl_->reset();
 
-  return ( ErrCode::OK );
+  DBG_INFO( "InterfaceMonitorImplWindows::StopMonitor:%d# EXIT %d", __LINE__, (int)ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode InterfaceMonitorImplWindows::GetInterfaceAddrList( InterfaceAddressPtrArray &if_ptr_array, bool skip_if_down )
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# ENTER skip_if_down %d", __LINE__, skip_if_down );
+
   ScopedMutex lock( pimpl_->access_mutex_ );
+
+  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# Current no of if address %d", __LINE__, pimpl_->curr_if_addr_ptr_list_.Count() );
 
   if( pimpl_->curr_if_addr_ptr_list_.Count() > 0 )
   {
@@ -106,20 +133,29 @@ ErrCode InterfaceMonitorImplWindows::GetInterfaceAddrList( InterfaceAddressPtrAr
           continue;
         }
 
+        DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# Adding if_addr idx[%d], family[%d], flags[%x], addr[%s]", __LINE__, if_addr->getIndex(), (int)if_addr->getFamily(), (int)if_addr->getFlags(), if_addr->get_addr() );
         auto newIfAddr = new InterfaceAddress( *if_addr );
         if_ptr_array.Add( newIfAddr );
       }
     }
   }
 
-  return ( ErrCode::OK );
+  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# EXIT status %d", __LINE__, (int)ret_status );
+
+  return ( ret_status );
 }
 
 ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtrArray &newly_found_if_addr_ptr_list )
 {
+  ErrCode ret_status = ErrCode::OK;
+
+  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# ENTER", __LINE__ );
+
   pimpl_->access_mutex_->Lock();
 
   pimpl_->is_old_if_addr_lost_ = false;
+
+  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Newly found if_addr count[%d]", __LINE__, pimpl_->new_if_addr_ptr_list_.Count() );
 
   if( pimpl_->new_if_addr_ptr_list_.Count() > 0 )
   {
@@ -129,6 +165,8 @@ ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtr
 
       if( if_addr != nullptr )
       {
+        DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Adding if_addr idx[%d], family[%d], flags[%x]", __LINE__, if_addr->getIndex(), (int)if_addr->getFamily(), (int)if_addr->getFlags() );
+
         newly_found_if_addr_ptr_list.Add( new InterfaceAddress{ *if_addr } );
 
         /* free the interface address */
@@ -142,17 +180,25 @@ ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtr
   bool is_old_if_addr_lost{ pimpl_->is_old_if_addr_lost_ };
   bool is_new_if_addr_found{ pimpl_->new_if_addr_ptr_list_.Count() > 0 };
 
+  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# old if_addr lost [%d], new if_addr_found[%d]", __LINE__, is_old_if_addr_lost, is_new_if_addr_found );
+
   pimpl_->access_mutex_->Unlock();
 
   if( is_old_if_addr_lost )
   {
+    DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Notifying IF_DOWN", __LINE__ );
     pimpl_->notify_if_state_changed( InterfaceStatusFlag::DOWN );
   }
 
   if( is_new_if_addr_found )
   {
+    DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Notifying IF_UP", __LINE__ );
     pimpl_->notify_if_state_changed( InterfaceStatusFlag::UP );
   }
+
+  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# EXIT status %d", __LINE__, (int)ret_status );
+
+  return ( ret_status );
 
   return ( ErrCode::OK );
 }
@@ -161,6 +207,7 @@ void InterfaceMonitorImplWindows::AddInterfaceEventHandler( IInterfaceEventHandl
 {
   if( interface_event_handler != nullptr )
   {
+    DBG_INFO( "InterfaceMonitorImplWindows::AddInterfaceEventHandler:%d# Added if_handler %p", __LINE__, interface_event_handler );
     pimpl_->if_event_handler_ptr_array_.Add( interface_event_handler );
   }
 }
@@ -169,6 +216,7 @@ void InterfaceMonitorImplWindows::RemoveInterfaceEventHandler( IInterfaceEventHa
 {
   if( interface_event_handler != nullptr )
   {
+    DBG_INFO( "InterfaceMonitorImplWindows::RemoveInterfaceEventHandler:%d# Removed if_handler %p", __LINE__, interface_event_handler );
     pimpl_->if_event_handler_ptr_array_.Remove( interface_event_handler );
   }
 }
@@ -186,6 +234,7 @@ void InterfaceMonitorImplWindowsData::notify_if_state_changed( InterfaceStatusFl
 
       if( if_modified_handler != nullptr )
       {
+        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_state_changed:%d# Calling the HandleEvent for handler[%p]", __LINE__, if_modified_handler );
         if_modified_handler->HandleInterfaceEvent( &interface_event );
       }
     }
@@ -205,6 +254,7 @@ void InterfaceMonitorImplWindowsData::notify_if_modified()
 
       if( if_modified_handler != nullptr )
       {
+        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_modified:%d# Calling the HandleEvent for handler[%p]", __LINE__, if_modified_handler );
         if_modified_handler->HandleInterfaceEvent( &interface_event );
       }
     }
@@ -219,6 +269,8 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
   /*We don't need most of the default information, so optimize this call by not asking for them. */
   ULONG                 flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME;
 
+  DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# ENTER", __LINE__ );
+
   /*
    *   Call up to 3 times: once to get the size, once to get the data, and once more
    *   just in case there was an increase in length in between the first two. If the
@@ -227,6 +279,7 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
    */
   for( int i = 0; i < 3; i++ )
   {
+    DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# calling GetAdaptersAddresses [%d] times", __LINE__, i );
     ULONG ret = GetAdaptersAddresses( AF_UNSPEC, flags, NULL, p_adapter_adrr_start_ptr, &u32_adapter_addr_buf_len );
 
     if( ERROR_BUFFER_OVERFLOW == ret )
@@ -241,6 +294,7 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
 
       if( p_adapter_adrr_start_ptr == nullptr )
       {
+        DBG_ERROR( "InterfaceMonitorImplWindowsData::get_adapters:%d# FAILED to alloc memory", __LINE__ );
         break;
       }
 
@@ -252,6 +306,7 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
       break;
     }
 
+    DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# EXIT SUCCESS", __LINE__ );
     // Succeeded getting adapters
     return ( p_adapter_adrr_start_ptr );
   }
@@ -260,6 +315,8 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
   {
     delete p_adapter_adrr_start_ptr;
   }
+
+  DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# EXIT FAILED", __LINE__ );
 
   return ( NULL );
 }
@@ -301,21 +358,25 @@ bool InterfaceMonitorImplWindowsData::is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS 
 
 inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_t index, PtrArray<InterfaceAddress *> &if_addr_ptr_list )
 {
-  if( index < 0 )
-  {
-    return;
-  }
+  DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# ENTER idx[%d]", __LINE__, index );
 
   auto p_adapters_list = get_adapters();
 
+  if( index < 0 )
+  {
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# invalid idx", __LINE__ );
+    goto exit_label_;
+  }
+
   if( p_adapters_list == nullptr )
   {
-    return;
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# FAILED to get adapters list", __LINE__ );
+    goto exit_label_;
   }
 
   for( IP_ADAPTER_ADDRESSES *p_cur_adapter_addr = p_adapters_list; p_cur_adapter_addr != nullptr; p_cur_adapter_addr = p_cur_adapter_addr->Next )
   {
-    printf( "adapter address index %u, type %u OperStatus %d \n", (uint32_t) p_cur_adapter_addr->IfIndex, (uint32_t) p_cur_adapter_addr->IfType, p_cur_adapter_addr->OperStatus );
+    DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# adapter index[%d], if_type[%d], if_status[%d]", __LINE__, (uint32_t) p_cur_adapter_addr->IfIndex, (uint32_t) p_cur_adapter_addr->IfType, p_cur_adapter_addr->OperStatus );
 
     if( ( ( index > 0 ) && ( p_cur_adapter_addr->IfIndex != index ) ) || ( p_cur_adapter_addr->IfType & IF_TYPE_SOFTWARE_LOOPBACK ) || ( ( p_cur_adapter_addr->OperStatus & IfOperStatusUp ) == 0 ) )
     {
@@ -347,9 +408,11 @@ inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_
         }
       }
 
-      printf( "Found address %s\n", &temp_addr_buf[0] );
+      auto is_addr_valid = is_valid_addr( p_unicast_adapter_addr );
 
-      if( !is_valid_addr( p_unicast_adapter_addr ) )
+      DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# Found address %s, valid[%d]", __LINE__, &temp_addr_buf[0], is_addr_valid );
+
+      if( !is_addr_valid )
       {
         continue;
       }
@@ -366,15 +429,22 @@ inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_
   }
 
   delete p_adapters_list;
+exit_label_:
+  DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# EXIT", __LINE__ );
 }
 
 inline bool InterfaceMonitorImplWindowsData::register_for_addr_change()
 {
+  bool ret_status = true;
+
+  DBG_INFO( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# ENTER", __LINE__ );
+
   shutdown_event_ = CreateEvent( NULL, TRUE, FALSE, NULL );
 
   if( shutdown_event_ == 0 )
   {
-    return ( false );
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create shutdown event", __LINE__ );
+    ret_status = false; goto exit_label_;
   }
 
   monitor_thread_handle_ = CreateThread( nullptr, 0, InterfaceMonitorThread, this, 0, nullptr );
@@ -383,18 +453,24 @@ inline bool InterfaceMonitorImplWindowsData::register_for_addr_change()
   {
     CloseHandle( shutdown_event_ );
     shutdown_event_ = 0;
-    return ( false );
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create monitor thread", __LINE__ );
+    ret_status = false; goto exit_label_;
   }
 
   handle_interface_addr_change();
 
+exit_label_:
+  DBG_INFO( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# EXIT status %d", __LINE__, !ret_status );
   return ( true );
 }
 
 inline bool InterfaceMonitorImplWindowsData::unregister_for_addr_change()
 {
+  DBG_INFO( "InterfaceMonitorImplWindowsData::unregister_for_addr_change:%d# ENTER", __LINE__ );
+
   if( shutdown_event_ != nullptr )
   {
+    DBG_INFO( "InterfaceMonitorImplWindowsData::unregister_for_addr_change:%d# closing shutdown event", __LINE__ );
     SetEvent( shutdown_event_ );
     WaitForSingleObject( monitor_thread_handle_, INFINITE );
     CloseHandle( shutdown_event_ );
@@ -403,15 +479,20 @@ inline bool InterfaceMonitorImplWindowsData::unregister_for_addr_change()
 
   if( monitor_thread_handle_ != nullptr )
   {
+    DBG_INFO( "InterfaceMonitorImplWindowsData::unregister_for_addr_change:%d# stopping monitor thread", __LINE__ );
     CloseHandle( monitor_thread_handle_ );
     monitor_thread_handle_ = nullptr;
   }
+
+  DBG_INFO( "InterfaceMonitorImplWindowsData::unregister_for_addr_change:%d# EXIT", __LINE__ );
 
   return ( true );
 }
 
 inline void InterfaceMonitorImplWindowsData::reset()
 {
+  DBG_INFO( "InterfaceMonitorImplWindowsData::reset:%d# ENTER", __LINE__ );
+
   if( new_if_addr_ptr_list_.Count() > 0 )
   {
     for( int i = 0; i < new_if_addr_ptr_list_.Count(); i++ )
@@ -447,6 +528,8 @@ inline void InterfaceMonitorImplWindowsData::reset()
     OsalMgr::Inst()->FreeMutex( access_mutex_ );
     access_mutex_ = nullptr;
   }
+
+  DBG_INFO( "enclosing_method:%d# EXIT", __LINE__ );
 }
 
 inline void InterfaceMonitorImplWindowsData::run_if_monitor_thread()
@@ -545,6 +628,7 @@ static DWORD WINAPI InterfaceMonitorThread( PVOID context )
 
 inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
 {
+	DBG_INFO("InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# ENTER", __LINE__);
   InterfaceAddressPtrList temp_old_if_addr_list{};
   ScopedMutex lock( access_mutex_ );
 
@@ -683,6 +767,7 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
       if_addr_store_.Free( oldAddr );
     }
   }
+  DBG_INFO("InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# EXIT", __LINE__);
 }
 }
 }

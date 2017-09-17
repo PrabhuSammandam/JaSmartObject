@@ -26,7 +26,7 @@ Esp8266PlatformFactory gs_esp8266_platform_factory{};
 
 INetworkPlatformFactory *INetworkPlatformFactory::curr_factory_{ nullptr };
 
-INetworkPlatformFactory * INetworkPlatformFactory::GetFactory( NetworkPlatform platform )
+INetworkPlatformFactory * INetworkPlatformFactory::CreateFactory( NetworkPlatform platform )
 {
 #ifdef _OS_WINDOWS_
 

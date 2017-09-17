@@ -52,7 +52,7 @@ IpAddress::IpAddress( uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4
   address_family_ = IpAddrFamily::IPV4;
 }
 
-IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : scope_id_{ scope }
+IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : address_family_{IpAddrFamily::IPv6},  scope_id_{ scope }
 {
   set_addr_by_scope( scope, address );
 }
@@ -656,6 +656,10 @@ void IpAddress::to_string( uint8_t *buf, uint8_t buf_len )
   }
   else
   {
+    sprintf( (char *) buf, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", address_[0], address_[1], address_[2], address_[3],
+      address_[4], address_[5], address_[6], address_[7],
+      address_[8], address_[9], address_[10], address_[11],
+      address_[12], address_[13], address_[14], address_[15] );
   }
 }
 }
