@@ -32,8 +32,8 @@
 								<option id="gnu.cpp.compiler.lib.debug.option.debugging.level.1157380500" name="Debug Level" superClass="gnu.cpp.compiler.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.916573756" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.2144324364" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.343058590" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -41,8 +41,8 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.lib.debug.option.optimization.level.2095811972" name="Optimization Level" superClass="gnu.c.compiler.lib.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.lib.debug.option.debugging.level.155091950" name="Debug Level" superClass="gnu.c.compiler.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.973285344" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1255979367" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -50,8 +50,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.194480799" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1176402274" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug">
 								<option id="gnu.both.asm.option.include.paths.1789394609" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.19859861" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -92,6 +92,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1618595333" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -102,6 +103,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.686791081" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -112,6 +114,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1615513505" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>

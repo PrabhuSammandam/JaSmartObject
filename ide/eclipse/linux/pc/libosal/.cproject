@@ -35,10 +35,10 @@
 								<option id="gnu.cpp.compiler.lib.debug.option.debugging.level.26765331" name="Debug Level" superClass="gnu.cpp.compiler.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.1740253768" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1666882417" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libosal/osal/export}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.2057519888" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
@@ -49,10 +49,10 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.lib.debug.option.optimization.level.1808894479" name="Optimization Level" superClass="gnu.c.compiler.lib.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.lib.debug.option.debugging.level.1795047168" name="Debug Level" superClass="gnu.c.compiler.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.195444938" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libosal/osal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libosal/osal/export}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.765108793" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
@@ -69,22 +69,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.316313631" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-						</toolChain>
-					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.lib.debug.151439129.731372391" name="/" resourcePath="osal/port/windows">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.lib.debug.303563572" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.lib.debug" unusedChildren="">
-							<tool id="cdt.managedbuild.tool.gnu.archiver.lib.debug.138454374" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.lib.debug.1499138899"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.146904307" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.1400518217">
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1539069340" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.447540419" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.lib.debug.1562225250">
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.742531322" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1249731160" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.366840145"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2002600225" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.2079896331"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1874751621" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug.957497902">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1322295499" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
