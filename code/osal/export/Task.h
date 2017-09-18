@@ -56,6 +56,26 @@ class Task
 
     virtual OsalError SendMsg( void *msgMem ) = 0;
 };
+
+#define DECLARE_TASK_MSG_HANDLER_CLASS( HNDLR_CLASS, HOST, HNDL_FUNC, DELETE_FUNC ) class HNDLR_CLASS : public ja_iot::osal::ITaskMsgHandler \
+{ \
+    public: \
+      HNDLR_CLASS( HOST * host ) : host_{ host } {} \
+      void HandleMsg( void *msg ) override{ host_->HNDL_FUNC( msg ); } \
+      void DeleteMsg( void *msg ) override{ host_->DELETE_FUNC( msg ); } \
+    private: \
+      HOST * host_; \
+}; \
+
+#define DECLARE_TASK_ROUTINE_CLASS( ROUTINE_CLASS, HOST, RUN_FUNC ) class ROUTINE_CLASS : public ja_iot::osal::ITaskRoutine \
+{ \
+    public: \
+      ROUTINE_CLASS( HOST * host ) : host_{ host } {} \
+      void Run( void *arg ) override{ host_->RUN_FUNC( arg ); } \
+    private: \
+      HOST * host_; \
+}; \
+
 }
 }
 

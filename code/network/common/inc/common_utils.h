@@ -8,7 +8,7 @@
 #ifndef COMMON_UTILS_H_
 #define COMMON_UTILS_H_
 
-#include <TransportType.h>
+#include <data_types.h>
 
 namespace ja_iot {
 namespace network {

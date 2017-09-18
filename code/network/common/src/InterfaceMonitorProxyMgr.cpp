@@ -5,7 +5,7 @@
  *      Author: psammand
  */
 
-#include <IInterfaceMonitor.h>
+#include <i_interface_monitor.h>
 
 namespace ja_iot {
 namespace network {

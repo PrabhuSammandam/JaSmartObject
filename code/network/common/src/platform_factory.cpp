@@ -4,10 +4,10 @@
  *  Created on: Jul 11, 2017
  *      Author: psammand
  */
-#include <INetworkPlatformFactory.h>
+#include <i_nwk_platform_factory.h>
 
 #ifdef _OS_WINDOWS_
-#include "port/windows/inc/WindowsPlatformFactory.h"
+#include <port/windows/inc/platform_factory_win.h>
 #endif
 
 #ifdef _OS_FREERTOS_

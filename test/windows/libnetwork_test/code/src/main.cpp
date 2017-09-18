@@ -4,8 +4,8 @@
  *  Created on: Sep 15, 2017
  *      Author: psammand
  */
-#include <AdapterMgr.h>
-#include <INetworkPlatformFactory.h>
+#include <adapter_mgr.h>
+#include <i_nwk_platform_factory.h>
 #include <OsalMgr.h>
 #include <IMemAllocator.h>
 
