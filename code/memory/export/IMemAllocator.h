@@ -35,6 +35,19 @@ class IMemAllocator
     void  free( const char *file_name, const uint32_t line_no, void *p_memory );
 };
 
+class MemStamp
+{
+  public:
+    char const *const   _fileName;
+    int const           _lineNum;
+
+  public:
+
+    MemStamp( char const *filename, int lineNo ) : _fileName( filename ), _lineNum( lineNo ) {}
+
+    ~MemStamp () {}
+};
+
 class MemAllocatorFactory
 {
   public:
@@ -51,6 +64,43 @@ class MemAllocatorFactory
   private:
     static IMemAllocator * cur_mem_allocator_factory_;
 };
+
+
+template<class T> inline T * operator + ( const MemStamp &memStamp, T *p )
+{
+#ifdef JAIOT_ENABLE_MEM_DEBUG
+  printf( "P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum );
+#endif
+  return ( p );
+}
+
+template<class T> inline void operator - ( const MemStamp &memStamp, T *p )
+{
+  delete p;
+#ifdef JAIOT_ENABLE_MEM_DEBUG
+  printf( "P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum );
+#endif
+}
+
+#ifdef JAIOT_ENABLE_MEM_DEBUG
+#define mnew ja_iot::memory::MemStamp( _jaiot_file_name, __LINE__ ) + new
+#define mdelete ja_iot::memory::MemStamp( _jaiot_file_name, __LINE__ ) -
+
+#define mnew_g( __size__ ) do { return ( ja_iot::memory::MemAllocatorFactory::get().alloc( _jaiot_file_name, __LINE__, __size__ ) ); \
+} while( 0 );
+
+#define mdelete_g( __mem_ptr__ ) do { return ( ja_iot::memory::MemAllocatorFactory::get().free( _jaiot_file_name, __LINE__, __mem_ptr__ ) ); \
+} while( 0 );
+
+#else
+#define mnew new
+#define mdelete delete
+
+#define mnew_g( __size__ )  ja_iot::memory::MemAllocatorFactory::get().alloc( __size__ )
+
+#define mdelete_g( __mem_ptr__ )  ja_iot::memory::MemAllocatorFactory::get().free( __mem_ptr__ )
+
+#endif /* JAIOT_ENABLE_MEM_DEBUG */
 
 #ifdef JAIOT_ENABLE_MEM_DEBUG
 #define jaiot_mem_alloc( __size__ ) do { return ( ja_iot::memory::MemAllocatorFactory::get().alloc( _jaiot_file_name, __LINE__, __size__ ) ); \

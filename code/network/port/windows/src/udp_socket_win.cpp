@@ -16,6 +16,9 @@
 
 namespace ja_iot {
 namespace network {
+
+using namespace ja_iot::base;
+
 UdpSocketImplWindows::UdpSocketImplWindows ()
 {
   WSADATA wsa_data{};

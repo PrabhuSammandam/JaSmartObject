@@ -19,6 +19,9 @@
 							<builder buildPath="${workspace_loc:/win_pc_libnetwork_test}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.1777125363" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="4" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug.1687731690" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug">
 								<option id="gnu.both.asm.option.include.paths.314548441" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork_test/code/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -35,6 +38,9 @@
 								<option id="gnu.cpp.compiler.option.dialect.flags.1720203839" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++1y" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.other.other.870807637" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Wno-attributes" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1744918119" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork_test/code/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -54,6 +60,9 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.exe.debug.option.optimization.level.1621224942" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.mingw.exe.debug.option.debugging.level.1234640189" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1142868283" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork_test/code/inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -71,10 +80,10 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.735813373" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1833204495" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug">
 								<option id="gnu.cpp.link.option.libs.814199152" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="base"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="memory"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="osal"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="network"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="memory"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="base"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="Ws2_32"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="Iphlpapi"/>
 								</option>
@@ -99,6 +108,27 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libnetwork"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libnetwork/Debug"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="network" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="win_pc_libbase;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libbase"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libbase/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="base" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="win_pc_libmemory;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libmemory"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libmemory/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="memory" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="win_pc_libosal;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libosal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libosal/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="osal" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>

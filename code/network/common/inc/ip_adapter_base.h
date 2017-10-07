@@ -16,6 +16,7 @@
 #include "Task.h"
 #include "SimpleList.h"
 #include "PtrMsgQ.h"
+#include <base_consts.h>
 #include "Mutex.h"
 
 constexpr uint16_t IP_ADAPTER_MSG_Q_CAPACITY = 10;
@@ -57,7 +58,7 @@ class IpAdapterBase : public IAdapter
     int32_t SendUnicastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) override;
     int32_t SendMulticastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) override;
 
-    AdapterType GetType() override { return ( AdapterType::IP ); }
+    uint16_t GetType() override { return ( ja_iot::base::kAdapterType_ip ); }
 
     void SetAdapterHandler( IAdapterEventHandler *adapterHandler ) { _adapterHandler = adapterHandler; }
 
@@ -96,8 +97,8 @@ class IpAdapterBase : public IAdapter
 
   private:
 
-    ErrCode InitInternal();
     ErrCode TerminateInternal();
+    ErrCode init_internal();
     ErrCode StartInterfaceMonitor();
     ErrCode StopInterfaceMonitor();
     void    InitFastShutdownMechanism();
@@ -105,8 +106,8 @@ class IpAdapterBase : public IAdapter
     ErrCode CreateAndStartSendingThread();
     void    ReceiveDataRoutine( void *arg ) { DoHandleReceive(); }
     ErrCode CreateSockets();
-    ErrCode OpenIPV6Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec );
-    ErrCode OpenIPV4Sockets( bool open_ucast_sec, bool open_mcast, bool open_mcast_sec );
+    ErrCode OpenIPV6Sockets( );
+    ErrCode OpenIPV4Sockets( );
     ErrCode OpenSocket( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port = 0 );
     ErrCode OpenSocket2( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port );
     void    join_mcast_group( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, uint32_t if_index );

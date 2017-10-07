@@ -12,11 +12,11 @@
 #include <common_defs.h>
 
 namespace ja_iot {
-namespace network {
+namespace base {
 enum class IpAddrFamily
 {
-  IPV4,
-  IPv6
+  IPV4 = 0,
+  IPv6 = 1
 };
 
 enum Ipv6AddrScope
@@ -63,6 +63,7 @@ class IpAddress
     void         set_addr( _in_ uint32_t ipv4_addr );
     void         set_addr( _in_ uint8_t *ip_addr, _in_ IpAddrFamily ip_addr_family );
 
+    bool operator == (const IpAddress &other);
     /***
      * Converts the internal binary address into ascii address. Pass always 1 byte
      * extra for null termination. If passed buffer is less than the actual representation

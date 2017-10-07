@@ -18,6 +18,8 @@ constexpr uint16_t kInterfaceAddressMaxSize = 66;
 
 namespace ja_iot {
 namespace network {
+
+using IpAddrFamily = ja_iot::base::IpAddrFamily;
 //
 class InterfaceAddress
 {

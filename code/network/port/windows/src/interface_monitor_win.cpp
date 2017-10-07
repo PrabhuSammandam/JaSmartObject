@@ -67,7 +67,7 @@ InterfaceMonitorImplWindows::InterfaceMonitorImplWindows ()
   pimpl_ = new InterfaceMonitorImplWindowsData{ this };
 }
 
-ErrCode InterfaceMonitorImplWindows::StartMonitor( AdapterType adapter_type )
+ErrCode InterfaceMonitorImplWindows::StartMonitor( uint16_t adapter_type )
 {
   ErrCode ret_status = ErrCode::OK;
 
@@ -96,7 +96,7 @@ exit_label_:
   return ( ret_status );
 }
 
-ErrCode InterfaceMonitorImplWindows::StopMonitor( AdapterType adapter_type )
+ErrCode InterfaceMonitorImplWindows::StopMonitor( uint16_t adapter_type )
 {
   ErrCode ret_status = ErrCode::OK;
 
@@ -244,7 +244,7 @@ void InterfaceMonitorImplWindowsData::notify_if_modified()
   if( if_event_handler_ptr_array_.Count() > 0 )
   {
     InterfaceEvent interface_event{ InterfaceEventType::kInterfaceModified };
-    interface_event.setAdapterType( AdapterType::IP );
+    interface_event.setAdapterType( kAdapterType_ip );
 
     for( int i = 0; i < if_event_handler_ptr_array_.Count(); i++ )
     {

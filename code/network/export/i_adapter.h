@@ -37,9 +37,9 @@ class AdapterEvent
     AdapterEvent( AdapterEventType adapter_event_type )
       : adapter_event_type_{ adapter_event_type } {}
 
-    AdapterType get_adapter_type() const { return ( adapter_type_ ); }
+    uint16_t get_adapter_type() const { return ( adapter_type_ ); }
 
-    void set_adapter_type( AdapterType adapter_type ) { adapter_type_ = adapter_type; }
+    void set_adapter_type( uint16_t adapter_type ) { adapter_type_ = adapter_type; }
 
     uint8_t* get_data() const { return ( data_ ); }
     void     set_data( uint8_t *data ) { data_ = data; }
@@ -70,7 +70,7 @@ class AdapterEvent
     uint8_t *          data_               = nullptr;
     uint16_t           data_length_        = 0;
     ErrCode            error_code_         = ErrCode::OK;
-    AdapterType        adapter_type_       = AdapterType::IP;
+    uint16_t        adapter_type_       = ja_iot::base::kAdapterType_ip;
     AdapterEventType   adapter_event_type_ = AdapterEventType::kNone;
 };
 
@@ -110,7 +110,7 @@ class IAdapter
 
     virtual void ReadData() = 0;
 
-    virtual AdapterType GetType() = 0;
+    virtual uint16_t GetType() = 0;
 
     virtual void SetAdapterHandler( IAdapterEventHandler *adapter_event_handler ) = 0;
 };

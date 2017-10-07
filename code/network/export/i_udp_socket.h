@@ -13,6 +13,8 @@
 
 namespace ja_iot {
 namespace network {
+
+using IpAddress = ja_iot::base::IpAddress;
 //
 enum class SocketError
 {
@@ -35,7 +37,7 @@ class IUdpSocket
 
     virtual ~IUdpSocket () {}
 
-    virtual SocketError OpenSocket( IpAddrFamily ip_addr_family = IpAddrFamily::IPV4 ) = 0;
+    virtual SocketError OpenSocket( ja_iot::base::IpAddrFamily ip_addr_family = ja_iot::base::IpAddrFamily::IPV4 ) = 0;
     virtual SocketError BindSocket( IpAddress &ip_address, uint16_t port = 0 )         = 0;
     virtual SocketError CloseSocket()                                                  = 0;
 
@@ -76,7 +78,7 @@ class IUdpSocket
      * which will be set during the construction of UDP socket. The valid address family are IPV4 & IPV6.
      * @return
      */
-    virtual IpAddrFamily GetAddrFamily() = 0;
+    virtual ja_iot::base::IpAddrFamily GetAddrFamily() = 0;
 };
 }
 }

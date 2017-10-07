@@ -5,49 +5,46 @@
  *      Author: psammand
  */
 
-#ifndef NETWORK_EXPORT_END_POINT_H_
-#define NETWORK_EXPORT_END_POINT_H_
+#pragma once
 
-#include <string.h>
-#include <data_types.h>
+#include <common_defs.h>
+#include <base_consts.h>
+#include <ip_addr.h>
 #include <cstdint>
-
-constexpr uint16_t kEndpointAddressMaxSize = 66;
 
 namespace ja_iot {
 namespace network {
+
 class Endpoint
 {
   public:
 
     Endpoint () {}
 
-    Endpoint( const Endpoint &other ) { *this = other; }
+    Endpoint( _in_ const Endpoint &other ) { *this = other; }
 
-    Endpoint & operator = ( const Endpoint &other );
+    Endpoint & operator = ( _in_ const Endpoint &other );
 
-    AdapterType getAdapterType() const { return ( adapter_type_ ); }
-    void        setAdapterType( AdapterType adapter_type ) { adapter_type_ = adapter_type; }
-    uint32_t    getIfIndex() const { return ( if_index_ ); }
-    void        setIfIndex( uint32_t if_index ) { if_index_ = if_index; }
-    NetworkFlag getNetworkFlags() const { return ( network_flags_ ); }
-    void        setNetworkFlags( NetworkFlag network_flags ) { network_flags_ = network_flags; }
-    uint16_t    getPort() const { return ( port_ ); }
-    void        setPort( uint16_t port ) { port_ = port; }
+    uint16_t get_adapter_type() const { return ( _adapter_type ); }
+    void     set_adapter_type( _in_ uint16_t adapter_type ) { _adapter_type = adapter_type; }
+    uint32_t get_if_index() const { return ( _if_index ); }
+    void     set_if_index( _in_ uint32_t if_index ) { _if_index = if_index; }
+    uint16_t get_network_flags() const { return ( _network_flags ); }
+    void     set_network_flags( _in_ uint16_t network_flags ) { _network_flags = network_flags; }
+    uint16_t get_port() const { return ( _port ); }
+    void     set_port( _in_ uint16_t port ) { _port = port; }
 
-    uint8_t* getAddr() { return ( &addr_[0] ); }
-    void     setAddr( const char *addr );
+    ja_iot::base::IpAddress* get_addr() { return ( &_addr ); }
+    void       set_addr( _in_ ja_iot::base::IpAddress *addr );
 
-    bool SetIpv6AddrByScope( NetworkFlag ipv6_scope );
+    bool set_ipv6_addr_by_scope( _in_ uint16_t ipv6_scope );
 
   private:
-    AdapterType   adapter_type_                  = AdapterType::TYPE_DEFAULT;
-    NetworkFlag   network_flags_                 = NetworkFlag::FLAG_DEFAULT;
-    uint16_t      port_                          = 0;
-    uint32_t      if_index_                      = 0;
-    uint8_t       addr_[kEndpointAddressMaxSize] = { 0 };
+    uint16_t    _adapter_type  = ja_iot::base::kAdapterType_default;
+    uint16_t    _network_flags = ja_iot::base::kNetworkFlag_none;
+    uint16_t    _port          = 0;
+    uint32_t    _if_index      = 0;
+    ja_iot::base::IpAddress   _addr;
 };
 }
 }
-
-#endif /* NETWORK_EXPORT_END_POINT_H_ */

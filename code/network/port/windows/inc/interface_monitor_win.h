@@ -28,8 +28,8 @@ class InterfaceMonitorImplWindows : public IInterfaceMonitor
 
     InterfaceMonitorImplWindows ();
 
-    ErrCode StartMonitor( AdapterType adapter_type ) override;
-    ErrCode StopMonitor( AdapterType adapter_type )  override;
+    ErrCode StartMonitor( uint16_t adapter_type ) override;
+    ErrCode StopMonitor( uint16_t adapter_type )  override;
 
     ErrCode GetInterfaceAddrList( InterfaceAddressPtrArray &interface_address_ptr_array, bool skip_if_down = true ) override;
     ErrCode GetNewlyFoundInterface( InterfaceAddressPtrArray &if_addr_ptr_array ) override;

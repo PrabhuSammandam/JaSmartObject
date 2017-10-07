@@ -18,12 +18,6 @@ namespace network {
 #define CLEAR_BIT( VAL, MASK ) VAL &= ( ~MASK )
 #define IS_BIT_SET( VAL, MASK ) ( ( VAL & MASK ) == MASK )
 
-enum DeviceType
-{
-  CLIENT = 0x01,
-  SERVER = 0x02
-};
-
 enum IpAdapterConfigFlag
 {
   IPV4_UCAST_ENABLED        = 0x01,
@@ -46,17 +40,14 @@ class IpAdapterConfig
 
     void set_config_flag( IpAdapterConfigFlag config_flag, bool value )
     {
-      if( value ){ SET_BIT( data_, config_flag ); }
-      else{ CLEAR_BIT( data_, config_flag ); }
+      if( value ){ SET_BIT( _flags_bitmask, config_flag ); }
+      else{ CLEAR_BIT( _flags_bitmask, config_flag ); }
     }
 
-    bool is_config_flag_set( IpAdapterConfigFlag config_flag ) { return ( IS_BIT_SET( data_, config_flag ) ); }
+    bool is_config_flag_set( IpAdapterConfigFlag config_flag ) { return ( IS_BIT_SET( _flags_bitmask, config_flag ) ); }
 
     bool is_device_client() { return ( is_config_flag_set( DEVICE_TYPE_CLIENT ) ); }
     bool is_device_server() { return ( is_config_flag_set( DEVICE_TYPE_SERVER ) ); }
-
-    uint16_t getClientNetworkFlag() const { return ( client_network_flag_ ); }
-    void     setClientNetworkFlag( uint16_t clientNetworkFlag = 0 ) { client_network_flag_ = clientNetworkFlag; }
 
     uint16_t getIpv4MulticastPort() const { return ( ipv4_multicast_port_ ); }
     void     setIpv4MulticastPort( uint16_t ipv4MulticastPort ) { ipv4_multicast_port_ = ipv4MulticastPort; }
@@ -82,20 +73,50 @@ class IpAdapterConfig
     uint16_t getIpv6UnicastSecurePort() const { return ( ipv6_unicast_secure_port_ ); }
     void     setIpv6UnicastSecurePort( uint16_t ipv6UnicastSecurePort ) { ipv6_unicast_secure_port_ = ipv6UnicastSecurePort; }
 
-    uint16_t getServerNetworkFlag() const { return ( server_network_flag_ ); }
-    void     setServerNetworkFlag( uint16_t serverNetworkFlag ) { server_network_flag_ = serverNetworkFlag; }
+    uint16_t get_cur_ipv4_unicast_port() const { return ( ipv4_cur_unicast_port_ ); }
+    void     set_cur_ipv4_unicast_port( uint16_t ipv4UnicastPort ) { ipv4_cur_unicast_port_ = ipv4UnicastPort; }
 
-    bool is_ipv4_enabled() { return ( (client_network_flag_ &NetworkFlag::IPV4) || ( server_network_flag_ & NetworkFlag::IPV4 ) ); }
-    bool is_ipv6_enabled() { return ( (client_network_flag_ &NetworkFlag::IPV6) || ( server_network_flag_ & NetworkFlag::IPV6 ) ); }
+    uint16_t get_cur_ipv4_unicast_secure_port() const { return ( ipv4_cur_unicast_secure_port_ ); }
+    void     set_cur_ipv4_unicast_secure_port( uint16_t ipv4UnicastSecurePort ) { ipv4_cur_unicast_secure_port_ = ipv4UnicastSecurePort; }
+
+    uint16_t get_cur_ipv6_unicast_port() const { return ( ipv6_cur_unicast_port_ ); }
+    void     set_cur_ipv6_unicast_port( uint16_t ipv6UnicastPort ) { ipv6_cur_unicast_port_ = ipv6UnicastPort; }
+
+    uint16_t get_cur_ipv6_unicast_secure_port() const { return ( ipv6_cur_unicast_secure_port_ ); }
+    void     set_cur_ipv6_unicast_secure_port( uint16_t ipv6UnicastSecurePort ) { ipv6_cur_unicast_secure_port_ = ipv6UnicastSecurePort; }
+
+    bool is_ipv4_enabled()
+    {
+      return (
+        is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_SECURE_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_SECURE_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_ENABLED )
+             );
+    }
+    bool is_ipv6_enabled()
+    {
+      return (
+        is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_SECURE_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_SECURE_ENABLED )
+             || is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_ENABLED )
+             );
+    }
 
   private:
-    uint16_t   data_                       = 0;
-    uint16_t   client_network_flag_        = 0;
-    uint16_t   server_network_flag_        = 0;
-    uint16_t   ipv4_unicast_port_          = 0;
-    uint16_t   ipv4_unicast_secure_port_   = 0;
-    uint16_t   ipv6_unicast_port_          = 0;
-    uint16_t   ipv6_unicast_secure_port_   = 0;
+    uint16_t   _flags_bitmask = 0;
+
+    uint16_t   ipv4_unicast_port_        = 0;
+    uint16_t   ipv4_unicast_secure_port_ = 0;
+    uint16_t   ipv6_unicast_port_        = 0;
+    uint16_t   ipv6_unicast_secure_port_ = 0;
+
+    uint16_t   ipv4_cur_unicast_port_        = 0;
+    uint16_t   ipv4_cur_unicast_secure_port_ = 0;
+    uint16_t   ipv6_cur_unicast_port_        = 0;
+    uint16_t   ipv6_cur_unicast_secure_port_ = 0;
+
     uint16_t   ipv4_multicast_port_        = COAP_PORT;
     uint16_t   ipv4_multicast_secure_port_ = COAP_SECURE_PORT;
     uint16_t   ipv6_multicast_port_        = COAP_PORT;

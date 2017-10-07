@@ -24,6 +24,9 @@
 							<builder buildPath="${workspace_loc:/win_pc_libnetwork}/Debug" id="org.eclipse.cdt.build.core.internal.builder.1575593786" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug.996222203" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug">
 								<option id="gnu.both.asm.option.include.paths.1687046085" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -40,6 +43,9 @@
 								<option id="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level.1881520455" name="Debug Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.std.759687483" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.199536934" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -60,6 +66,9 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.lib.debug.option.optimization.level.985520805" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.mingw.lib.debug.option.debugging.level.182171681" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1356959431" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
@@ -81,11 +90,33 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="network/port/esp8266" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="network/port/linux|network/port/esp8266" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="win_pc_libbase;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libbase"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libbase/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="base" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="win_pc_libmemory;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libmemory"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libmemory/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="memory" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="win_pc_libosal;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libosal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libosal/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="osal" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
 		</cconfiguration>
 		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807" moduleId="org.eclipse.cdt.core.settings" name="Release">
@@ -206,5 +237,10 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings">
+		<doc-comment-owner id="org.eclipse.cdt.ui.doxygen">
+			<path value=""/>
+		</doc-comment-owner>
 	</storageModule>
 </cproject>

@@ -21,7 +21,7 @@ class WindowsPlatformFactory : public INetworkPlatformFactory
     WindowsPlatformFactory ();
 
     IInterfaceMonitor* GetInterfaceMonitor()                  override;
-    IAdapter*          GetAdapter( AdapterType adapter_type ) override;
+    IAdapter*          GetAdapter( uint16_t adapter_type ) override;
     IUdpSocket*        AllocSocket() override;
     void               FreeSocket( IUdpSocket *socket ) override;
 };

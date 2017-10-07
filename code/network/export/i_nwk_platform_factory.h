@@ -33,7 +33,7 @@ class INetworkPlatformFactory
     static void                     SetCurrFactory( INetworkPlatformFactory *curr_factory ) { curr_factory_ = curr_factory; }
 
     virtual IInterfaceMonitor* GetInterfaceMonitor()                  = 0;
-    virtual IAdapter*          GetAdapter( AdapterType adapter_type ) = 0;
+    virtual IAdapter*          GetAdapter( uint16_t adapter_type ) = 0;
     virtual IUdpSocket*        AllocSocket()                          = 0;
     virtual void               FreeSocket( IUdpSocket *socket )       = 0;
 

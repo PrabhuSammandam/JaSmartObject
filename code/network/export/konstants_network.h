@@ -22,6 +22,10 @@ constexpr const char *const IPV6_MULTICAST_ADDRESS_SITE_LOCAL         = "ff05::1
 constexpr const char *const IPV6_MULTICAST_ADDRESS_ORGANIZATION_LOCAL = "ff08::158";
 constexpr const char *const IPV6_MULTICAST_ADDRESS_GLOBAL             = "ff0e::158";
 
+constexpr uint16_t JA_COAP_CONFIG_MAX_PAYLOAD_SIZE = 256;
+constexpr uint16_t JA_COAP_CONFIG_MAX_OPTION_SIZE = (1034);
+
+constexpr uint16_t k_resource_uri_path_max_size = 128;
 }
 }
 

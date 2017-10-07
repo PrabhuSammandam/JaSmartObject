@@ -56,12 +56,12 @@ class IpAdapterImplWindows : public IpAdapterBase
   private:
     void     AddSocketToEventArray( UdpSocketImplWindows *ip_socket );
     void     HandleAddressChangeEvent();
-    void     HandleReceivedSocketData( SOCKET socket_fd, NetworkFlag network_flag );
+    void     HandleReceivedSocketData( SOCKET socket_fd, uint16_t network_flag );
     uint16_t GetNetworkFlagForSocket( SOCKET socket_fd );
     ErrCode  ConvertNameToAddr( const char *host, uint16_t port, struct sockaddr_storage *sockaddr );
     void     SendData( UdpSocketImplWindows *udp_socket, Endpoint &endpoint, const uint8_t *data, const uint16_t data_length );
 
-    bool IsBitSetInNetworkFlag( NetworkFlag value, NetworkFlag mask )
+    bool IsBitSetInNetworkFlag( uint16_t value, uint16_t mask )
     {
       return ( ( (uint16_t) value & (uint16_t) mask ) != 0 );
     }

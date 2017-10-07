@@ -12,7 +12,7 @@
 #include <cstring>
 
 namespace ja_iot {
-namespace network {
+namespace base {
 static int inet_pton4( const char *src, uint8_t *dst, int pton );
 static int inet_pton6( const char *src, uint8_t *dst );
 
@@ -52,7 +52,7 @@ IpAddress::IpAddress( uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4
   address_family_ = IpAddrFamily::IPV4;
 }
 
-IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : address_family_{IpAddrFamily::IPv6},  scope_id_{ scope }
+IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : address_family_{ IpAddrFamily::IPv6 }, scope_id_{ scope }
 {
   set_addr_by_scope( scope, address );
 }
@@ -661,6 +661,23 @@ void IpAddress::to_string( uint8_t *buf, uint8_t buf_len )
       address_[8], address_[9], address_[10], address_[11],
       address_[12], address_[13], address_[14], address_[15] );
   }
+}
+bool IpAddress::operator == ( const IpAddress &other )
+{
+  if( this->address_family_ != other.address_family_ )
+  {
+    return ( false );
+  }
+
+  for( auto i = 0; i < 16; i++ )
+  {
+    if( address_[i] != other.address_[i] )
+    {
+      return ( false );
+    }
+  }
+
+  return ( true );
 }
 }
 }

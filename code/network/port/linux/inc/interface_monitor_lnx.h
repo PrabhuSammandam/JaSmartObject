@@ -23,8 +23,8 @@ class InterfaceMonitorImplLinux: public IInterfaceMonitor {
 public:
 	InterfaceMonitorImplLinux();
 
-	ErrCode StartMonitor(AdapterType adapter_type) override;
-	ErrCode StopMonitor(AdapterType adapter_type) override;
+	ErrCode StartMonitor(uint16_t adapter_type) override;
+	ErrCode StopMonitor(uint16_t adapter_type) override;
 
 	ErrCode GetInterfaceAddrList(
 			InterfaceAddressPtrArray &interface_address_ptr_array,

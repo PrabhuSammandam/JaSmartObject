@@ -7,6 +7,7 @@
 
 #ifdef _OS_WINDOWS_
 
+#include <base_consts.h>
 #include <port/windows/inc/platform_factory_win.h>
 #include <port/windows/inc/interface_monitor_win.h>
 #include <port/windows/inc/ip_adapter_win.h>
@@ -14,6 +15,9 @@
 
 namespace ja_iot {
 namespace network {
+
+using namespace ja_iot::base;
+
 static InterfaceMonitorImplWindows gs_if_monitor_windows{};
 
 #ifdef _IP_ADAPTER_
@@ -29,11 +33,11 @@ IInterfaceMonitor * ja_iot::network::WindowsPlatformFactory::GetInterfaceMonitor
   return ( &gs_if_monitor_windows );
 }
 
-IAdapter * ja_iot::network::WindowsPlatformFactory::GetAdapter( AdapterType adapter_type )
+IAdapter * ja_iot::network::WindowsPlatformFactory::GetAdapter( uint16_t adapter_type )
 {
 #ifdef _IP_ADAPTER_
 
-  if( adapter_type == AdapterType::IP )
+  if( adapter_type == kAdapterType_ip )
   {
     return ( &gs_ip_adapter_windows );
   }

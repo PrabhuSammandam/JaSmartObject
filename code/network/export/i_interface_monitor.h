@@ -10,6 +10,7 @@
 
 #include <interface_addr.h>
 #include "ErrCode.h"
+#include <base_consts.h>
 #include "PtrArray.h"
 #include <data_types.h>
 
@@ -33,36 +34,18 @@ class InterfaceEvent
 {
   public:
 
-    InterfaceEvent( InterfaceEventType interface_event_type )
-      : interface_event_type_{ interface_event_type }
-    {
-    }
+    InterfaceEvent( InterfaceEventType interface_event_type ) : interface_event_type_{ interface_event_type } {}
 
-    InterfaceEventType getInterfaceEventType() const
-    {
-      return ( interface_event_type_ );
-    }
-    void setInterfaceEventType( InterfaceEventType interface_event_type )
-    {
-      interface_event_type_ = interface_event_type;
-    }
-    AdapterType getAdapterType() const { return ( adapter_type_ ); }
-    void        setAdapterType( AdapterType adapter_type )
-    {
-      adapter_type_ = adapter_type;
-    }
-    InterfaceStatusFlag getInterfaceStatusFlag() const
-    {
-      return ( interface_status_flag_ );
-    }
-    void setInterfaceStatusFlag( InterfaceStatusFlag interface_status_flag )
-    {
-      interface_status_flag_ = interface_status_flag;
-    }
+    InterfaceEventType  getInterfaceEventType() const { return ( interface_event_type_ ); }
+    void                setInterfaceEventType( InterfaceEventType interface_event_type ) { interface_event_type_ = interface_event_type; }
+    uint16_t            getAdapterType() const { return ( adapter_type_ ); }
+    void                setAdapterType( uint16_t adapter_type ) { adapter_type_ = adapter_type; }
+    InterfaceStatusFlag getInterfaceStatusFlag() const { return ( interface_status_flag_ ); }
+    void                setInterfaceStatusFlag( InterfaceStatusFlag interface_status_flag ) { interface_status_flag_ = interface_status_flag; }
 
   private:
     InterfaceEventType    interface_event_type_;
-    AdapterType           adapter_type_          = AdapterType::TYPE_DEFAULT;
+    uint16_t              adapter_type_          = ja_iot::base::kAdapterType_default;
     InterfaceStatusFlag   interface_status_flag_ = InterfaceStatusFlag::DOWN;
 };
 
@@ -84,8 +67,8 @@ class IInterfaceMonitor
 
     virtual ~IInterfaceMonitor () {}
 
-    virtual ErrCode StartMonitor( AdapterType adapter_type ) = 0;
-    virtual ErrCode StopMonitor( AdapterType adapter_type )  = 0;
+    virtual ErrCode StartMonitor( uint16_t adapter_type ) = 0;
+    virtual ErrCode StopMonitor( uint16_t adapter_type )  = 0;
 
     /**
      * This function will return all the found interfaces in the system.

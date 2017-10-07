@@ -21,7 +21,7 @@ class UdpSocketImplWindows : public IUdpSocket
 
     UdpSocketImplWindows ();
 
-    SocketError OpenSocket( IpAddrFamily ip_addr_family = IpAddrFamily::IPV4 ) override;
+    SocketError OpenSocket( ja_iot::base::IpAddrFamily ip_addr_family = ja_iot::base::IpAddrFamily::IPV4 ) override;
     SocketError BindSocket( IpAddress &ip_address, uint16_t port = 0 ) override;
     SocketError CloseSocket()                                            override;
 
@@ -42,7 +42,7 @@ class UdpSocketImplWindows : public IUdpSocket
 
     uint16_t GetLocalPort() override;
 
-    IpAddrFamily GetAddrFamily() override;
+    ja_iot::base::IpAddrFamily GetAddrFamily() override;
 
 
     SOCKET getSocket() { return ( socket_fd_ ); }
@@ -50,7 +50,7 @@ class UdpSocketImplWindows : public IUdpSocket
 
   private:
     SOCKET         socket_fd_      = INVALID_SOCKET;
-    IpAddrFamily   ip_addr_family_ = IpAddrFamily::IPV4;
+    ja_iot::base::IpAddrFamily   ip_addr_family_ = ja_iot::base::IpAddrFamily::IPV4;
 };
 }
 }
