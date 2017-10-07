@@ -15,6 +15,8 @@
 #include <PtrMsgQ.h>
 #include <base_utils.h>
 #include <config_mgr.h>
+#include <packet_event_handler.h>
+#include "adapter_mgr.h"
 
 using  namespace ja_iot::base;
 using namespace ja_iot::osal;
@@ -179,8 +181,8 @@ void MsgProcessorImpl::HandlePacketReceived( Endpoint const &end_point, const ui
 {
   ErrCode ret_status = ErrCode::OK;
   Packet *pcz_packet = nullptr;
-  CoapMsgHdr cz_coap_msg_hdr{};
   ByteArray cz_resource_uri{};
+  CoapMsgHdr cz_coap_msg_hdr{};
 
   DBG_INFO( "MsgProcessorImpl::HandlePacketReceived:%d# ENTER data_len[%d]", __LINE__, u16_coap_pdu_len );
 
@@ -250,7 +252,6 @@ void MsgProcessorImpl::handle_sender_task_msg( void *msg )
 
   DBG_INFO( "MsgProcessorImpl::handle_sender_task_msg:%d# ENTER", __LINE__ );
 
-exit_label_:
   DBG_INFO( "MsgProcessorImpl::handle_sender_task_msg:%d# EXIT", __LINE__ );
 }
 void MsgProcessorImpl::delete_sender_task_msg( void *msg )
@@ -264,7 +265,6 @@ void MsgProcessorImpl::delete_sender_task_msg( void *msg )
 
   DBG_INFO( "MsgProcessorImpl::delete_sender_task_msg:%d# ENTER", __LINE__ );
 
-exit_label_:
   DBG_INFO( "MsgProcessorImpl::delete_sender_task_msg:%d# EXIT", __LINE__ );
 }
 
@@ -357,6 +357,7 @@ ErrCode MsgProcessor::set_packet_event_handler( PacketEventHandler *pcz_packet_e
 ErrCode MsgProcessor::handle_req_res_callbacks()
 {
 #ifdef _SINGLE_THREAD_
+	AdapterManager::Inst().ReadData();
 #else
   this->pimpl_->receive_mutex_->Lock();
 

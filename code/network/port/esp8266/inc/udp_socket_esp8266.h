@@ -11,9 +11,9 @@
 #ifdef _OS_FREERTOS_
 
 #include <lwip/sockets.h>
-#include <IpAddress.h>
+#include <ip_addr.h>
 #include <cstdint>
-#include <IUdpSocket.h>
+#include <i_udp_socket.h>
 
 namespace ja_iot {
 namespace network {
@@ -23,7 +23,7 @@ class UdpSocketImplEsp8266 : public IUdpSocket
 
 	UdpSocketImplEsp8266 ();
 
-    SocketError OpenSocket( IpAddrFamily ip_addr_family = IpAddrFamily::IPV4 ) override;
+    SocketError OpenSocket( ja_iot::base::IpAddrFamily ip_addr_family = ja_iot::base::IpAddrFamily::IPV4 ) override;
     SocketError BindSocket( IpAddress &ip_address, uint16_t port = 0 ) override;
     SocketError CloseSocket()                                            override;
 
@@ -44,7 +44,7 @@ class UdpSocketImplEsp8266 : public IUdpSocket
 
     uint16_t GetLocalPort() override;
 
-    IpAddrFamily GetAddrFamily() override;
+    ja_iot::base::IpAddrFamily GetAddrFamily() override;
 
 
     int  getSocket() { return ( socket_fd_ ); }
@@ -52,7 +52,7 @@ class UdpSocketImplEsp8266 : public IUdpSocket
 
   private:
     int            socket_fd_      = -1;
-    IpAddrFamily   ip_addr_family_ = IpAddrFamily::IPV4;
+    ja_iot::base::IpAddrFamily   ip_addr_family_ = ja_iot::base::IpAddrFamily::IPV4;
 };
 }
 }

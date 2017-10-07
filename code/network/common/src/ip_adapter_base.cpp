@@ -15,6 +15,7 @@
 #include <ip_adapter_config.h>
 #include <konstants_network.h>
 #include <config_mgr.h>
+#include <ja_debug.h>
 
 using namespace ja_iot::osal;
 
@@ -39,19 +40,11 @@ ErrCode IpAdapterBase::Initialize()
   /* call platform specific initialize */
   ret_status = DoPreIntialize();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterBase::Initialize:%d# DoPreIntialize() FAILED", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterBase::Initialize:%d# DoPreIntialize() FAILED", __LINE__);
 
   ret_status = init_internal();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterBase::Initialize:%d# InitInternal() FAILED", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterBase::Initialize:%d# InitInternal() FAILED", __LINE__);
 
   sender_task_mutex_ = OsalMgr::Inst()->AllocMutex();
 
@@ -64,11 +57,7 @@ ErrCode IpAdapterBase::Initialize()
   /* call platform specific post initialize */
   ret_status = DoPostIntialize();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterBase::Initialize:%d# DoPostIntialize() FAILED", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterBase::Initialize:%d# DoPostIntialize() FAILED", __LINE__);
 
 exit_label_:
   DBG_INFO( "IpAdapterBase::Initialize:%d# EXIT %d", __LINE__, (int) ret_status );

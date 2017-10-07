@@ -1,14 +1,14 @@
+#include <adapter_mgr.h>
+#include <base_consts.h>
 #include <c_types.h>
-#include <stdio.h>
-#include <cstdlib>
-#include <esp_misc.h>
 #include <esp_system.h>
-#include <OsalMgr.h>
-#include <AdapterMgr.h>
+#include <i_nwk_platform_factory.h>
 #include <IMemAllocator.h>
-#include <INetworkPlatformFactory.h>
+#include <OsalMgr.h>
+#include <stdio.h>
 #include <wifi_task.h>
-#include <adapter_task.h>
+#include <connectivity_mgr.h>
+#include <config_mgr.h>
 
 using namespace ja_iot::base;
 using namespace ja_iot::osal;
@@ -115,7 +115,7 @@ extern "C" void user_init( void )
 {
   print_system_info();
 
-  auto mem_alloctor = MemAllocatorFactory::get( MemAlloctorType::kFreeRTOS );
+  auto mem_alloctor = MemAllocatorFactory::create_mem_allocator( MemAlloctorType::kFreeRTOS );
 
   if(mem_alloctor == nullptr)
   {
@@ -126,7 +126,7 @@ extern "C" void user_init( void )
 
   OsalMgr::Inst()->Init();
 
-  auto platform_factory = INetworkPlatformFactory::GetFactory( NetworkPlatform::kEsp8266 );
+  auto platform_factory = INetworkPlatformFactory::CreateFactory( NetworkPlatform::kEsp8266 );
 
   if(platform_factory == nullptr)
   {
@@ -135,10 +135,10 @@ extern "C" void user_init( void )
 
   INetworkPlatformFactory::SetCurrFactory( platform_factory );
 
-  AdapterManager::Inst().SetPlatformFactory(platform_factory);
-  AdapterManager::Inst().InitializeAdapters( (uint16_t) AdapterType::IP );
+  ConfigManager::Inst().get_ip_adapter_config()->set_config_flag(IpAdapterConfigFlag::IPV4_UCAST_ENABLED, true);
+  ConfigManager::Inst().get_ip_adapter_config()->set_config_flag(IpAdapterConfigFlag::IPV4_MCAST_ENABLED, true);
 
-//  AdapterManager::Inst().StartAdapter( AdapterType::IP );
+  ConnectivityManager::Inst().initialize(kAdapterType_ip);
 
   gs_wifi_task.create_task();
 }

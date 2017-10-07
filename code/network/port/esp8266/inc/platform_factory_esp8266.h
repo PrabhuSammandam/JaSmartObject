@@ -10,7 +10,7 @@
 
 #ifdef _OS_FREERTOS_
 
-#include <INetworkPlatformFactory.h>
+#include <i_nwk_platform_factory.h>
 
 namespace ja_iot {
 namespace network {
@@ -21,7 +21,7 @@ class Esp8266PlatformFactory : public INetworkPlatformFactory
     Esp8266PlatformFactory ();
 
     IInterfaceMonitor* GetInterfaceMonitor()                  override;
-    IAdapter*          GetAdapter( AdapterType adapter_type ) override;
+    IAdapter*          GetAdapter( uint16_t adapter_type ) override;
     IUdpSocket*        AllocSocket() override;
     void               FreeSocket( IUdpSocket *socket ) override;
 };

@@ -11,7 +11,7 @@
 #endif
 
 #ifdef _OS_FREERTOS_
-#include "port/esp8266/inc/Esp8266PlatformFactory.h"
+#include "port/esp8266/inc/platform_factory_esp8266.h"
 #endif /* _OS_FREERTOS_ */
 
 namespace ja_iot {

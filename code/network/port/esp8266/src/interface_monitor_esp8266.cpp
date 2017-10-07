@@ -10,7 +10,7 @@
 #include <esp_common.h>
 #include <lwip/sockets.h>
 #include <lwip/ipv4/lwip/ip4_addr.h>
-#include <port/esp8266/inc/InterfaceMonitorImplEsp8266.h>
+#include <port/esp8266/inc/interface_monitor_esp8266.h>
 
 namespace ja_iot {
 namespace network {
@@ -18,12 +18,12 @@ InterfaceMonitorImplEsp8266::InterfaceMonitorImplEsp8266 ()
 {
 }
 
-ErrCode InterfaceMonitorImplEsp8266::StartMonitor( AdapterType adapter_type )
+ErrCode InterfaceMonitorImplEsp8266::StartMonitor( uint16_t adapter_type )
 {
   return ( ErrCode::OK );
 }
 
-ErrCode InterfaceMonitorImplEsp8266::StopMonitor( AdapterType adapter_type )
+ErrCode InterfaceMonitorImplEsp8266::StopMonitor( uint16_t adapter_type )
 {
   return ( ErrCode::OK );
 }

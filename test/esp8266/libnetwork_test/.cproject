@@ -96,6 +96,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libnetwork/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/lib&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/Debug}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1756235206" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="network"/>
@@ -124,6 +125,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="wps"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="memory"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="osal"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="base"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1192835828" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -262,6 +264,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libnetwork/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libmemory/Debug}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/Debug}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1801950103" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="mbedtls"/>
@@ -290,6 +293,8 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="osal"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="network"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="memory"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${workspace_loc:/esp8266_win_libbase/Debug/libbase.a}&quot;"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="base"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.595802813" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

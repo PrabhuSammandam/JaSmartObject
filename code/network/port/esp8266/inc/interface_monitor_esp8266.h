@@ -10,9 +10,8 @@
 
 #ifdef _OS_FREERTOS_
 
-#include <TransportType.h>
-#include <InterfaceAddress.h>
-#include <IInterfaceMonitor.h>
+#include <interface_addr.h>
+#include <i_interface_monitor.h>
 
 namespace ja_iot {
 namespace network {
@@ -22,8 +21,8 @@ class InterfaceMonitorImplEsp8266 : public IInterfaceMonitor
 
     InterfaceMonitorImplEsp8266 ();
 
-    ErrCode StartMonitor( AdapterType adapter_type ) override;
-    ErrCode StopMonitor( AdapterType adapter_type )  override;
+    ErrCode StartMonitor( uint16_t adapter_type ) override;
+    ErrCode StopMonitor( uint16_t adapter_type )  override;
 
     ErrCode GetInterfaceAddrList( InterfaceAddressPtrArray &interface_address_ptr_array, bool skip_if_down = true ) override;
     ErrCode GetNewlyFoundInterface( InterfaceAddressPtrArray &if_addr_ptr_array ) override;

@@ -5,6 +5,7 @@
  *      Author: psammand
  */
 
+#include <string.h>
 #include <common/inc/coap_msg_codec.h>
 #include <konstants_network.h>
 #include <IMemAllocator.h>

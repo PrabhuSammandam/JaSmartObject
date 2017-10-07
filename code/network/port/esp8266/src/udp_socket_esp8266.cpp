@@ -11,11 +11,14 @@
 #include <string.h>
 #include <climits>
 #include <lwip/sockets.h>
-#include <IpAddress.h>
-#include <port/esp8266/inc/UdpSocketImplEsp8266.h>
+#include <ip_addr.h>
+#include <port/esp8266/inc/udp_socket_esp8266.h>
 
 namespace ja_iot {
 namespace network {
+
+using namespace ja_iot::base;
+
 UdpSocketImplEsp8266::UdpSocketImplEsp8266 ()
 {
 }
@@ -167,6 +170,8 @@ SocketError UdpSocketImplEsp8266::ReceiveData( IpAddress &remote_addr, uint16_t 
     return ( SocketError::ERR );
   }
 
+//  printf("UdpSocketImplEsp8266::ReceiveData: ReadData socked_fd[%d]\n", socket_fd_);
+
   struct sockaddr_storage sock_store = { 0 };
 
   unsigned int            sockaddr_len   = sizeof( struct sockaddr_storage );
@@ -174,6 +179,7 @@ SocketError UdpSocketImplEsp8266::ReceiveData( IpAddress &remote_addr, uint16_t 
 
   if( received_bytes > 0 )
   {
+//  printf("UdpSocketImplEsp8266::ReceiveData: ReadData data_len[%d]\n", received_bytes);
     if( sock_store.ss_family == AF_INET )
     {
       struct sockaddr_in *p_ipv4_addr = (struct sockaddr_in *) &sock_store;

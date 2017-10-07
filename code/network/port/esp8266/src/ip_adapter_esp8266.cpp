@@ -10,11 +10,16 @@
 #include <lwip/sockets.h>
 #include <lwip/ipv4/lwip/inet.h>
 #include <common/inc/logging_network.h>
-#include <port/esp8266/inc/IpAdapterImplEsp8266.h>
-#include <AdapterMgr.h>
+#include <port/esp8266/inc/ip_adapter_esp8266.h>
+#include <adapter_mgr.h>
+#include <config_mgr.h>
+#include <base_consts.h>
+#include "ja_debug.h"
 
 namespace ja_iot {
 namespace network {
+using namespace ja_iot::base;
+
 IpAdapterImplEsp8266::IpAdapterImplEsp8266 ()
 {
 }
@@ -80,25 +85,17 @@ ErrCode IpAdapterImplEsp8266::StartAdapter()
 
   DBG_INFO( "IpAdapterImplEsp8266::StartAdapter:%d# ENTER", __LINE__ );
 
-  auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
+  auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
 
   this->ipv4_ucast_port_ = ip_adapter_config->getIpv4UnicastPort();
 
   ret_status = StartServer();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterImplEsp8266::StartAdapter:%d# StartServer() Failed", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterImplEsp8266::StartAdapter:%d# StartServer() Failed", __LINE__);
 
   ret_status = StartListening();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterImplEsp8266::StartAdapter:%d# StartListening() Failed", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterImplEsp8266::StartAdapter:%d# StartListening() Failed", __LINE__);
 
 exit_label_:
 
@@ -115,11 +112,7 @@ ErrCode IpAdapterImplEsp8266::StopAdapter()
 
   ret_status = StopServer();
 
-  if( ret_status != ErrCode::OK )
-  {
-    DBG_ERROR( "IpAdapterImplEsp8266::StopAdapter:%d# StopServer() Failed", __LINE__ );
-    goto exit_label_;
-  }
+  JA_ERR_OK_PRINT_GO(ret_status, "IpAdapterImplEsp8266::StopAdapter:%d# StopServer FAIL", __LINE__);
 
   this->ipv4_ucast_port_ = 0;
 
@@ -131,11 +124,16 @@ exit_label_:
 
 ErrCode IpAdapterImplEsp8266::StartServer()
 {
+  if( _is_server_started )
+  {
+    return ( ErrCode::OK );
+  }
+
   ErrCode ret_status = ErrCode::OK;
 
   DBG_INFO( "IpAdapterImplEsp8266::StartServer:%d# ENTER", __LINE__ );
 
-  auto ip_adapter_config = AdapterManager::Inst().get_ip_adapter_config();
+  auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
 
   /* Start UNICAST server */
   ret_status = OpenSocket2( IpAddrFamily::IPV4, false, ipv4_ucast_socket_, this->ipv4_ucast_port_ );
@@ -154,6 +152,8 @@ ErrCode IpAdapterImplEsp8266::StartServer()
     DBG_ERROR( "IpAdapterBase::StartServer:%d# Failed to open socket IPV4 multicast socket[%p], port[%d]", __LINE__, ipv4_mcast_socket_, ip_adapter_config->getIpv4MulticastPort() );
     return ( ret_status );
   }
+
+  _is_server_started = true;
 
   DBG_INFO( "IpAdapterImplEsp8266::StartServer:%d# EXIT", __LINE__ );
 
@@ -179,6 +179,8 @@ ErrCode IpAdapterImplEsp8266::StopServer()
     DBG_INFO( "IpAdapterImplEsp8266::StopServer:%d# Closing IPV4 mcast socket", __LINE__ );
     ipv4_mcast_socket_->CloseSocket();
   }
+
+  _is_server_started = false;
 
   DBG_INFO( "IpAdapterImplEsp8266::StopServer:%d# EXIT", __LINE__ );
 
@@ -265,30 +267,33 @@ int32_t IpAdapterImplEsp8266::SendMulticastData( Endpoint &end_point, const uint
   return ( send_bytes );
 }
 
-void IpAdapterImplEsp8266::send_packet_received_adapter_event( uint8_t *received_data, int16_t data_length, uint16_t port, IpAddress remote_addr, bool is_mcast )
+void IpAdapterImplEsp8266::send_packet_received_adapter_event( uint8_t *pu8_pdu_buf, int16_t u16_pdu_buf_len, uint16_t u16_remote_port, IpAddress remote_addr, bool is_mcast )
 {
   if( p_adapter_handler_ != nullptr )
   {
-    uint8_t *data = new uint8_t[data_length];
+    uint8_t *pu8_pdu_buf_copy = new uint8_t[u16_pdu_buf_len];
 
-    memcpy( (void *) ( data ), (void *) received_data, data_length );
+    memcpy( (void *) ( pu8_pdu_buf_copy ), (void *) pu8_pdu_buf, u16_pdu_buf_len );
+
     Endpoint end_point;
-    AdapterEvent adapter_event{ AdapterEventType::kPacketReceived };
-    end_point.setPort( port );
-    end_point.setAdapterType( AdapterType::IP );
-    end_point.setNetworkFlags( (NetworkFlag) ( ( is_mcast ) ? ( NetworkFlag::IPV4 | NetworkFlag::MULTICAST ) : NetworkFlag::IPV4 ) );
-    /* TODO set the addr in endpoint */
-    adapter_event.set_data( data );
-    adapter_event.set_data_length( data_length );
-    adapter_event.set_adapter_type( AdapterType::IP );
-    adapter_event.set_end_point( &end_point );
-    p_adapter_handler_->handle_adapter_event( &adapter_event );
+    end_point.set_port( u16_remote_port );
+    end_point.set_adapter_type( kAdapterType_ip );
+    end_point.set_network_flags( ( ( is_mcast ) ? ( kNetworkFlag_ipv4 | kNetworkFlag_multicast ) : kNetworkFlag_ipv4 ) );
+    end_point.get_addr()->set_addr(remote_addr.get_addr(), remote_addr.get_addr_family());
+
+    AdapterEvent cz_adapter_event{ AdapterEventType::kPacketReceived };
+    cz_adapter_event.set_data( pu8_pdu_buf_copy );
+    cz_adapter_event.set_data_length( u16_pdu_buf_len );
+    cz_adapter_event.set_adapter_type( kAdapterType_ip );
+    cz_adapter_event.set_end_point( &end_point );
+
+    p_adapter_handler_->handle_adapter_event( &cz_adapter_event );
   }
 }
 
 void IpAdapterImplEsp8266::ReadData()
 {
-  // DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# ENTER", __LINE__ );
+//  DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# ENTER", __LINE__ );
 
   IpAddress remote_addr;
   int16_t   data_length = COAP_MAX_PDU_SIZE;
@@ -299,26 +304,26 @@ void IpAdapterImplEsp8266::ReadData()
 
   if( data_length > 0 )
   {
-    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, false );
     remote_addr.to_string( addr_buff, sizeof( addr_buff ) );
     DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# Received unicast from %s port %d data length %d", __LINE__, addr_buff, port, data_length );
+    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, false );
   }
 
   ipv4_mcast_socket_->ReceiveData( remote_addr, port, &receive_buffer_[0], data_length );
 
   if( data_length > 0 )
   {
-    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, true );
     remote_addr.to_string( addr_buff, sizeof( addr_buff ) );
     DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# Received multicast from %s port %d data length %d", __LINE__, addr_buff, port, data_length );
+    send_packet_received_adapter_event( &receive_buffer_[0], data_length, port, remote_addr, true );
   }
 
   // DBG_INFO( "IpAdapterImplEsp8266::ReadData:%d# EXIT", __LINE__ );
 }
 
-AdapterType IpAdapterImplEsp8266::GetType()
+uint16_t IpAdapterImplEsp8266::GetType()
 {
-  return ( AdapterType::IP );
+  return ( kAdapterType_ip );
 }
 
 void IpAdapterImplEsp8266::SetAdapterHandler( IAdapterEventHandler *adapter_event_handler )
@@ -432,9 +437,9 @@ int32_t IpAdapterImplEsp8266::send_data( Endpoint &end_point, const uint8_t *dat
       bytes_sent = -1; goto exit_label_;
     }
 
-    DBG_INFO( "IpAdapterImplEsp8266::send_data:%d# Multicast SendData ip[], port[%d], len[%d]", __LINE__, end_point.getPort(), data_length );
+    DBG_INFO( "IpAdapterImplEsp8266::send_data:%d# Multicast SendData ip[], port[%d], len[%d]", __LINE__, end_point.get_port(), data_length );
 
-    if( ipv4_ucast_socket_->SendData( ip_addr, end_point.getPort(), (uint8_t *) data, data_length ) != SocketError::OK )
+    if( ipv4_ucast_socket_->SendData( ip_addr, end_point.get_port(), (uint8_t *) data, data_length ) != SocketError::OK )
     {
       DBG_ERROR( "IpAdapterImplEsp8266::send_data:%d# Multicast SendData() FAILED, if_index %d", __LINE__, 1 );
       bytes_sent = -1; goto exit_label_;
@@ -444,11 +449,11 @@ int32_t IpAdapterImplEsp8266::send_data( Endpoint &end_point, const uint8_t *dat
   {
     IpAddress ip_addr{};
 
-    ipaddr_aton( (const char *) end_point.getAddr(), (ip_addr_t *) ip_addr.get_addr() );
+    ipaddr_aton( (const char *) end_point.get_addr(), (ip_addr_t *) ip_addr.get_addr() );
 
-    DBG_INFO( "IpAdapterImplEsp8266::send_data:%d# Unicast SendData ip[], port[%d], len[%d]", __LINE__, end_point.getPort(), data_length );
+    DBG_INFO( "IpAdapterImplEsp8266::send_data:%d# Unicast SendData ip[], port[%d], len[%d]", __LINE__, end_point.get_port(), data_length );
 
-    if( ipv4_ucast_socket_->SendData( ip_addr, end_point.getPort(), (uint8_t *) data, data_length ) != SocketError::OK )
+    if( ipv4_ucast_socket_->SendData( ip_addr, end_point.get_port(), (uint8_t *) data, data_length ) != SocketError::OK )
     {
       DBG_ERROR( "IpAdapterImplEsp8266::send_data:%d# Unicast SendData() FAILED, if_index %d", __LINE__, 1 );
       bytes_sent = -1; goto exit_label_;

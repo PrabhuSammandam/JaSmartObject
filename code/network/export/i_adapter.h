@@ -1,5 +1,5 @@
 /*
- * 1 * IAdapter.h
+ * IAdapter.h
  *
  *  Created on: Jun 30, 2017
  *      Author: psammand
@@ -34,12 +34,10 @@ class AdapterEvent
 {
   public:
 
-    AdapterEvent( AdapterEventType adapter_event_type )
-      : adapter_event_type_{ adapter_event_type } {}
+    AdapterEvent( AdapterEventType adapter_event_type ) : adapter_event_type_{ adapter_event_type } {}
 
     uint16_t get_adapter_type() const { return ( adapter_type_ ); }
-
-    void set_adapter_type( uint16_t adapter_type ) { adapter_type_ = adapter_type; }
+    void     set_adapter_type( uint16_t adapter_type ) { adapter_type_ = adapter_type; }
 
     uint8_t* get_data() const { return ( data_ ); }
     void     set_data( uint8_t *data ) { data_ = data; }
@@ -54,14 +52,13 @@ class AdapterEvent
     void    set_error_code( ErrCode error_code ) { error_code_ = error_code; }
 
     bool is_connected() const { return ( is_connected_ ); }
-    void set_is_connected( bool is_connected ) { is_connected_ = is_connected; }
+    void set_connected( bool is_connected ) { is_connected_ = is_connected; }
 
     bool is_enabled() const { return ( is_enabled_ ); }
-    void set_is_enabled( bool is_enabled ) { is_enabled_ = is_enabled; }
+    void set_enabled( bool is_enabled ) { is_enabled_ = is_enabled; }
 
     AdapterEventType get_adapter_event_type() const { return ( adapter_event_type_ ); }
-
-    void set_adapter_event_type( AdapterEventType adapter_event_type ) { adapter_event_type_ = adapter_event_type; }
+    void             set_adapter_event_type( AdapterEventType adapter_event_type ) { adapter_event_type_ = adapter_event_type; }
 
   private:
     bool               is_enabled_         = false;
@@ -70,7 +67,7 @@ class AdapterEvent
     uint8_t *          data_               = nullptr;
     uint16_t           data_length_        = 0;
     ErrCode            error_code_         = ErrCode::OK;
-    uint16_t        adapter_type_       = ja_iot::base::kAdapterType_ip;
+    uint16_t           adapter_type_       = ja_iot::base::kAdapterType_ip;
     AdapterEventType   adapter_event_type_ = AdapterEventType::kNone;
 };
 

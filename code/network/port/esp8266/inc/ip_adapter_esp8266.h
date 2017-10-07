@@ -8,9 +8,9 @@
 #ifndef NETWORK_PORT_ESP8266_INC_IPADAPTERIMPLESP8266_H_
 #define NETWORK_PORT_ESP8266_INC_IPADAPTERIMPLESP8266_H_
 
-#include <IpAdapterBase.h>
+#include <common/inc/ip_adapter_base.h>
 #include <config_network.h>
-#include <IUdpSocket.h>
+#include <i_udp_socket.h>
 
 #ifdef _OS_FREERTOS_
 
@@ -42,7 +42,7 @@ class IpAdapterImplEsp8266 : public IAdapter
 
     void ReadData() override;
 
-    AdapterType GetType() override;
+    uint16_t GetType() override;
 
     void SetAdapterHandler( IAdapterEventHandler *adapter_event_handler ) override;
 
@@ -50,7 +50,7 @@ class IpAdapterImplEsp8266 : public IAdapter
     ErrCode OpenSocket( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port );
     ErrCode OpenSocket2( IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port );
     int32_t send_data( Endpoint &end_point, const uint8_t *data, uint16_t data_length, bool is_multicast );
-	void send_packet_received_adapter_event(uint8_t*received_data,int16_t data_length, uint16_t port, IpAddress remote_addr, bool is_mcast);
+    void    send_packet_received_adapter_event( uint8_t *received_data, int16_t data_length, uint16_t port, IpAddress remote_addr, bool is_mcast );
 
   private:
     uint16_t               ipv4_ucast_port_   = 0;
@@ -58,6 +58,7 @@ class IpAdapterImplEsp8266 : public IAdapter
     IUdpSocket *           ipv4_ucast_socket_ = nullptr;
     IUdpSocket *           ipv4_mcast_socket_ = nullptr;
     uint8_t                receive_buffer_[COAP_MAX_PDU_SIZE];
+    bool                   _is_server_started = false;
 };
 }  // namespace network
 }  // namespace ja_iot

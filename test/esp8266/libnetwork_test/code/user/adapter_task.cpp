@@ -8,8 +8,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <adapter_task.h>
-#include <AdapterMgr.h>
+#include <adapter_mgr.h>
 #include <OsalMgr.h>
+#include <connectivity_mgr.h>
 
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
@@ -36,43 +37,43 @@ bool AdapterTask::create_task()
     return ( false );
   }
 
-  osal_status = adapter_task_->Init( (uint8_t*)"adap_task", 2, 256, (ITaskRoutine*)this, this );
+  osal_status = adapter_task_->Init( (uint8_t *) "adap_task", 2, 256, (ITaskRoutine *) this, this );
 
-  if(osal_status != OsalError::OK)
+  if( osal_status != OsalError::OK )
   {
-	  DBG_ERROR("AdapterTask::create_task:%d# Task Init failed", __LINE__);
+    DBG_ERROR( "AdapterTask::create_task:%d# Task Init failed", __LINE__ );
 
-	  OsalMgr::Inst()->FreeTask(adapter_task_);
-	  adapter_task_=nullptr;
+    OsalMgr::Inst()->FreeTask( adapter_task_ );
+    adapter_task_ = nullptr;
 
-	  return false;
+    return ( false );
   }
 
   osal_status = adapter_task_->Start();
 
-  if(osal_status != OsalError::OK)
+  if( osal_status != OsalError::OK )
   {
-	  DBG_ERROR("AdapterTask::create_task:%d# Task Start failed", __LINE__);
+    DBG_ERROR( "AdapterTask::create_task:%d# Task Start failed", __LINE__ );
 
-	  OsalMgr::Inst()->FreeTask(adapter_task_);
-	  adapter_task_=nullptr;
+    OsalMgr::Inst()->FreeTask( adapter_task_ );
+    adapter_task_ = nullptr;
 
-	  return false;
+    return ( false );
   }
 
-  return true;
+  return ( true );
 }
 
 void AdapterTask::Run( void *arg )
 {
-	auto adapter_mgr = &AdapterManager::Inst();
+  ConnectivityManager::Inst().select_network( kAdapterType_ip );
+  ConnectivityManager::Inst().start_listening_server();
 
-	adapter_mgr->StartAdapter( AdapterType::IP );
-
-	while(1)
-	{
-		adapter_mgr->ReadData();
-//		DBG_INFO("AdapterTask::Run:%d# Running", __LINE__);
-		vTaskDelay(500 / portTICK_RATE_MS);
-	}
+  while( 1 )
+  {
+    ConnectivityManager::Inst().handle_request_response();
+//	  AdapterManager::Inst().ReadData();
+//    DBG_INFO("AdapterTask::Run:%d# Running", __LINE__);
+    vTaskDelay( 200 / portTICK_RATE_MS );
+  }
 }

@@ -7,14 +7,15 @@
 
 #ifdef _OS_FREERTOS_
 
-#include <port/esp8266/inc/Esp8266PlatformFactory.h>
-#include <port/esp8266/inc/InterfaceMonitorImplEsp8266.h>
-#include <port/esp8266/inc/IpAdapterImplEsp8266.h>
-#include <port/esp8266/inc/UdpSocketImplEsp8266.h>
-#include <TransportType.h>
+#include <port/esp8266/inc/platform_factory_esp8266.h>
+#include <port/esp8266/inc/interface_monitor_esp8266.h>
+#include <port/esp8266/inc/ip_adapter_esp8266.h>
+#include <port/esp8266/inc/udp_socket_esp8266.h>
+#include <base_consts.h>
 
 namespace ja_iot {
 namespace network {
+using namespace ja_iot::base;
 //static InterfaceMonitorImplEsp8266 gs_if_monitor_esp8266{};
 
 #ifdef _IP_ADAPTER_
@@ -30,11 +31,11 @@ IInterfaceMonitor * Esp8266PlatformFactory::GetInterfaceMonitor()
   return nullptr;
 }
 
-IAdapter * Esp8266PlatformFactory::GetAdapter( AdapterType adapter_type )
+IAdapter * Esp8266PlatformFactory::GetAdapter( uint16_t adapter_type )
 {
 #ifdef _IP_ADAPTER_
 
-  if( adapter_type == AdapterType::IP )
+  if( adapter_type == kAdapterType_ip )
   {
     return ( &gs_ip_adapter_esp8266 );
   }

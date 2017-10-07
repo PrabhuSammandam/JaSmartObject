@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include "BaseObject.h"
+#include <IMemAllocator.h>
 
 namespace ja_iot {
 namespace base {
