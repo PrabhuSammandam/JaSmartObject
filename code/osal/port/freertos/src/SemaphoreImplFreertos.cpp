@@ -1,4 +1,3 @@
-
 /*
  * SemaphoreImplFreertos.cpp
  *
@@ -59,6 +58,19 @@ OsalError SemaphoreImplFreertos::Wait()
   }
 
   return ( OsalError::OK );
+}
+
+OsalError SemaphoreImplFreertos::Wait(uint32_t timeout_ms)
+{
+	dbg("%s=>Wait semaphore\n", __FUNCTION__);
+
+	if (xSemaphoreTake(semaphore_handle_,  timeout_ms/portTICK_RATE_MS) == pdFALSE)
+	{
+		dbg("%s=>Wait semaphore failed\n", __FUNCTION__);
+		return (OsalError::ERR);
+	}
+
+	return (OsalError::OK);
 }
 
 OsalError SemaphoreImplFreertos::Post()

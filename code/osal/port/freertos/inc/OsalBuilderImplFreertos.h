@@ -5,12 +5,11 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_PORT_FREERTOS_INC_OSALBUILDERIMPLFREERTOS_H_
-#define OSAL_PORT_FREERTOS_INC_OSALBUILDERIMPLFREERTOS_H_
+#pragma once
 
 #ifdef _OS_FREERTOS_
 
-#include <inc/OsalBuilder.h>
+#include <common/inc/OsalBuilder.h>
 
 namespace ja_iot {
 namespace osal {
@@ -45,11 +44,9 @@ class OsalBuilderImplFreertos : public OsalBuilder
     void       free_semaphore( Semaphore *semaphore ) override;
 
   private:
-    Mutex * access_mutex = nullptr;
+//    MutexImplFreertos access_mutex;
 };
 }
 }
 
 #endif /* _OS_FREERTOS_ */
-
-#endif /* OSAL_PORT_FREERTOS_INC_OSALBUILDERIMPLFREERTOS_H_ */

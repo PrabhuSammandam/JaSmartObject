@@ -12,20 +12,18 @@
 namespace ja_iot {
 namespace osal {
 static void task_base_function( void *arg );
-
-TaskImplWindowsSem::TaskImplWindowsSem ()
+TaskImplWindows::TaskImplWindows ()
+{
+}
+TaskImplWindows::~TaskImplWindows ()
 {
 }
 
-TaskImplWindowsSem::~TaskImplWindowsSem ()
+OsalError TaskImplWindows::port_create_task()
 {
-}
+  _taskHandle = CreateThread( nullptr, 0, PTHREAD_START_ROUTINE( task_base_function ), this, 0, nullptr );
 
-OsalError TaskImplWindowsSem::PortCreateTask()
-{
-  _taskHandle = CreateThread( NULL, 0, (PTHREAD_START_ROUTINE) task_base_function, this, 0, NULL );
-
-  if( _taskHandle == NULL )
+  if( _taskHandle == nullptr )
   {
     return ( OsalError::ERR );
   }
@@ -33,21 +31,21 @@ OsalError TaskImplWindowsSem::PortCreateTask()
   return ( OsalError::OK );
 }
 
-OsalError TaskImplWindowsSem::PortDeleteTask()
+OsalError TaskImplWindows::port_delete_task()
 {
-  if( _taskHandle != 0 )
+  if( _taskHandle != nullptr )
   {
     CloseHandle( _taskHandle );
-    _taskHandle = 0;
+    _taskHandle = nullptr;
   }
 
   return ( OsalError::OK );
 }
 
-OsalError TaskImplWindowsSem::Wait()
+OsalError TaskImplWindows::Wait()
 {
-  OsalError res         = OsalError::OK;
-  DWORD     wait_result = WaitForSingleObject( _taskHandle, INFINITE );
+  auto       res         = OsalError::OK;
+  const auto wait_result = WaitForSingleObject( _taskHandle, INFINITE );
 
   if( WAIT_OBJECT_0 != wait_result )
   {
@@ -59,7 +57,7 @@ OsalError TaskImplWindowsSem::Wait()
 
 static void task_base_function( void *arg )
 {
-  TaskBase *task_base = (TaskBase *) arg;
+  auto task_base = static_cast<TaskBase *>( arg );
 
   if( task_base != nullptr )
   {

@@ -28,15 +28,16 @@ public:
 	OsalError Uninit() override;
 
 	OsalError Wait() override;
+	OsalError Wait(uint32_t timeout_ms)override;
 	OsalError Post() override;
 
 	sem_t* get_semaphore_impl()
 	{
-		return &semaphore_handle_;
+		return semaphore_handle_;
 	}
 
 private:
-	sem_t semaphore_handle_;
+	sem_t* semaphore_handle_ = nullptr;
 };
 
 }

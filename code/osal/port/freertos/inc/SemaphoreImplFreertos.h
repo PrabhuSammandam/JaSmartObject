@@ -29,6 +29,7 @@ public:
 	OsalError Uninit() override;
 
 	OsalError Wait() override;
+	OsalError Wait(uint32_t timeout_ms)override;
 	OsalError Post() override;
 
 	xSemaphoreHandle  get_semaphore_impl()

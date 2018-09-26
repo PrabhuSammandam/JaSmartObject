@@ -5,78 +5,84 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_EXPORT_TASK_H_
-#define OSAL_EXPORT_TASK_H_
+#pragma once
 
-#include "PrimitiveDataTypes.h"
+#include <cstdint>
+#include <string>
+
 #include "OsalError.h"
 #include "MsgQ.h"
-#include <cstdint>
 
 namespace ja_iot {
 namespace osal {
-constexpr uint8_t kTASK_NAME_MAX_LENGTH = 8;
+typedef void ( *pfn_task_run_cb ) ( void *pv_task_arg );
+typedef void ( *pfn_task_handle_msg_cb ) ( void *pv_msg, void *pv_user_data );
+typedef void ( *pfn_task_delete_msg_cb ) ( void *pv_msg, void *pv_user_data );
 
-class ITaskRoutine
+struct task_creation_params_t
 {
-  public:
+  task_creation_params_t(){}
+  task_creation_params_t( const std::string &cz_name, uint32_t u32_priority, uint16_t u16_stack_size, base::MsgQ *pcz_msg_queue, pfn_task_handle_msg_cb pfn_handle_msg, void *pv_handle_msg_cb_data, pfn_task_delete_msg_cb pfn_delete_msg, void *pv_delete_msg_cb_data )
+    : cz_name{ cz_name },
+    u32_priority{ u32_priority },
+    u16_stack_size{ u16_stack_size },
+    pcz_msg_queue{ pcz_msg_queue },
+    pfn_handle_msg{ pfn_handle_msg },
+    pv_handle_msg_cb_data{ pv_handle_msg_cb_data },
+    pfn_delete_msg{ pfn_delete_msg },
+    pv_delete_msg_cb_data{ pv_delete_msg_cb_data }
+  {
+  }
+  task_creation_params_t( const std::string &cz_name, uint32_t u32_priority, uint16_t u16_stack_size, pfn_task_run_cb pfn_run_cb, void *pv_task_arg )
+    : cz_name{ cz_name },
+    u32_priority{ u32_priority },
+    u16_stack_size{ u16_stack_size },
+    pfn_run_cb{ pfn_run_cb },
+    pv_task_arg{ pv_task_arg }
+  {
+  }
 
-    virtual ~ITaskRoutine () {}
-    virtual void Run( void *arg ) = 0;
-};
+	void clear()
+	{
+		cz_name.clear();
+		u32_priority=0;
+		u16_stack_size=0;
+		pcz_msg_queue=nullptr;
+		pfn_run_cb = nullptr;
+		pfn_handle_msg = nullptr;
+		pv_handle_msg_cb_data = nullptr;
+		pfn_delete_msg = nullptr;
+		pv_delete_msg_cb_data = nullptr;
+		pv_task_arg = nullptr;
+	}
 
-class ITaskMsgHandler
-{
-  public:
-
-    virtual ~ITaskMsgHandler () {}
-    virtual void HandleMsg( void *msg ) = 0;
-    virtual void DeleteMsg( void *msg ) = 0;
-};
-
-struct TaskMsgQParam
-{
-  ja_iot::base::MsgQ * msgQ;
-  ITaskMsgHandler *    taskMsgHandler;
+  std::string              cz_name{};
+  uint32_t                 u32_priority{};
+  uint16_t                 u16_stack_size{};
+  base::MsgQ *             pcz_msg_queue{};
+  pfn_task_run_cb          pfn_run_cb{};
+  pfn_task_handle_msg_cb   pfn_handle_msg{};
+  void *                   pv_handle_msg_cb_data{};
+  pfn_task_delete_msg_cb   pfn_delete_msg{};
+  void *                   pv_delete_msg_cb_data{};
+  void *                   pv_task_arg{};
 };
 
 class Task
 {
   public:
+    virtual ~Task ()
+    {
+    }
 
-    virtual ~Task () {}
+    virtual OsalError Init( task_creation_params_t *pst_task_creation_params ) = 0;
+    virtual OsalError Init(const task_creation_params_t &task_creation_params) = 0;
+    virtual OsalError Start()                                                  = 0;
+    virtual OsalError Stop()                                                   = 0;
+    virtual OsalError Destroy()                                                = 0;
+    virtual OsalError Wait()                                                   = 0;
 
-    virtual OsalError InitWithMsgQ( uint8_t *taskName, uint32_t taskPriority, uint32_t stackSize, TaskMsgQParam *taskMsgQParam, void *taskArg ) = 0;
-    virtual OsalError Init( uint8_t *taskName, uint32_t taskPriority, uint32_t stackSize, ITaskRoutine *taskRoutine, void *taskArg )            = 0;
-
-    virtual OsalError Start()   = 0;
-    virtual OsalError Stop()    = 0;
-    virtual OsalError Destroy() = 0;
-    virtual OsalError Wait()    = 0;
-
-    virtual OsalError SendMsg( void *msgMem ) = 0;
+    virtual OsalError SendMsg( void *pv_msg ) = 0;
 };
-
-#define DECLARE_TASK_MSG_HANDLER_CLASS( HNDLR_CLASS, HOST, HNDL_FUNC, DELETE_FUNC ) class HNDLR_CLASS : public ja_iot::osal::ITaskMsgHandler \
-{ \
-    public: \
-      HNDLR_CLASS( HOST * host ) : host_{ host } {} \
-      void HandleMsg( void *msg ) override{ host_->HNDL_FUNC( msg ); } \
-      void DeleteMsg( void *msg ) override{ host_->DELETE_FUNC( msg ); } \
-    private: \
-      HOST * host_; \
-}; \
-
-#define DECLARE_TASK_ROUTINE_CLASS( ROUTINE_CLASS, HOST, RUN_FUNC ) class ROUTINE_CLASS : public ja_iot::osal::ITaskRoutine \
-{ \
-    public: \
-      ROUTINE_CLASS( HOST * host ) : host_{ host } {} \
-      void Run( void *arg ) override{ host_->RUN_FUNC( arg ); } \
-    private: \
-      HOST * host_; \
-}; \
-
 }
 }
-
-#endif /* OSAL_EXPORT_TASK_H_ */

@@ -5,15 +5,15 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_PORT_FREERTOS_INC_MUTEXIMPLFREERTOS_H_
-#define OSAL_PORT_FREERTOS_INC_MUTEXIMPLFREERTOS_H_
+#pragma once
+
+#ifdef _OS_FREERTOS_
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <Mutex.h>
 #include <OsalError.h>
 
-#ifdef _OS_FREERTOS_
 
 namespace ja_iot {
 namespace osal {
@@ -42,7 +42,3 @@ class MutexImplFreertos : public Mutex
 }  // namespace osal
 }  // namespace ja_iot
 #endif /* _OS_FREERTOS_ */
-
-
-
-#endif /* OSAL_PORT_FREERTOS_INC_MUTEXIMPLFREERTOS_H_ */

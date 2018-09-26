@@ -7,10 +7,12 @@
 #ifdef _OS_FREERTOS_
 
 #include <stdio.h>
-#include <port/freertos/inc/TaskImplFreertos.h>
-#include <OsalError.h>
+#include "port/freertos/inc/TaskImplFreertos.h"
+#include "OsalError.h"
 #include "OsalMgr.h"
 #include "ScopedMutex.h"
+
+//#define _DEBUG_
 
 #ifdef _DEBUG_
 #define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
@@ -21,18 +23,21 @@
 namespace ja_iot {
 namespace osal {
 static void task_base_function( void *arg );
-
 TaskImplFreertos::TaskImplFreertos ()
 {
 }
-
 TaskImplFreertos::~TaskImplFreertos ()
 {
 }
 
-OsalError TaskImplFreertos::PortCreateTask()
+OsalError TaskImplFreertos::port_create_task()
 {
-  if( xTaskCreate( task_base_function, (const signed char *) &task_name_[0], stack_size_, this, task_priority_, &task_handle_ ) == pdFALSE )
+  if( xTaskCreate( task_base_function,
+    (const signed char *) _st_task_params.cz_name.c_str(),
+    _st_task_params.u16_stack_size,
+    this
+                 , _st_task_params.u32_priority
+                 , &task_handle_ ) == pdFALSE )
   {
     dbg( "%s=> Failed to created task\n", __FUNCTION__ );
     return ( OsalError::ERR );
@@ -43,7 +48,7 @@ OsalError TaskImplFreertos::PortCreateTask()
   return ( OsalError::OK );
 }
 
-OsalError TaskImplFreertos::PortDeleteTask()
+OsalError TaskImplFreertos::port_delete_task()
 {
   vTaskDelete( this->task_handle_ );
   this->task_handle_ = 0;

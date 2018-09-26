@@ -5,12 +5,11 @@
  *      Author: prabhu
  */
 
-#ifndef OSAL_PORT_LINUX_INC_OSALBUILDERIMPLLINUX_H_
-#define OSAL_PORT_LINUX_INC_OSALBUILDERIMPLLINUX_H_
+#pragma once
 
 #ifdef _OS_LINUX_
 
-#include <inc/OsalBuilder.h>
+#include <common/inc/OsalBuilder.h>
 
 namespace ja_iot {
 namespace osal {
@@ -51,5 +50,3 @@ class OsalBuilderImplLinux : public OsalBuilder
 }
 
 #endif /* _OS_LINUX_ */
-
-#endif /* OSAL_PORT_LINUX_INC_OSALBUILDERIMPLLINUX_H_ */

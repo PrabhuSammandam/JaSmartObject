@@ -1,12 +1,11 @@
 /*
- * TaskImplWindowsSem.h
+ * TaskImplWindows.h
  *
  *  Created on: Sep 7, 2017
  *      Author: psammand
  */
 
-#ifndef OSAL_PORT_WINDOWS_INC_TASKIMPLWINDOWS_H_
-#define OSAL_PORT_WINDOWS_INC_TASKIMPLWINDOWS_H_
+#pragma once
 
 #ifdef _OS_WINDOWS_
 
@@ -14,30 +13,28 @@
 #include "common/inc/TaskBase.h"
 #include "OsalError.h"
 
-namespace ja_iot {
-namespace osal {
-class TaskImplWindowsSem : public TaskBase
+namespace ja_iot
 {
-  public:
+  namespace osal
+  {
+    class TaskImplWindows : public TaskBase
+    {
+    public:
 
-    TaskImplWindowsSem ();
+      TaskImplWindows();
 
-    ~TaskImplWindowsSem ();
+      ~TaskImplWindows();
 
-    OsalError PortCreateTask() override;
-    OsalError PortDeleteTask() override;
-    OsalError Wait() override;
+      OsalError port_create_task() override;
+      OsalError port_delete_task() override;
+      OsalError Wait() override;
 
-  private:
+    private:
 
-    HANDLE   _taskHandle = 0;
-};
+      HANDLE _taskHandle = nullptr;
+    };
+  }
 }
-}
-
-#endif /* _OS_WINDOWS_ */
-
-
 
 
 #endif /* OSAL_PORT_WINDOWS_INC_TASKIMPLWINDOWS_H_ */

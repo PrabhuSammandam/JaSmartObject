@@ -5,11 +5,8 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_EXPORT_OSALMGR_H_
-#define OSAL_EXPORT_OSALMGR_H_
+#pragma once
 
-#include "PrimitiveDataTypes.h"
-#include "OsalError.h"
 #include "Mutex.h"
 #include "Condition.h"
 #include "Task.h"
@@ -17,6 +14,8 @@
 
 namespace ja_iot {
 namespace osal {
+class OsalTimerMgr;
+
 class OsalMgr
 {
   public:
@@ -24,7 +23,7 @@ class OsalMgr
 
     void Init();
 
-    Mutex* AllocMutex();
+    Mutex* AllocMutex() const;
     void   FreeMutex( Mutex *mutex );
 
     Condition* AllocCondition();
@@ -36,13 +35,16 @@ class OsalMgr
     Semaphore* alloc_semaphore();
     void       free_semaphore( Semaphore * );
 
-  private:
+		OsalTimerMgr* get_timer_mgr();
 
+  private:
     OsalMgr ();
     static OsalMgr   _instance;
     bool             is_inited_ = false;
+    OsalMgr( const OsalMgr &other )               = delete;
+    OsalMgr( OsalMgr &&other )                    = delete;
+    OsalMgr & operator = ( const OsalMgr &other ) = delete;
+    OsalMgr & operator = ( OsalMgr &&other )      = delete;
 };
 }
 }
-
-#endif /* OSAL_EXPORT_OSALMGR_H_ */

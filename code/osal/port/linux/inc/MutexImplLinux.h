@@ -5,8 +5,7 @@
  *      Author: prabhu
  */
 
-#ifndef OSAL_PORT_LINUX_INC_MUTEXIMPLLINUX_H_
-#define OSAL_PORT_LINUX_INC_MUTEXIMPLLINUX_H_
+#pragma once
 
 #ifdef _OS_LINUX_
 
@@ -41,5 +40,3 @@ class MutexImplLinux : public Mutex
 }
 }  // namespace ja_iot
 #endif /*_OS_LINUX_*/
-
-#endif /* OSAL_PORT_LINUX_INC_MUTEXIMPLLINUX_H_ */

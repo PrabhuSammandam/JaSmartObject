@@ -25,8 +25,8 @@ class TaskImplFreertos : public TaskBase
 
     virtual ~TaskImplFreertos ();
 
-    OsalError PortCreateTask() override;
-    OsalError PortDeleteTask() override;
+    OsalError port_create_task() override;
+    OsalError port_delete_task() override;
     OsalError Wait() override;
 
   private:

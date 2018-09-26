@@ -6,11 +6,14 @@
  */
 
 #include "OsalMgr.h"
-#include "inc/OsalBuilder.h"
+#include "common/inc/OsalBuilder.h"
+#include "common/inc/OsalTimerMgr.h"
 
 namespace ja_iot {
 namespace osal {
 static OsalBuilder *gs_osal_builder = nullptr;
+static OsalTimerMgr* gs_osal_timer_mgr = nullptr;
+
 OsalMgr OsalMgr::_instance{};
 
 OsalMgr * OsalMgr::Inst()
@@ -18,7 +21,7 @@ OsalMgr * OsalMgr::Inst()
   return ( &_instance );
 }
 
-Mutex * OsalMgr::AllocMutex()
+Mutex * OsalMgr::AllocMutex() const
 {
   if( gs_osal_builder != nullptr )
   {
@@ -38,7 +41,7 @@ void OsalMgr::FreeMutex( Mutex *mutex )
 
 Condition * OsalMgr::AllocCondition()
 {
-  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->CreateCondition() : nullptr );
+  return ( gs_osal_builder != nullptr ? gs_osal_builder->CreateCondition() : nullptr );
 }
 
 void OsalMgr::FreeCondition( Condition *condition )
@@ -51,7 +54,7 @@ void OsalMgr::FreeCondition( Condition *condition )
 
 Task * OsalMgr::AllocTask()
 {
-  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->AllocateTask() : nullptr );
+  return ( gs_osal_builder != nullptr ? gs_osal_builder->AllocateTask() : nullptr );
 }
 
 void OsalMgr::FreeTask( Task *task )
@@ -64,7 +67,7 @@ void OsalMgr::FreeTask( Task *task )
 
 Semaphore * OsalMgr::alloc_semaphore()
 {
-  return ( ( gs_osal_builder != nullptr ) ? gs_osal_builder->alloc_semaphore() : nullptr );
+  return ( gs_osal_builder != nullptr ? gs_osal_builder->alloc_semaphore() : nullptr );
 }
 
 void OsalMgr::free_semaphore( Semaphore *semaphore )
@@ -73,6 +76,11 @@ void OsalMgr::free_semaphore( Semaphore *semaphore )
   {
     gs_osal_builder->free_semaphore( semaphore );
   }
+}
+
+OsalTimerMgr * OsalMgr::get_timer_mgr()
+{
+	return gs_osal_timer_mgr;
 }
 
 OsalMgr::OsalMgr ()
@@ -92,6 +100,10 @@ void OsalMgr::Init()
   {
     gs_osal_builder->Init();
   }
+
+	gs_osal_timer_mgr = new OsalTimerMgr{};
+
+	gs_osal_timer_mgr->initialize();
 
   is_inited_ = true;
 }

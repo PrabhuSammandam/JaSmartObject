@@ -1,4 +1,3 @@
-
 #ifdef _OS_LINUX_
 
 #include "port/linux/inc/TaskImplLinux.h"
@@ -17,7 +16,7 @@ TaskImplLinux::~TaskImplLinux ()
 {
 }
 
-OsalError TaskImplLinux::PortCreateTask()
+OsalError TaskImplLinux::port_create_task()
 {
   int ret_status = pthread_create( &this->task_handle_, nullptr, task_base_function, this );
 
@@ -29,7 +28,7 @@ OsalError TaskImplLinux::PortCreateTask()
   return ( OsalError::OK );
 }
 
-OsalError TaskImplLinux::PortDeleteTask()
+OsalError TaskImplLinux::port_delete_task()
 {
   this->task_handle_ = 0;
 

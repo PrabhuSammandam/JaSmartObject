@@ -5,39 +5,37 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_EXPORT_SCOPEDMUTEX_H_
-#define OSAL_EXPORT_SCOPEDMUTEX_H_
+#pragma once
 
 #include "Mutex.h"
 
-namespace ja_iot {
-namespace osal {
-class ScopedMutex
+namespace ja_iot
 {
-  ScopedMutex( const ScopedMutex & )               = delete;
-  ScopedMutex & operator = ( const ScopedMutex & ) = delete;
-  Mutex * _mutex;
-
-  public:
-
-    ScopedMutex( Mutex const *mutex ) : _mutex{ (Mutex *) mutex }
+  namespace osal
+  {
+    class ScopedMutex
     {
-      if( _mutex != nullptr )
+      ScopedMutex(const ScopedMutex&) = delete;
+      ScopedMutex& operator =(const ScopedMutex&) = delete;
+      Mutex* _mutex;
+
+    public:
+
+      ScopedMutex(Mutex const* mutex) : _mutex{const_cast<Mutex *>(mutex)}
       {
-        _mutex->Lock();
+        if (_mutex != nullptr)
+        {
+          _mutex->Lock();
+        }
       }
-    }
 
-    ~ScopedMutex ()
-    {
-      if( _mutex != nullptr )
+      ~ScopedMutex()
       {
-        _mutex->Unlock();
+        if (_mutex != nullptr)
+        {
+          _mutex->Unlock();
+        }
       }
-    }
-};
+    };
+  }
 }
-}
-
-
-#endif /* OSAL_EXPORT_SCOPEDMUTEX_H_ */

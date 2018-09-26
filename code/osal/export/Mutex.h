@@ -5,27 +5,31 @@
  *      Author: psammand
  */
 
-#ifndef OSAL_EXPORT_MUTEX_H_
-#define OSAL_EXPORT_MUTEX_H_
+#pragma once
 
-#include "PrimitiveDataTypes.h"
 #include "OsalError.h"
 
-namespace ja_iot {
-namespace osal {
-class Mutex
+namespace ja_iot
 {
-  public:
+  namespace osal
+  {
+    class Mutex
+    {
+    public:
 
-    Mutex () {}
+      Mutex()
+      {
+      }
 
-    virtual ~Mutex () {}
-    virtual OsalError Init()   = 0;
-    virtual OsalError Uninit() = 0;
+      virtual ~Mutex()
+      {
+      }
 
-    virtual OsalError Lock()   = 0;
-    virtual OsalError Unlock() = 0;
-};
+      virtual OsalError Init() = 0;
+      virtual OsalError Uninit() = 0;
+
+      virtual OsalError Lock() = 0;
+      virtual OsalError Unlock() = 0;
+    };
+  }
 }
-}
-#endif /* OSAL_EXPORT_MUTEX_H_ */

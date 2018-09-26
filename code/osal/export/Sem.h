@@ -5,30 +5,32 @@
  *      Author: prabhu
  */
 
-#ifndef OSAL_EXPORT_SEM_H_
-#define OSAL_EXPORT_SEM_H_
+#pragma once
 
-#include <OsalError.h>
 #include <cstdint>
+#include "OsalError.h"
 
-namespace ja_iot {
-namespace osal {
-class Semaphore
+namespace ja_iot
 {
-  public:
+  namespace osal
+  {
+    class Semaphore
+    {
+    public:
+      Semaphore()
+      {
+      }
 
-    Semaphore () {}
+      virtual ~Semaphore()
+      {
+      }
 
-    virtual ~Semaphore (){}
+      virtual OsalError Init(uint32_t initial_count, uint32_t access_count) = 0;
+      virtual OsalError Uninit() = 0;
 
-    virtual OsalError Init( uint32_t initial_count,  uint32_t access_count ) = 0;
-    virtual OsalError Uninit()                      = 0;
-
-    virtual OsalError Wait() = 0;
-    virtual OsalError Post() = 0;
-};
+      virtual OsalError Wait() = 0;
+			virtual OsalError Wait(uint32_t timeout_ms) = 0;
+      virtual OsalError Post() = 0;
+    };
+  }
 }
-}
-
-
-#endif /* OSAL_EXPORT_SEM_H_ */

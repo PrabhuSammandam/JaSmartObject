@@ -5,8 +5,7 @@
  *      Author: prabhu
  */
 
-#ifndef OSAL_PORT_LINUX_INC_TASKIMPLLINUX_H_
-#define OSAL_PORT_LINUX_INC_TASKIMPLLINUX_H_
+#pragma once
 
 #ifdef _OS_LINUX_
 
@@ -24,8 +23,8 @@ class TaskImplLinux : public TaskBase
 
     virtual ~TaskImplLinux ();
 
-    OsalError PortCreateTask() override;
-    OsalError PortDeleteTask() override;
+    OsalError port_create_task() override;
+    OsalError port_delete_task() override;
     OsalError Wait() override;
 
   private:
@@ -35,5 +34,3 @@ class TaskImplLinux : public TaskBase
 }
 
 #endif /* _OS_LINUX_ */
-
-#endif /* OSAL_PORT_LINUX_INC_TASKIMPLLINUX_H_ */

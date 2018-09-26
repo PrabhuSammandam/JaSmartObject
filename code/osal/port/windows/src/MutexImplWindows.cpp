@@ -9,40 +9,42 @@
 
 #include "port/windows/inc/MutexImplWindows.h"
 
-namespace ja_iot {
-namespace osal {
-MutexImplWindows::MutexImplWindows ()
+namespace ja_iot
 {
-}
+  namespace osal
+  {
+    MutexImplWindows::MutexImplWindows()
+    {
+    }
 
-MutexImplWindows::~MutexImplWindows ()
-{
-}
+    MutexImplWindows::~MutexImplWindows()
+    {
+    }
 
-OsalError MutexImplWindows::Init()
-{
-  InitializeCriticalSection( &_criticalSection );
-  return ( OsalError::OK );
-}
+    OsalError MutexImplWindows::Init()
+    {
+      InitializeCriticalSection(&_criticalSection);
+      return OsalError::OK;
+    }
 
-OsalError MutexImplWindows::Lock()
-{
-  EnterCriticalSection( &_criticalSection );
-  return ( OsalError::OK );
-}
+    OsalError MutexImplWindows::Lock()
+    {
+      EnterCriticalSection(&_criticalSection);
+      return OsalError::OK;
+    }
 
-OsalError MutexImplWindows::Unlock()
-{
-  LeaveCriticalSection( &_criticalSection );
-  return ( OsalError::OK );
-}
+    OsalError MutexImplWindows::Unlock()
+    {
+      LeaveCriticalSection(&_criticalSection);
+      return OsalError::OK;
+    }
 
-OsalError MutexImplWindows::Uninit()
-{
-  DeleteCriticalSection( &_criticalSection );
-  return ( OsalError::OK );
-}
-}
+    OsalError MutexImplWindows::Uninit()
+    {
+      DeleteCriticalSection(&_criticalSection);
+      return OsalError::OK;
+    }
+  }
 }
 
 #endif /*#ifdef _OS_WINDOWS_*/

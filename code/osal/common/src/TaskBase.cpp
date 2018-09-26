@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <cstring>
 #include <common/inc/TaskBase.h>
 #include <MsgQ.h>
 #include <Mutex.h>
@@ -13,6 +14,8 @@
 #include <OsalMgr.h>
 #include <ScopedMutex.h>
 #include <Sem.h>
+
+// #define _DEBUG_
 
 #ifdef _DEBUG_
 #define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
@@ -22,105 +25,75 @@
 
 namespace ja_iot {
 namespace osal {
-OsalError TaskBase::InitWithMsgQ( uint8_t *taskName, uint32_t taskPriority, uint32_t stackSize, TaskMsgQParam *task_msg_q_parameter, void *taskArg )
+static constexpr uint8_t k_bit_is_to_stop       = 0;
+static constexpr uint8_t k_bit_is_msg_q_enabled = 1;
+
+OsalError TaskBase::Init( task_creation_params_t *pst_task_creation_params )
 {
-  bool is_msg_q_sem_inited = false;
-
-  msg_q_mutex_ = OsalMgr::Inst()->AllocMutex();
-
-  if( msg_q_mutex_ == nullptr )
+  if( pst_task_creation_params->pcz_msg_queue != nullptr )
   {
-    goto failed;
-  }
-
-  if( ( task_msg_q_parameter == nullptr ) || ( task_msg_q_parameter->msgQ == nullptr ) || ( task_msg_q_parameter->taskMsgHandler == nullptr ) )
-  {
-    goto failed;
-  }
-
-  if( task_msg_q_parameter->msgQ->GetCapacity() <= 0 )
-  {
-    goto failed;
-  }
-
-  msg_q_semaphore_ = OsalMgr::Inst()->alloc_semaphore();
-
-  if( msg_q_semaphore_ == nullptr )
-  {
-    goto failed;
-  }
-
-  msg_q_            = task_msg_q_parameter->msgQ;
-  task_msg_handler_ = task_msg_q_parameter->taskMsgHandler;
-
-  msg_q_semaphore_->Init( 0, task_msg_q_parameter->msgQ->GetCapacity() );
-  is_msg_q_sem_inited = true;
-
-  this->is_to_stop_    = true;
-  this->task_priority_ = taskPriority;
-  this->stack_size_    = stackSize;
-  this->task_argument_ = taskArg;
-
-  is_msg_q_enabled_ = true;
-
-  return ( OsalError::OK );
-
-failed:
-
-  dbg( "%s=> Failed to init task\n", __FUNCTION__ );
-
-  if( msg_q_semaphore_ != nullptr )
-  {
-    if( is_msg_q_sem_inited == true )
+    if( ( pst_task_creation_params->pfn_handle_msg == nullptr ) || ( pst_task_creation_params->pcz_msg_queue->GetCapacity() <= 0 ) )
     {
-      msg_q_semaphore_->Uninit();
+      return ( OsalError::INVALID_ARGS );
     }
 
-    OsalMgr::Inst()->free_semaphore( msg_q_semaphore_ );
-    msg_q_semaphore_ = nullptr;
-  }
+    _msg_q_mutex = OsalMgr::Inst()->AllocMutex();
 
-  if( msg_q_mutex_ != nullptr )
+    if( _msg_q_mutex == nullptr )
+    {
+      return ( OsalError::OUT_OF_MEMORY );
+    }
+
+    _msg_q_semaphore = OsalMgr::Inst()->alloc_semaphore();
+
+    if( _msg_q_semaphore == nullptr )
+    {
+      OsalMgr::Inst()->FreeMutex( _msg_q_mutex );
+      return ( OsalError::OUT_OF_MEMORY );
+    }
+
+    _msg_q_semaphore->Init( 0, pst_task_creation_params->pcz_msg_queue->GetCapacity() );
+
+    _st_task_params = *pst_task_creation_params;
+
+    _bits.set( k_bit_is_to_stop );
+    _bits.set( k_bit_is_msg_q_enabled );
+  }
+  else
   {
-    OsalMgr::Inst()->FreeMutex( msg_q_mutex_ );
-    msg_q_mutex_ = nullptr;
+    _bits.reset( k_bit_is_msg_q_enabled );
+    _st_task_params = *pst_task_creation_params;
   }
 
-  return ( OsalError::ERR );
+  return (OsalError::OK);
 }
 
-OsalError TaskBase::Init( uint8_t *taskName, uint32_t taskPriority, uint32_t stackSize, ITaskRoutine *taskRoutine, void *taskArg )
+OsalError TaskBase::Init( const task_creation_params_t &task_creation_params )
 {
-  is_msg_q_enabled_ = false;
-  task_priority_    = taskPriority;
-  stack_size_       = stackSize;
-  task_argument_    = taskArg;
-  task_routine_     = taskRoutine;
-
-  return ( OsalError::OK );
+  return ( Init( const_cast<task_creation_params_t *>( &task_creation_params ) ) );
 }
 
 OsalError TaskBase::Start()
 {
-  OsalError status = OsalError::OK;
+  auto status = OsalError::OK;
 
-  if( ( is_msg_q_enabled_ == true ) && ( is_to_stop_ == true ) )
+  if( ( _bits[k_bit_is_msg_q_enabled] == true ) && ( _bits[k_bit_is_to_stop] == true ) )
   {
     dbg( "%s=>Creating msg q task\n", __FUNCTION__ );
-    ScopedMutex scoped_mutex( msg_q_mutex_ );
-    is_to_stop_ = false;
-    status      = PortCreateTask();
+    ScopedMutex scoped_mutex( _msg_q_mutex );
+    _bits.reset( k_bit_is_to_stop );
+    status = port_create_task();
 
     if( status != OsalError::OK )
     {
-      is_to_stop_ = true;
+      _bits.set( k_bit_is_to_stop );
     }
 
     dbg( "%s=>Created task succesfully\n", __FUNCTION__ );
   }
   else
   {
-    status = PortCreateTask();
+    status = port_create_task();
   }
 
   return ( status );
@@ -129,14 +102,14 @@ OsalError TaskBase::Start()
 OsalError TaskBase::Stop()
 {
   /* get the lock to modify the shared variable */
-  ScopedMutex scoped_mutex( msg_q_mutex_ );
+  ScopedMutex scoped_mutex( _msg_q_mutex );
 
-  if( !is_to_stop_ )
+  if( _bits[k_bit_is_to_stop] == false )
   {
-    is_to_stop_ = true;
+    _bits.set( k_bit_is_to_stop );
 
     /* inform the thread that there are some signals sent */
-    msg_q_semaphore_->Post();
+    _msg_q_semaphore->Post();
   }
 
   return ( OsalError::OK );
@@ -144,73 +117,81 @@ OsalError TaskBase::Stop()
 
 OsalError TaskBase::Destroy()
 {
-  if( !is_to_stop_ )
+  if( _bits[k_bit_is_to_stop] == false )
   {
     return ( OsalError::ERR );
   }
 
-  if( msg_q_ != nullptr )
+  if( _st_task_params.pcz_msg_queue != nullptr )
   {
-    if( msg_q_mutex_ != nullptr )
+    if( _msg_q_mutex != nullptr )
     {
-      msg_q_mutex_->Lock();
+      _msg_q_mutex->Lock();
     }
 
-    while( msg_q_->IsEmpty() == false )
+    while( _st_task_params.pcz_msg_queue->IsEmpty() == false )
     {
-      auto msg = msg_q_->Dequeue();
+      const auto msg = _st_task_params.pcz_msg_queue->Dequeue();
 
-      if( msg != nullptr )
+      if( ( msg != nullptr ) && ( this->_st_task_params.pfn_delete_msg != nullptr ) )
       {
-        task_msg_handler_->DeleteMsg( msg );
+        this->_st_task_params.pfn_delete_msg( msg, this->_st_task_params.pv_delete_msg_cb_data );
       }
     }
 
-    msg_q_ = nullptr;
-
-    if( msg_q_mutex_ != nullptr )
+    if( _msg_q_mutex != nullptr )
     {
-      msg_q_mutex_->Unlock();
+      _msg_q_mutex->Unlock();
     }
   }
 
-  if( msg_q_mutex_ != nullptr )
+  if( _msg_q_mutex != nullptr )
   {
-    OsalMgr::Inst()->FreeMutex( msg_q_mutex_ );
+    OsalMgr::Inst()->FreeMutex( _msg_q_mutex );
   }
 
-  msg_q_mutex_ = nullptr;
+  _msg_q_mutex = nullptr;
 
-  if( msg_q_semaphore_ != nullptr )
+  if( _msg_q_semaphore != nullptr )
   {
-    msg_q_semaphore_->Uninit();
-    OsalMgr::Inst()->free_semaphore( msg_q_semaphore_ );
+    _msg_q_semaphore->Uninit();
+    OsalMgr::Inst()->free_semaphore( _msg_q_semaphore );
   }
 
-  msg_q_semaphore_ = nullptr;
+  _msg_q_semaphore = nullptr;
 
-  PortDeleteTask();
+  port_delete_task();
+
+	_st_task_params.clear();
 
   return ( OsalError::OK );
 }
 
-OsalError TaskBase::SendMsg( void *msgMem )
+OsalError TaskBase::SendMsg( void *pv_msg )
 {
-  if( ( msgMem == nullptr ) || ( msg_q_ == nullptr ) )
+  if( ( pv_msg == nullptr ) || ( _st_task_params.pcz_msg_queue == nullptr ) )
   {
     return ( OsalError::INVALID_ARGS );
   }
 
   dbg( "%s=>ENTER\n", __FUNCTION__ );
 
-  ScopedMutex scoped_mutex( msg_q_mutex_ );
+  ScopedMutex scoped_mutex( _msg_q_mutex );
 
-  if( msg_q_->Enqueue( msgMem ) == true )
+  if( _st_task_params.pcz_msg_queue->Enqueue( pv_msg ) == true )
   {
-    msg_q_semaphore_->Post();
+    if( _msg_q_semaphore != nullptr )
+    {
+      _msg_q_semaphore->Post();
+      dbg( "%s=>Msg sent successfully, msg_q_sem %p\n", __FUNCTION__, _msg_q_semaphore );
+      return ( OsalError::OK );
+    }
 
-    dbg( "%s=>Msg sent successfully, msg_q_sem %p\n", __FUNCTION__, msg_q_semaphore_ );
-    return ( OsalError::OK );
+    dbg( "%s=>msg_q_sem NULL\n", __FUNCTION__ );
+  }
+  else
+  {
+      dbg( "%s=>enque failed\n", __FUNCTION__ );
   }
 
   return ( OsalError::ERR );
@@ -219,38 +200,50 @@ OsalError TaskBase::SendMsg( void *msgMem )
 
 void TaskBase::Run()
 {
-  if( is_msg_q_enabled_ )
+  if( _bits[k_bit_is_msg_q_enabled] == true )
   {
-    while( is_to_stop_ == false )
+    while( _bits[k_bit_is_to_stop] == false )
     {
-      dbg( "%s=>**********************************going to wait******************\n", __FUNCTION__ );
-      msg_q_semaphore_->Wait();
+      // dbg( "%s=>**********************************going to wait******************\n", __FUNCTION__ );
 
-      msg_q_mutex_->Lock();
+      _msg_q_semaphore->Wait();
+
+      _msg_q_mutex->Lock();
 
       /* if it is exited from wait condition, first check whether stop signal is
        * send by anyone */
-      if( is_to_stop_ == true )
+      if( _bits[k_bit_is_to_stop] == true )
       {
-        msg_q_mutex_->Unlock();
+        _msg_q_mutex->Unlock();
         continue;
       }
 
-      auto new_msg = msg_q_->Dequeue();
+      const auto new_msg = _st_task_params.pcz_msg_queue->Dequeue();
 
-      msg_q_mutex_->Unlock();
+      _msg_q_mutex->Unlock();
 
       if( new_msg != nullptr )
       {
         dbg( "%s=>Calling task handler\n", __FUNCTION__ );
-        task_msg_handler_->HandleMsg( new_msg );
-        task_msg_handler_->DeleteMsg( new_msg );
+
+        if( this->_st_task_params.pfn_handle_msg )
+        {
+          this->_st_task_params.pfn_handle_msg( new_msg, this->_st_task_params.pv_handle_msg_cb_data );
+        }
+
+        if( this->_st_task_params.pfn_delete_msg )
+        {
+          this->_st_task_params.pfn_delete_msg( new_msg, this->_st_task_params.pv_delete_msg_cb_data );
+        }
       }
     }
   }
   else
   {
-    task_routine_->Run( task_argument_ );
+    if( this->_st_task_params.pfn_run_cb )
+    {
+      this->_st_task_params.pfn_run_cb( this->_st_task_params.pv_task_arg );
+    }
   }
 }
 }
