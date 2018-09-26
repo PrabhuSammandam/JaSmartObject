@@ -11,9 +11,7 @@ include_directories(../../../code/base/export
                     ../../../code/stack/export
                     ../../../code/osal/export)
 
-set(SRCS
-    code/main.cpp
-	code/BinarySwitchResource.cpp)
+set(SRCS code/main.cpp code/BinarySwitchResource.cpp)
 
 add_executable(linux_server ${SRCS})
 target_link_libraries(linux_server stack osal network memory base pthread)
