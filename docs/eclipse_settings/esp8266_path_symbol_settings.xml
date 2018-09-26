@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="C Source File">
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/extra_include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/driver_lib/include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/espressif</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv4</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv6</includepath>
+<includepath workspace_path="true">/libbase/base/export</includepath>
+<includepath workspace_path="true">/libmemory/memory/export</includepath>
+<includepath workspace_path="true">/libosal/osal/export</includepath>
+<includepath workspace_path="true">/libnetwork/network/export</includepath>
+<includepath workspace_path="true">/libdebug/debug/export</includepath>
+<includepath workspace_path="true">/esp8266_basic_network_app/code/include</includepath>
+
+</language>
+<language name="C++ Source File">
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/espressif</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/extra_include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/driver_lib/include</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv4</includepath>
+<includepath>${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv6</includepath>
+<includepath workspace_path="true">/libbase/base/export</includepath>
+<includepath workspace_path="true">/libmemory/memory/export</includepath>
+<includepath workspace_path="true">/libosal/osal/export</includepath>
+<includepath workspace_path="true">/libnetwork/network/export</includepath>
+<includepath workspace_path="true">/libdebug/debug/export</includepath>
+<includepath workspace_path="true">/esp8266_basic_network_app/code/include</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="C Source File">
+<macro>
+<name>ICACHE_FLASH</name><value/>
+</macro>
+<macro>
+<name>__STDC_NO_ATOMICS__</name><value>1</value>
+</macro>
+<macro>
+<name>ESP8266_RTOS</name><value/>
+</macro>
+<macro>
+<name>FREERTOS_ARCH_ESP8266</name><value/>
+</macro>
+<macro>
+<name>__ets__</name><value/>
+</macro>
+<macro>
+<name>_OS_FREERTOS_</name><value/>
+</macro>
+<macro>
+<name>_LITTLE_ENDIAN_</name><value/>
+</macro>
+<macro>
+<name>_DEBUG_</name><value/>
+</macro>
+<macro>
+<name>_IP_ADAPTER_</name><value/>
+</macro>
+<macro>
+<name>_SINGLE_THREAD_</name><value/>
+</macro>
+<macro>
+<name>LWIP_COMPAT_SOCKETS</name><value/>
+</macro>
+
+</language>
+<language name="C++ Source File">
+<macro>
+<name>ICACHE_FLASH</name><value/>
+</macro>
+<macro>
+<name>_GLIBCXX_USE_CXX11_ABI</name><value>0</value>
+</macro>
+<macro>
+<name>__STDC_NO_ATOMICS__</name><value>1</value>
+</macro>
+<macro>
+<name>ESP8266_RTOS</name><value/>
+</macro>
+<macro>
+<name>__STDC_VERSION__</name><value>201112L</value>
+</macro>
+<macro>
+<name>FREERTOS_ARCH_ESP8266</name><value/>
+</macro>
+<macro>
+<name>__ets__</name><value/>
+</macro>
+<macro>
+<name>_OS_FREERTOS_</name><value/>
+</macro>
+<macro>
+<name>_LITTLE_ENDIAN_</name><value/>
+</macro>
+<macro>
+<name>_DEBUG_</name><value/>
+</macro>
+<macro>
+<name>_IP_ADAPTER_</name><value/>
+</macro>
+<macro>
+<name>_SINGLE_THREAD_</name><value/>
+</macro>
+<macro>
+<name>LWIP_COMPAT_SOCKETS</name><value/>
+</macro>
+
+</language>
+<language name="Object File">
+
+</language>
+<language name="Assembly Source File">
+
+</language>
+</section>
+</cdtprojectproperties>
