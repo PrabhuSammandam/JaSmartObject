@@ -10,12 +10,16 @@
 
 #include <data_types.h>
 
-namespace ja_iot {
-namespace network {
-template <typename T> bool IsBitSet(const T value, const T bitmask) {
-  return ((value & bitmask) == bitmask);
-}
-}
+namespace ja_iot
+{
+  namespace network
+  {
+    template <typename T>
+    bool IsBitSet(const T value, const T bitmask)
+    {
+      return ((value & bitmask) == bitmask);
+    }
+  }
 }
 
 #endif /* COMMON_UTILS_H_ */

@@ -26,16 +26,16 @@ Esp8266PlatformFactory::Esp8266PlatformFactory ()
 {
 }
 
-IInterfaceMonitor * Esp8266PlatformFactory::GetInterfaceMonitor()
+IInterfaceMonitor * Esp8266PlatformFactory::get_interface_monitor()
 {
   return nullptr;
 }
 
-IAdapter * Esp8266PlatformFactory::GetAdapter( uint16_t adapter_type )
+IAdapter * Esp8266PlatformFactory::get_adapter( uint16_t adapter_type )
 {
 #ifdef _IP_ADAPTER_
 
-  if( adapter_type == kAdapterType_ip )
+  if( adapter_type == k_adapter_type_ip )
   {
     return ( &gs_ip_adapter_esp8266 );
   }
@@ -50,7 +50,7 @@ IUdpSocket * Esp8266PlatformFactory::AllocSocket()
   return ( new UdpSocketImplEsp8266{} );
 }
 
-void Esp8266PlatformFactory::FreeSocket( IUdpSocket *socket )
+void Esp8266PlatformFactory::free_socket( IUdpSocket *socket )
 {
   if( socket != nullptr )
   {

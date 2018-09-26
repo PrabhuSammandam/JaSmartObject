@@ -20,10 +20,10 @@ class Esp8266PlatformFactory : public INetworkPlatformFactory
 
     Esp8266PlatformFactory ();
 
-    IInterfaceMonitor* GetInterfaceMonitor()                  override;
-    IAdapter*          GetAdapter( uint16_t adapter_type ) override;
+    IInterfaceMonitor* get_interface_monitor()                  override;
+    IAdapter*          get_adapter( uint16_t adapter_type ) override;
     IUdpSocket*        AllocSocket() override;
-    void               FreeSocket( IUdpSocket *socket ) override;
+    void               free_socket( IUdpSocket *socket ) override;
 };
 }
 }

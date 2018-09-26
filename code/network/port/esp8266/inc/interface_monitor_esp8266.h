@@ -10,6 +10,7 @@
 
 #ifdef _OS_FREERTOS_
 
+#include "ErrCode.h"
 #include <interface_addr.h>
 #include <i_interface_monitor.h>
 
@@ -18,17 +19,16 @@ namespace network {
 class InterfaceMonitorImplEsp8266 : public IInterfaceMonitor
 {
   public:
-
     InterfaceMonitorImplEsp8266 ();
 
-    ErrCode StartMonitor( uint16_t adapter_type ) override;
-    ErrCode StopMonitor( uint16_t adapter_type )  override;
+    base::ErrCode start_monitor( uint16_t adapter_type ) override;
+    base::ErrCode stop_monitor( uint16_t adapter_type )  override;
 
-    ErrCode GetInterfaceAddrList( InterfaceAddressPtrArray &interface_address_ptr_array, bool skip_if_down = true ) override;
-    ErrCode GetNewlyFoundInterface( InterfaceAddressPtrArray &if_addr_ptr_array ) override;
+    std::vector<InterfaceAddress *> get_interface_addr_list(  bool skip_if_down = true ) override;
+    std::vector<InterfaceAddress *> get_newly_found_interface( ) override;
 
-    void AddInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )    override;
-    void RemoveInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler ) override;
+    void add_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_cb, void* pv_user_data)    override;
+    void remove_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_cb ) override;
 
   private:
     InterfaceAddress   if_addr_;

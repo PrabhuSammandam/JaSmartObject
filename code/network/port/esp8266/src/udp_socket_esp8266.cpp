@@ -7,18 +7,19 @@
  */
 #ifdef _OS_FREERTOS_
 
+#include <functional>
 #include <lwip/err.h>
 #include <string.h>
 #include <climits>
 #include <lwip/sockets.h>
-#include <ip_addr.h>
-#include <port/esp8266/inc/udp_socket_esp8266.h>
+
+#include "i_udp_socket.h"
+#include "ip_addr.h"
+#include "port/esp8266/inc/udp_socket_esp8266.h"
 
 namespace ja_iot {
 namespace network {
-
 using namespace ja_iot::base;
-
 UdpSocketImplEsp8266::UdpSocketImplEsp8266 ()
 {
 }
@@ -26,7 +27,7 @@ UdpSocketImplEsp8266::UdpSocketImplEsp8266 ()
 SocketError UdpSocketImplEsp8266::OpenSocket( IpAddrFamily ip_addr_family )
 {
   ip_addr_family_ = ip_addr_family;
-  socket_fd_      = socket( ( ip_addr_family == IpAddrFamily::IPV4 ) ? PF_INET : PF_INET6, SOCK_DGRAM, IPPROTO_UDP );
+  socket_fd_      = socket( ( ip_addr_family == IpAddrFamily::IPv4 ) ? PF_INET : PF_INET6, SOCK_DGRAM, IPPROTO_UDP );
 
   if( socket_fd_ < 0 )
   {
@@ -46,7 +47,7 @@ SocketError UdpSocketImplEsp8266::BindSocket( IpAddress &ip_address, uint16_t po
   const sockaddr *p_sock_addr  = nullptr;
   int             sockaddr_len = 0;
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( ip_addr_family_ == IpAddrFamily::IPv4 )
   {
     struct sockaddr_in ipv4_sock_addr = { 0 };
 
@@ -97,7 +98,7 @@ SocketError UdpSocketImplEsp8266::JoinMulticastGroup( IpAddress &group_address, 
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( ip_addr_family_ == IpAddrFamily::IPv4 )
   {
     struct ip_mreq mreq {};
 
@@ -122,7 +123,7 @@ SocketError UdpSocketImplEsp8266::LeaveMulticastGroup( IpAddress &group_address,
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( ip_addr_family_ == IpAddrFamily::IPv4 )
   {
     struct ip_mreq mreq {};
 
@@ -145,7 +146,7 @@ SocketError UdpSocketImplEsp8266::SelectMulticastInterface( IpAddress &group_add
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( ip_addr_family_ == IpAddrFamily::IPv4 )
   {
     struct ip_mreq mreq {};
 
@@ -170,7 +171,7 @@ SocketError UdpSocketImplEsp8266::ReceiveData( IpAddress &remote_addr, uint16_t 
     return ( SocketError::ERR );
   }
 
-//  printf("UdpSocketImplEsp8266::ReceiveData: ReadData socked_fd[%d]\n", socket_fd_);
+  // printf("UdpSocketImplEsp8266::ReceiveData: ReadData socked_fd[%d]\n", socket_fd_);
 
   struct sockaddr_storage sock_store = { 0 };
 
@@ -179,12 +180,12 @@ SocketError UdpSocketImplEsp8266::ReceiveData( IpAddress &remote_addr, uint16_t 
 
   if( received_bytes > 0 )
   {
-//  printf("UdpSocketImplEsp8266::ReceiveData: ReadData data_len[%d]\n", received_bytes);
+    // printf("UdpSocketImplEsp8266::ReceiveData: ReadData data_len[%d]\n", received_bytes);
     if( sock_store.ss_family == AF_INET )
     {
       struct sockaddr_in *p_ipv4_addr = (struct sockaddr_in *) &sock_store;
-      remote_addr.set_addr_family( IpAddrFamily::IPV4 );
-      remote_addr.set_addr( (uint8_t *) &p_ipv4_addr->sin_addr.s_addr, IpAddrFamily::IPV4 );
+      remote_addr.set_addr_family( IpAddrFamily::IPv4 );
+      remote_addr.set_addr( (uint8_t *) &p_ipv4_addr->sin_addr.s_addr, IpAddrFamily::IPv4 );
       port = ntohs( p_ipv4_addr->sin_port );
     }
     else if( sock_store.ss_family == AF_INET6 )
@@ -203,8 +204,6 @@ SocketError UdpSocketImplEsp8266::ReceiveData( IpAddress &remote_addr, uint16_t 
 
 SocketError UdpSocketImplEsp8266::SendData( IpAddress &ip_address, uint16_t port, uint8_t *data, uint16_t data_length )
 {
-  SocketError ret_status = SocketError::OK;
-
   if( ( data == nullptr ) || ( data_length == 0 )
     || ( socket_fd_ < 0 ) )
   {
@@ -212,12 +211,14 @@ SocketError UdpSocketImplEsp8266::SendData( IpAddress &ip_address, uint16_t port
   }
 
   const sockaddr *p_sock_addr{ nullptr };
+  struct sockaddr_in  sock_addr = { 0 };
+
+  struct sockaddr_in6 sock_addr6 = { 0 };
+
   int sockaddr_len{ 0 };
 
-  if( ip_address.get_addr_family() == IpAddrFamily::IPV4 )
+  if( ip_address.get_addr_family() == IpAddrFamily::IPv4 )
   {
-    struct sockaddr_in sock_addr = { 0 };
-
     sock_addr.sin_family      = AF_INET;
     sock_addr.sin_port        = htons( port );
     sock_addr.sin_addr.s_addr = htonl( ip_address.as_u32() );
@@ -227,8 +228,6 @@ SocketError UdpSocketImplEsp8266::SendData( IpAddress &ip_address, uint16_t port
   }
   else
   {
-    struct sockaddr_in6 sock_addr6 = { 0 };
-
     sock_addr6.sin6_family = AF_INET6;
     sock_addr6.sin6_port   = htons( port );
     memcpy( &sock_addr6.sin6_addr, ip_address.get_addr(),
@@ -238,34 +237,9 @@ SocketError UdpSocketImplEsp8266::SendData( IpAddress &ip_address, uint16_t port
     sockaddr_len = sizeof( struct sockaddr_in6 );
   }
 
-  int len{ 0 };
-  size_t currently_no_of_bytes_sent = 0;
+  auto len = sendto( socket_fd_, reinterpret_cast<char *>( data ), data_length, 0, p_sock_addr, sockaddr_len );
 
-  do
-  {
-    int remaining_bytes_to_send = ( ( data_length - currently_no_of_bytes_sent ) > INT_MAX ) ? INT_MAX : (int) ( data_length - currently_no_of_bytes_sent );
-
-    len = sendto( socket_fd_, ( (char *) data ) + currently_no_of_bytes_sent,
-        remaining_bytes_to_send, 0, p_sock_addr, sockaddr_len );
-
-    if( -1 == len )
-    {
-      ret_status = SocketError::SEND_FAILED;
-    }
-    else
-    {
-      currently_no_of_bytes_sent += len;
-
-      if( currently_no_of_bytes_sent != (size_t) len )
-      {
-      }
-      else
-      {
-      }
-    }
-  } while( ( -1 == len ) || ( currently_no_of_bytes_sent < data_length ) );
-
-  return ( ret_status );
+  return ( ( -1 == len ) ? SocketError::SEND_FAILED : SocketError::OK );
 }
 
 SocketError UdpSocketImplEsp8266::EnableMulticastLoopback( bool is_enabled )
@@ -275,7 +249,7 @@ SocketError UdpSocketImplEsp8266::EnableMulticastLoopback( bool is_enabled )
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( ip_addr_family_ == IpAddrFamily::IPv4 )
   {
     int on = ( is_enabled ) ? 1 : 0;
 

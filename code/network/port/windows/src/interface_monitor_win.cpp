@@ -7,17 +7,19 @@
 
 #ifdef _OS_WINDOWS_
 
+#include <memory>
+#include <vector>
+#include <functional>
+#include <algorithm>
+#include <forward_list>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
-#include <mstcpip.h>
 #include <ws2ipdef.h>
 #include <iptypes.h>
-#include <mswsock.h>
 #include "ScopedMutex.h"
 #include "OsalMgr.h"
 #include <port/windows/inc/interface_monitor_win.h>
-#include "SimpleList.h"
 #include <common/inc/logging_network.h>
 
 using namespace ja_iot::osal;
@@ -25,51 +27,58 @@ using namespace ja_iot::base;
 
 namespace ja_iot {
 namespace network {
-//
-using InterfaceAddressList          = SimpleList<InterfaceAddress, MAX_NO_OF_INTERFACE_ADDRESS>;
-using InterfaceAddressPtrList       = StaticPtrArray<InterfaceAddress *, MAX_NO_OF_INTERFACE_ADDRESS>;
-using InterfaceEventHandlerPtrArray = StaticPtrArray<IInterfaceEventHandler *, MAX_NO_OF_INTERFACE_EVENT_HANDLER>;
+struct InterfaceMonitorCbData
+{
+  pfn_interface_monitor_cb   cz_if_monitor_cb = nullptr;
+  void *                     pv_user_data     = nullptr;
+  InterfaceMonitorCbData( const pfn_interface_monitor_cb cz_if_monitor_cb, void *pv_user_data )
+    : cz_if_monitor_cb{ cz_if_monitor_cb },
+    pv_user_data{ pv_user_data }
+  {
+  }
+};
 
 static DWORD WINAPI InterfaceMonitorThread( PVOID context );
 
 class InterfaceMonitorImplWindowsData
 {
   public:
+    InterfaceMonitorImplWindowsData( InterfaceMonitorImplWindows *host ) : host_{ host }
+    {
+    }
 
-    InterfaceMonitorImplWindowsData( InterfaceMonitorImplWindows *host ) : host_{ host } {}
+    std::unique_ptr<IP_ADAPTER_ADDRESSES> get_adapters() const;
+    bool                                  is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS *p_unicast_adapter_addr ) const;
+    std::vector<InterfaceAddress *>       get_if_addr_list_for_index( uint16_t index ) const;
+    bool                                  register_for_addr_change();
+    bool                                  unregister_for_addr_change();
+    void                                  reset();
+    void                                  run_if_monitor_thread();
+    void                                  handle_interface_addr_change();
+    void                                  notify_if_modified();
+    void                                  notify_if_state_changed( InterfaceStatusFlag interface_status );
 
-  public:
-    IP_ADAPTER_ADDRESSES* get_adapters();
-    bool                  is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS *p_unicast_adapter_addr );
-    void                  get_if_addr_list_for_index( uint16_t index, PtrArray<InterfaceAddress *> &if_addr_ptr_list );
-    bool                  register_for_addr_change();
-    bool                  unregister_for_addr_change();
-    void                  reset();
-    void                  run_if_monitor_thread();
-    void                  handle_interface_addr_change();
-    void                  notify_if_modified();
-    void                  notify_if_state_changed( InterfaceStatusFlag interface_status );
-
-  public:
-    InterfaceMonitorImplWindows *   host_                  = nullptr;
-    Mutex *                         access_mutex_          = nullptr;
-    HANDLE                          shutdown_event_        = nullptr;
-    HANDLE                          monitor_thread_handle_ = nullptr;
-    bool                            is_old_if_addr_lost_   = false;
-    InterfaceAddressPtrList         curr_if_addr_ptr_list_;
-    InterfaceAddressPtrList         new_if_addr_ptr_list_;
-    InterfaceAddressList            if_addr_store_;
-    InterfaceEventHandlerPtrArray   if_event_handler_ptr_array_;
+    InterfaceMonitorImplWindows *host_{};
+    Mutex *access_mutex_{};
+    HANDLE shutdown_event_{};
+    HANDLE monitor_thread_handle_{};
+    bool   is_old_if_addr_lost_ = false;
+    std::vector<InterfaceAddress *> curr_if_addr_ptr_list_{};
+    std::vector<InterfaceAddress *> new_if_addr_ptr_list_{};
+    std::forward_list<InterfaceMonitorCbData *> _if_monitor_clients_list{};
 };
 
 InterfaceMonitorImplWindows::InterfaceMonitorImplWindows ()
 {
-  pimpl_ = new InterfaceMonitorImplWindowsData{ this };
+  pimpl_ = std::make_unique<InterfaceMonitorImplWindowsData>( this );
+}
+InterfaceMonitorImplWindows::~InterfaceMonitorImplWindows ()
+{
 }
 
-ErrCode InterfaceMonitorImplWindows::StartMonitor( uint16_t adapter_type )
+ErrCode InterfaceMonitorImplWindows::start_monitor( uint16_t adapter_type )
 {
-  ErrCode ret_status = ErrCode::OK;
+  auto ret_status = ErrCode::OK;
 
   DBG_INFO( "InterfaceMonitorImplWindows::StartMonitor:%d# ENTER adapter_type[%x]", __LINE__, (int) adapter_type );
 
@@ -78,162 +87,149 @@ ErrCode InterfaceMonitorImplWindows::StartMonitor( uint16_t adapter_type )
   if( pimpl_->access_mutex_ == nullptr )
   {
     DBG_ERROR( "InterfaceMonitorImplWindows::StartMonitor:%d# AllocMutex FAILED", __LINE__ );
-    ret_status = ErrCode::ERR; goto exit_label_;
+    ret_status = ErrCode::ERR;
+    goto exit_label_;
   }
 
-  pimpl_->curr_if_addr_ptr_list_.Clear();
+  pimpl_->curr_if_addr_ptr_list_.clear();
 
   if( !pimpl_->register_for_addr_change() )
   {
     DBG_ERROR( "InterfaceMonitorImplWindows::StartMonitor:%d# FAILED to register for addr change", __LINE__ );
     pimpl_->reset();
-    ret_status = ErrCode::ERR; goto exit_label_;
+    ret_status = ErrCode::ERR;
   }
 
 exit_label_:
-  DBG_INFO( "InterfaceMonitorImplWindows::StartMonitor:%d# EXIT status %d", __LINE__, (int)ret_status );
+  DBG_INFO( "InterfaceMonitorImplWindows::StartMonitor:%d# EXIT status %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }
 
-ErrCode InterfaceMonitorImplWindows::StopMonitor( uint16_t adapter_type )
+ErrCode InterfaceMonitorImplWindows::stop_monitor( uint16_t adapter_type )
 {
-  ErrCode ret_status = ErrCode::OK;
+  auto ret_status = ErrCode::OK;
 
   DBG_INFO( "InterfaceMonitorImplWindows::StopMonitor:%d# ENTER AdapterType %x", __LINE__, (int) adapter_type );
 
   pimpl_->unregister_for_addr_change();
   pimpl_->reset();
 
-  DBG_INFO( "InterfaceMonitorImplWindows::StopMonitor:%d# EXIT %d", __LINE__, (int)ret_status );
+  DBG_INFO( "InterfaceMonitorImplWindows::StopMonitor:%d# EXIT %d", __LINE__, (int) ret_status );
 
   return ( ret_status );
 }
 
-ErrCode InterfaceMonitorImplWindows::GetInterfaceAddrList( InterfaceAddressPtrArray &if_ptr_array, bool skip_if_down )
+std::vector<InterfaceAddress *> InterfaceMonitorImplWindows::get_interface_addr_list( bool skip_if_down )
 {
-  ErrCode ret_status = ErrCode::OK;
+  std::vector<InterfaceAddress *> if_ptr_array{};
 
-  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# ENTER skip_if_down %d", __LINE__, skip_if_down );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_interface_addr_list:%d# ENTER skip_if_down %d", __LINE__, skip_if_down );
 
   ScopedMutex lock( pimpl_->access_mutex_ );
 
-  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# Current no of if address %d", __LINE__, pimpl_->curr_if_addr_ptr_list_.Count() );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_interface_addr_list:%d# Current no of if address %d", __LINE__, static_cast<int>( pimpl_->curr_if_addr_ptr_list_.size() ) );
 
-  if( pimpl_->curr_if_addr_ptr_list_.Count() > 0 )
+  for( auto &if_addr : pimpl_->curr_if_addr_ptr_list_ )
   {
-    for( int i = 0; i < pimpl_->curr_if_addr_ptr_list_.Count(); i++ )
+    if( !( skip_if_down && ( ( if_addr->get_flags() & IFF_UP ) != IFF_UP ) ) )
     {
-      auto if_addr = pimpl_->curr_if_addr_ptr_list_.GetItem( i );
+#ifdef _DEBUG_
+      char ascii_interface_addr[64] = {0};
+			inet_ntop( if_addr->get_family() == IpAddrFamily::IPv4 ? AF_INET : AF_INET6,
+        (void *) ( if_addr->get_addr() ),
+        &ascii_interface_addr[0], sizeof( ascii_interface_addr ) );
+      DBG_INFO(
+        "InterfaceMonitorImplWindows::get_interface_addr_list:%d# Adding if_addr idx[%d], family[%d], flags[%x], addr[%s]",
+        __LINE__,
+        if_addr->get_index(),
+        int(if_addr->get_family() ),
+        int(if_addr->get_flags() ),
+        &ascii_interface_addr[0] );
+#endif /*_DEBUG_*/
 
-      if( if_addr != nullptr )
-      {
-        if( skip_if_down && ( ( if_addr->getFlags() & IFF_UP ) != IFF_UP ) )
-        {
-          continue;
-        }
-
-        DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# Adding if_addr idx[%d], family[%d], flags[%x], addr[%s]", __LINE__, if_addr->getIndex(), (int)if_addr->getFamily(), (int)if_addr->getFlags(), if_addr->get_addr() );
-        auto newIfAddr = new InterfaceAddress( *if_addr );
-        if_ptr_array.Add( newIfAddr );
-      }
+      if_ptr_array.push_back( new InterfaceAddress{ *if_addr } );
     }
   }
 
-  DBG_INFO( "InterfaceMonitorImplWindows::GetInterfaceAddrList:%d# EXIT status %d", __LINE__, (int)ret_status );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_interface_addr_list:%d# EXIT", __LINE__ );
 
-  return ( ret_status );
+  return ( if_ptr_array );
 }
 
-ErrCode InterfaceMonitorImplWindows::GetNewlyFoundInterface( InterfaceAddressPtrArray &newly_found_if_addr_ptr_list )
+std::vector<InterfaceAddress *> InterfaceMonitorImplWindows::get_newly_found_interface()
 {
-  ErrCode ret_status = ErrCode::OK;
-
-  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# ENTER", __LINE__ );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# ENTER", __LINE__ );
 
   pimpl_->access_mutex_->Lock();
 
+  std::vector<InterfaceAddress *> newly_found_if_addr_ptr_list{};
+
   pimpl_->is_old_if_addr_lost_ = false;
 
-  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Newly found if_addr count[%d]", __LINE__, pimpl_->new_if_addr_ptr_list_.Count() );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# Newly found if_addr count[%d]", __LINE__, static_cast<int>( pimpl_->new_if_addr_ptr_list_.size() ) );
+  newly_found_if_addr_ptr_list.swap( pimpl_->new_if_addr_ptr_list_ );
+  pimpl_->new_if_addr_ptr_list_.clear();
 
-  if( pimpl_->new_if_addr_ptr_list_.Count() > 0 )
-  {
-    for( int i = 0; i < pimpl_->new_if_addr_ptr_list_.Count(); i++ )
-    {
-      auto if_addr = pimpl_->new_if_addr_ptr_list_.GetItem( i );
+  const auto is_new_if_addr_found{ pimpl_->new_if_addr_ptr_list_.size() > 0 };
 
-      if( if_addr != nullptr )
-      {
-        DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Adding if_addr idx[%d], family[%d], flags[%x]", __LINE__, if_addr->getIndex(), (int)if_addr->getFamily(), (int)if_addr->getFlags() );
-
-        newly_found_if_addr_ptr_list.Add( new InterfaceAddress{ *if_addr } );
-
-        /* free the interface address */
-        pimpl_->if_addr_store_.Free( if_addr );
-      }
-    }
-  }
-
-  pimpl_->new_if_addr_ptr_list_.Clear();
-
-  bool is_old_if_addr_lost{ pimpl_->is_old_if_addr_lost_ };
-  bool is_new_if_addr_found{ pimpl_->new_if_addr_ptr_list_.Count() > 0 };
-
-  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# old if_addr lost [%d], new if_addr_found[%d]", __LINE__, is_old_if_addr_lost, is_new_if_addr_found );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# old if_addr lost [%d], new if_addr_found[%d]", __LINE__, pimpl_->is_old_if_addr_lost_, is_new_if_addr_found );
 
   pimpl_->access_mutex_->Unlock();
 
-  if( is_old_if_addr_lost )
+  if( pimpl_->is_old_if_addr_lost_ )
   {
-    DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Notifying IF_DOWN", __LINE__ );
+    DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# Notifying IF_DOWN", __LINE__ );
     pimpl_->notify_if_state_changed( InterfaceStatusFlag::DOWN );
   }
 
   if( is_new_if_addr_found )
   {
-    DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# Notifying IF_UP", __LINE__ );
+    DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# Notifying IF_UP", __LINE__ );
     pimpl_->notify_if_state_changed( InterfaceStatusFlag::UP );
   }
 
-  DBG_INFO( "InterfaceMonitorImplWindows::GetNewlyFoundInterface:%d# EXIT status %d", __LINE__, (int)ret_status );
+  DBG_INFO( "InterfaceMonitorImplWindows::get_newly_found_interface:%d# EXIT", __LINE__ );
 
-  return ( ret_status );
+  return ( newly_found_if_addr_ptr_list );
 }
 
-void InterfaceMonitorImplWindows::AddInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )
+void InterfaceMonitorImplWindows::add_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_cb, void *pv_user_data )
 {
-  if( interface_event_handler != nullptr )
+  if( cz_if_monitor_cb )
   {
-    DBG_INFO( "InterfaceMonitorImplWindows::AddInterfaceEventHandler:%d# Added if_handler %p", __LINE__, interface_event_handler );
-    pimpl_->if_event_handler_ptr_array_.Add( interface_event_handler );
+    pimpl_->_if_monitor_clients_list.push_front( new InterfaceMonitorCbData{ cz_if_monitor_cb, pv_user_data } );
   }
 }
 
-void InterfaceMonitorImplWindows::RemoveInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )
+void InterfaceMonitorImplWindows::remove_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_cb )
 {
-  if( interface_event_handler != nullptr )
+  if( cz_if_monitor_cb )
   {
-    DBG_INFO( "InterfaceMonitorImplWindows::RemoveInterfaceEventHandler:%d# Removed if_handler %p", __LINE__, interface_event_handler );
-    pimpl_->if_event_handler_ptr_array_.Remove( interface_event_handler );
+    for( auto it = pimpl_->_if_monitor_clients_list.begin(); it != pimpl_->_if_monitor_clients_list.end(); ++it )
+    {
+      if( ( *it )->cz_if_monitor_cb == cz_if_monitor_cb )
+      {
+        delete ( *it );
+        break;
+      }
+    }
   }
 }
 
-void InterfaceMonitorImplWindowsData::notify_if_state_changed( InterfaceStatusFlag interface_status )
+void InterfaceMonitorImplWindowsData::notify_if_state_changed( const InterfaceStatusFlag interface_status )
 {
-  if( if_event_handler_ptr_array_.Count() > 0 )
+  if( !_if_monitor_clients_list.empty() )
   {
     InterfaceEvent interface_event{ InterfaceEventType::kInterfaceStateChanged };
-    interface_event.setInterfaceStatusFlag( interface_status );
+    interface_event.set_status_flag( interface_status );
 
-    for( int i = 0; i < if_event_handler_ptr_array_.Count(); i++ )
+    for( auto &callback : _if_monitor_clients_list )
     {
-      auto if_modified_handler = if_event_handler_ptr_array_.GetItem( i );
-
-      if( if_modified_handler != nullptr )
+      if( callback->cz_if_monitor_cb )
       {
-        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_state_changed:%d# Calling the HandleEvent for handler[%p]", __LINE__, if_modified_handler );
-        if_modified_handler->HandleInterfaceEvent( &interface_event );
+        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_state_changed:%d# Calling the HandleEvente", __LINE__ );
+        callback->cz_if_monitor_cb( &interface_event, callback->pv_user_data );
       }
     }
   }
@@ -241,36 +237,34 @@ void InterfaceMonitorImplWindowsData::notify_if_state_changed( InterfaceStatusFl
 
 void InterfaceMonitorImplWindowsData::notify_if_modified()
 {
-  if( if_event_handler_ptr_array_.Count() > 0 )
+  if( !_if_monitor_clients_list.empty() )
   {
     InterfaceEvent interface_event{ InterfaceEventType::kInterfaceModified };
-    interface_event.setAdapterType( kAdapterType_ip );
+    interface_event.set_adapter_type( k_adapter_type_ip );
 
-    for( int i = 0; i < if_event_handler_ptr_array_.Count(); i++ )
+    for( auto &callback : _if_monitor_clients_list )
     {
-      auto if_modified_handler = if_event_handler_ptr_array_.GetItem( i );
-
-      if( if_modified_handler != nullptr )
+      if( callback->cz_if_monitor_cb )
       {
-        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_modified:%d# Calling the HandleEvent for handler[%p]", __LINE__, if_modified_handler );
-        if_modified_handler->HandleInterfaceEvent( &interface_event );
+        DBG_INFO( "InterfaceMonitorImplWindowsData::notify_if_modified:%d# Calling the HandleEvente", __LINE__ );
+        callback->cz_if_monitor_cb( &interface_event, callback->pv_user_data );
       }
     }
   }
 }
 
-IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
+std::unique_ptr<IP_ADAPTER_ADDRESSES> InterfaceMonitorImplWindowsData::get_adapters() const
 {
   ULONG                 u32_adapter_addr_buf_len = 0;
   IP_ADAPTER_ADDRESSES *p_adapter_adrr_start_ptr = nullptr;
 
   /*We don't need most of the default information, so optimize this call by not asking for them. */
-  ULONG                 flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME;
+  const ULONG           flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME;
 
   DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# ENTER", __LINE__ );
 
   /*
-   *   Call up to 3 times: once to get the size, once to get the data, and once more
+   *   Call up to 3 times: once to get the size, once to get the msg_data, and once more
    *   just in case there was an increase in length in between the first two. If the
    *   length is still increasing due to more addresses being added, even this may fail
    *   and we'll have to wait for the next IP address change notification.
@@ -278,17 +272,17 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
   for( int i = 0; i < 3; i++ )
   {
     DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# calling GetAdaptersAddresses [%d] times", __LINE__, i );
-    ULONG ret = GetAdaptersAddresses( AF_UNSPEC, flags, NULL, p_adapter_adrr_start_ptr, &u32_adapter_addr_buf_len );
+    const auto ret = GetAdaptersAddresses( AF_UNSPEC, flags, nullptr, p_adapter_adrr_start_ptr, &u32_adapter_addr_buf_len );
 
     if( ERROR_BUFFER_OVERFLOW == ret )
     {
       // Redo with updated length.
       if( p_adapter_adrr_start_ptr != nullptr )
       {
-        delete p_adapter_adrr_start_ptr;
+        delete[] p_adapter_adrr_start_ptr;
       }
 
-      p_adapter_adrr_start_ptr = (IP_ADAPTER_ADDRESSES *) new unsigned char[u32_adapter_addr_buf_len];
+      p_adapter_adrr_start_ptr = reinterpret_cast<IP_ADAPTER_ADDRESSES *>( new unsigned char[u32_adapter_addr_buf_len] );
 
       if( p_adapter_adrr_start_ptr == nullptr )
       {
@@ -306,20 +300,20 @@ IP_ADAPTER_ADDRESSES * InterfaceMonitorImplWindowsData::get_adapters()
 
     DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# EXIT SUCCESS", __LINE__ );
     // Succeeded getting adapters
-    return ( p_adapter_adrr_start_ptr );
+    return ( std::unique_ptr<IP_ADAPTER_ADDRESSES>( p_adapter_adrr_start_ptr ) /*p_adapter_adrr_start_ptr*/ );
   }
 
-  if( p_adapter_adrr_start_ptr != NULL )
+  if( p_adapter_adrr_start_ptr != nullptr )
   {
-    delete p_adapter_adrr_start_ptr;
+    delete[] p_adapter_adrr_start_ptr;
   }
 
   DBG_INFO( "InterfaceMonitorImplWindowsData::get_adapters:%d# EXIT FAILED", __LINE__ );
 
-  return ( NULL );
+  return ( nullptr );
 }
 
-bool InterfaceMonitorImplWindowsData::is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS *p_unicast_adapter_addr )
+bool InterfaceMonitorImplWindowsData::is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS *p_unicast_adapter_addr ) const
 {
   if( p_unicast_adapter_addr->Address.lpSockaddr->sa_family != AF_INET6 )
   {
@@ -327,16 +321,13 @@ bool InterfaceMonitorImplWindowsData::is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS 
     return ( true );
   }
 
-  if( p_unicast_adapter_addr->Address.lpSockaddr->sa_family == AF_INET6 )
-  {
-    struct sockaddr_in6 *ipv6_socket_addr = (struct sockaddr_in6 *) p_unicast_adapter_addr->Address.lpSockaddr;
+    const auto ipv6_socket_addr = reinterpret_cast<struct sockaddr_in6 *>( p_unicast_adapter_addr->Address.lpSockaddr );
 
     // if the addr is link local then it it valid
     if( ( ipv6_socket_addr->sin6_addr.u.Byte[0] == 0xfe ) && ( ( ipv6_socket_addr->sin6_addr.u.Byte[1] & 0xc0 ) == 0x80 ) )
     {
       return ( true );
     }
-  }
 
   /*
    *  PSOCKADDR_IN6 sockAddr = (PSOCKADDR_IN6) pAddress->Address.lpSockaddr;
@@ -354,59 +345,55 @@ bool InterfaceMonitorImplWindowsData::is_valid_addr( IP_ADAPTER_UNICAST_ADDRESS 
 }
 
 
-inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_t index, PtrArray<InterfaceAddress *> &if_addr_ptr_list )
+inline std::vector<InterfaceAddress *> InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( const uint16_t index ) const
 {
   DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# ENTER idx[%d]", __LINE__, index );
+  std::vector<InterfaceAddress *> if_addr_ptr_list{};
 
-  auto p_adapters_list = get_adapters();
+  const auto p_adapters_list = get_adapters();
 
-  if( index < 0 )
-  {
-    DBG_ERROR( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# invalid idx", __LINE__ );
-    goto exit_label_;
-  }
-
-  if( p_adapters_list == nullptr )
+  if( !p_adapters_list )
   {
     DBG_ERROR( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# FAILED to get adapters list", __LINE__ );
     goto exit_label_;
   }
 
-  for( IP_ADAPTER_ADDRESSES *p_cur_adapter_addr = p_adapters_list; p_cur_adapter_addr != nullptr; p_cur_adapter_addr = p_cur_adapter_addr->Next )
+  for( IP_ADAPTER_ADDRESSES *p_cur_adapter_addr = p_adapters_list.get(); p_cur_adapter_addr != nullptr; p_cur_adapter_addr
+      = p_cur_adapter_addr->Next )
   {
-    DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# adapter index[%d], if_type[%d], if_status[%d]", __LINE__, (uint32_t) p_cur_adapter_addr->IfIndex, (uint32_t) p_cur_adapter_addr->IfType, p_cur_adapter_addr->OperStatus );
+    DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# adapter index[%d], if_type[%d], if_status[%d]"
+            , __LINE__, uint32_t( p_cur_adapter_addr->IfIndex ), uint32_t( p_cur_adapter_addr->IfType ), p_cur_adapter_addr->
+      OperStatus );
 
-    if( ( ( index > 0 ) && ( p_cur_adapter_addr->IfIndex != index ) ) || ( p_cur_adapter_addr->IfType & IF_TYPE_SOFTWARE_LOOPBACK ) || ( ( p_cur_adapter_addr->OperStatus & IfOperStatusUp ) == 0 ) )
+    if( ( ( index > 0 ) && ( p_cur_adapter_addr->IfIndex != index ) )
+      || ( p_cur_adapter_addr->IfType & IF_TYPE_SOFTWARE_LOOPBACK )
+      || ( ( p_cur_adapter_addr->OperStatus & IfOperStatusUp ) == 0 ) )
     {
       continue;
     }
 
-    for( IP_ADAPTER_UNICAST_ADDRESS *p_unicast_adapter_addr = p_cur_adapter_addr->FirstUnicastAddress;
-      p_unicast_adapter_addr != NULL;
+    for( auto p_unicast_adapter_addr = p_cur_adapter_addr->FirstUnicastAddress;
+      p_unicast_adapter_addr != nullptr;
       p_unicast_adapter_addr = p_unicast_adapter_addr->Next )
     {
-      char temp_addr_buf[INET6_ADDRSTRLEN] = { 0 };
+      char temp_addr_buf[64] = { 0 };
+      auto addr_family       = (p_unicast_adapter_addr->Address.lpSockaddr->sa_family == AF_INET) ? IpAddrFamily::IPv4 : IpAddrFamily::IPv6;
+			InterfaceAddress *if_addr = nullptr;
 
-      if( p_unicast_adapter_addr->Address.lpSockaddr->sa_family == AF_INET )
+      if( addr_family == IpAddrFamily::IPv4)
       {
-        struct sockaddr_in *p_ipv4_addr = (struct sockaddr_in *) p_unicast_adapter_addr->Address.lpSockaddr;
-
-        if( !inet_ntop( AF_INET, (void *) &p_ipv4_addr->sin_addr, temp_addr_buf, sizeof( temp_addr_buf ) ) )
-        {
-          continue;
-        }
+        auto p_ipv4_addr = reinterpret_cast<struct sockaddr_in *>( p_unicast_adapter_addr->Address.lpSockaddr );
+				if_addr = new InterfaceAddress{ (uint32_t)p_cur_adapter_addr->IfIndex, IFF_UP, addr_family, (const char *)&p_ipv4_addr->sin_addr };
+        inet_ntop( AF_INET, static_cast<void *>( &p_ipv4_addr->sin_addr ), (char*)&temp_addr_buf[0], sizeof( temp_addr_buf ) );
       }
-      else if( p_unicast_adapter_addr->Address.lpSockaddr->sa_family == AF_INET6 )
+      else if( addr_family == IpAddrFamily::IPv6)
       {
-        struct sockaddr_in6 *p_ipv6_addr = (struct sockaddr_in6 *) p_unicast_adapter_addr->Address.lpSockaddr;
-
-        if( !inet_ntop( AF_INET6, (void *) &p_ipv6_addr->sin6_addr, temp_addr_buf, sizeof( temp_addr_buf ) ) )
-        {
-          continue;
-        }
+        auto p_ipv6_addr = reinterpret_cast<struct sockaddr_in6 *>( p_unicast_adapter_addr->Address.lpSockaddr );
+				if_addr = new InterfaceAddress{ (uint32_t)p_cur_adapter_addr->IfIndex, IFF_UP, addr_family, (const char *)&p_ipv6_addr->sin6_addr };
+        inet_ntop( AF_INET6, static_cast<void *>( &p_ipv6_addr->sin6_addr ), (char*)&temp_addr_buf[0], sizeof( temp_addr_buf ) );
       }
 
-      auto is_addr_valid = is_valid_addr( p_unicast_adapter_addr );
+      const auto is_addr_valid = is_valid_addr( p_unicast_adapter_addr );
 
       DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# Found address %s, valid[%d]", __LINE__, &temp_addr_buf[0], is_addr_valid );
 
@@ -414,45 +401,42 @@ inline void InterfaceMonitorImplWindowsData::get_if_addr_list_for_index( uint16_
       {
         continue;
       }
-
-      auto interfaceAddress = if_addr_store_.Alloc();
-      auto ip_addr_family   = ( p_unicast_adapter_addr->Address.lpSockaddr->sa_family == AF_INET ) ? IpAddrFamily::IPV4 : IpAddrFamily::IPv6;
-      interfaceAddress->setIndex( p_cur_adapter_addr->IfIndex );
-      interfaceAddress->setFlags( IFF_UP );
-      interfaceAddress->setFamily( ip_addr_family );
-      interfaceAddress->set_addr( &temp_addr_buf[0] );
-
-      if_addr_ptr_list.Add( interfaceAddress );
+      if_addr_ptr_list.push_back(if_addr);
     }
   }
 
-  delete p_adapters_list;
 exit_label_:
   DBG_INFO( "InterfaceMonitorImplWindowsData::get_if_addr_list_for_index:%d# EXIT", __LINE__ );
+
+  return ( if_addr_ptr_list );
 }
 
 inline bool InterfaceMonitorImplWindowsData::register_for_addr_change()
 {
-  bool ret_status = true;
+  auto ret_status = true;
 
   DBG_INFO( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# ENTER", __LINE__ );
 
-  shutdown_event_ = CreateEvent( NULL, TRUE, FALSE, NULL );
+  shutdown_event_ = CreateEvent( nullptr, TRUE, FALSE, nullptr );
 
-  if( shutdown_event_ == 0 )
+  if( shutdown_event_ == nullptr )
   {
-    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create shutdown event", __LINE__ );
-    ret_status = false; goto exit_label_;
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create shutdown event",
+      __LINE__ );
+    ret_status = false;
+    goto exit_label_;
   }
 
   monitor_thread_handle_ = CreateThread( nullptr, 0, InterfaceMonitorThread, this, 0, nullptr );
 
-  if( monitor_thread_handle_ == 0 )
+  if( monitor_thread_handle_ == nullptr )
   {
     CloseHandle( shutdown_event_ );
-    shutdown_event_ = 0;
-    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create monitor thread", __LINE__ );
-    ret_status = false; goto exit_label_;
+    shutdown_event_ = nullptr;
+    DBG_ERROR( "InterfaceMonitorImplWindowsData::register_for_addr_change:%d# FAILED to create monitor thread",
+      __LINE__ );
+    ret_status = false;
+    goto exit_label_;
   }
 
   handle_interface_addr_change();
@@ -491,35 +475,19 @@ inline void InterfaceMonitorImplWindowsData::reset()
 {
   DBG_INFO( "InterfaceMonitorImplWindowsData::reset:%d# ENTER", __LINE__ );
 
-  if( new_if_addr_ptr_list_.Count() > 0 )
+  for( auto &if_addr : new_if_addr_ptr_list_ )
   {
-    for( int i = 0; i < new_if_addr_ptr_list_.Count(); i++ )
-    {
-      auto if_addr = new_if_addr_ptr_list_.GetItem( i );
-
-      if( if_addr != nullptr )
-      {
-        if_addr_store_.Free( if_addr );
-      }
-    }
+    delete if_addr;
   }
 
-  new_if_addr_ptr_list_.Clear();
+  new_if_addr_ptr_list_.clear();
 
-  if( curr_if_addr_ptr_list_.Count() > 0 )
+  for( auto &if_addr : curr_if_addr_ptr_list_ )
   {
-    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
-    {
-      auto if_addr = curr_if_addr_ptr_list_.GetItem( i );
-
-      if( if_addr != nullptr )
-      {
-        if_addr_store_.Free( if_addr );
-      }
-    }
+    delete if_addr;
   }
 
-  curr_if_addr_ptr_list_.Clear();
+  curr_if_addr_ptr_list_.clear();
 
   if( access_mutex_ != nullptr )
   {
@@ -534,16 +502,16 @@ inline void InterfaceMonitorImplWindowsData::run_if_monitor_thread()
 {
   {
     OVERLAPPED overlapped = { 0 };
-    WSADATA wsaData{};
+    WSADATA wsa_data{};
 
-    if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != NO_ERROR )
+    if( WSAStartup( MAKEWORD( 2, 2 ), &wsa_data ) != NO_ERROR )
     {
       return;
     }
 
-    SOCKET nwmSocket = WSASocketW( AF_INET6, SOCK_DGRAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED );
+    const auto nwm_socket = WSASocketW( AF_INET6, SOCK_DGRAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED );
 
-    if( INVALID_SOCKET == nwmSocket )
+    if( INVALID_SOCKET == nwm_socket )
     {
       WSACleanup();
 
@@ -551,21 +519,22 @@ inline void InterfaceMonitorImplWindowsData::run_if_monitor_thread()
     }
 
     // Put socket into dual IPv4/IPv6 mode.
-    BOOL ipv6Only = FALSE;
+    auto ipv6_only = FALSE;
 
-    if( SOCKET_ERROR == setsockopt( nwmSocket, IPPROTO_IPV6, IPV6_V6ONLY, (char *) &ipv6Only, sizeof( ipv6Only ) ) )
+    if( SOCKET_ERROR == setsockopt( nwm_socket, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<char *>( &ipv6_only ),
+      sizeof ipv6_only ) )
     {
-      closesocket( nwmSocket );
+      closesocket( nwm_socket );
       WSACleanup();
 
       return;
     }
 
-    overlapped.hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+    overlapped.hEvent = CreateEvent( nullptr, TRUE, FALSE, nullptr );
 
-    if( NULL == overlapped.hEvent )
+    if( nullptr == overlapped.hEvent )
     {
-      closesocket( nwmSocket );
+      closesocket( nwm_socket );
 
       WSACleanup();
       return;
@@ -576,49 +545,48 @@ inline void InterfaceMonitorImplWindowsData::run_if_monitor_thread()
 
     for(;; )
     {
-      if( SOCKET_ERROR == WSAIoctl( nwmSocket, SIO_ADDRESS_LIST_CHANGE, NULL, 0, NULL, 0, &bytesReturned, &overlapped, NULL ) )
+      if( SOCKET_ERROR == WSAIoctl( nwm_socket, SIO_ADDRESS_LIST_CHANGE, nullptr, 0, nullptr, 0, &bytesReturned,
+        &overlapped, nullptr ) )
       {
-        int err = WSAGetLastError();
+        const auto err = WSAGetLastError();
 
         if( err != ERROR_IO_PENDING )
         {
           break;
         }
-        else
+
+        // Wait for an address change or a request to cancel the thread.
+        const auto wait_status = WSAWaitForMultipleEvents(
+          _countof( eventList ), eventList, FALSE, WSA_INFINITE, FALSE );
+
+        if( wait_status != WSA_WAIT_EVENT_0 )
         {
-          // Wait for an address change or a request to cancel the thread.
-          DWORD waitStatus = WSAWaitForMultipleEvents( _countof( eventList ), eventList, FALSE, WSA_INFINITE, FALSE );
-
-          if( waitStatus != WSA_WAIT_EVENT_0 )
-          {
-            // The cancel event was signaled.  There is no need to call CancelIo
-            // here, because we will close the socket handle below, causing any
-            // pending I/O to be canceled then.
-            break;
-          }
-
-          WSAResetEvent( overlapped.hEvent );
+          // The cancel event was signaled.  There is no need to call CancelIo
+          // here, because we will close the socket handle below, causing any
+          // pending I/O to be canceled then.
+          break;
         }
+
+        WSAResetEvent( overlapped.hEvent );
       }
 
       // We have a change to process.  The address change callback ignores the parameters, so we just pass default values.
       handle_interface_addr_change();
     }
 
-    closesocket( nwmSocket );
+    closesocket( nwm_socket );
     CloseHandle( overlapped.hEvent );
     WSACleanup();
-    return;
   }
 }
 
-static DWORD WINAPI InterfaceMonitorThread( PVOID context )
+static DWORD WINAPI InterfaceMonitorThread( const PVOID context )
 {
-  InterfaceMonitorImplWindowsData *implData = (InterfaceMonitorImplWindowsData *) context;
+  auto impl_data = static_cast<InterfaceMonitorImplWindowsData *>( context );
 
-  if( implData != nullptr )
+  if( impl_data != nullptr )
   {
-    implData->run_if_monitor_thread();
+    impl_data->run_if_monitor_thread();
   }
 
   return ( 1 );
@@ -626,32 +594,16 @@ static DWORD WINAPI InterfaceMonitorThread( PVOID context )
 
 inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
 {
-	DBG_INFO("InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# ENTER", __LINE__);
-  InterfaceAddressPtrList temp_old_if_addr_list{};
+  DBG_INFO( "InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# ENTER", __LINE__ );
   ScopedMutex lock( access_mutex_ );
 
-  if( curr_if_addr_ptr_list_.Count() > 0 )
-  {
-    /* copy the old interface addresses to temp */
-    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
-    {
-      auto curr_if = curr_if_addr_ptr_list_.GetItem( i );
+  std::vector<InterfaceAddress *> temp_old_if_addr_list{};
 
-      if( curr_if == nullptr )
-      {
-        continue;
-      }
+  /* copy the old interface addresses to temp */
+  temp_old_if_addr_list.swap( curr_if_addr_ptr_list_ );
+  curr_if_addr_ptr_list_.clear();     // clear it to get new addresses
 
-      if( !temp_old_if_addr_list.Add( curr_if ) )
-      {
-        break;
-      }
-    }
-  }
-
-  curr_if_addr_ptr_list_.Clear();   // clear it to get new addresses
-
-  get_if_addr_list_for_index( 0, curr_if_addr_ptr_list_ );
+  curr_if_addr_ptr_list_ = get_if_addr_list_for_index( 0 );
 
   // old - 5 6 7 8 9
   // new - 5 6 7 8 9 - case 1
@@ -660,42 +612,22 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
   is_old_if_addr_lost_ = false;
 
   // check for the old address mising
-  if( temp_old_if_addr_list.Count() > 0 )
+  for( auto it = temp_old_if_addr_list.cbegin(); it != temp_old_if_addr_list.cend(); ++it )
   {
-    for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
+    is_old_if_addr_lost_ = true;
+
+    for( auto it2 = curr_if_addr_ptr_list_.cbegin(); it2 != curr_if_addr_ptr_list_.cend(); ++it2 )
     {
-      auto old_if = temp_old_if_addr_list.GetItem( i );
-
-      if( old_if == nullptr )
+      if( *it == *it2 )
       {
-        continue;
-      }
-
-      is_old_if_addr_lost_ = true;
-
-      if( curr_if_addr_ptr_list_.Count() > 0 )
-      {
-        for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
-        {
-          auto new_if = curr_if_addr_ptr_list_.GetItem( i );
-
-          if( new_if == nullptr )
-          {
-            continue;
-          }
-
-          if( old_if == new_if )
-          {
-            is_old_if_addr_lost_ = false;
-            break;
-          }
-        }
-      }
-
-      if( is_old_if_addr_lost_ )
-      {
+        is_old_if_addr_lost_ = false;
         break;
       }
+    }
+
+    if( is_old_if_addr_lost_ )
+    {
+      break;
     }
   }
 
@@ -704,68 +636,40 @@ inline void InterfaceMonitorImplWindowsData::handle_interface_addr_change()
   // old - 1 2 3	  - case 2
   // old - 5 6 7 8  - case 3
   // check for any new address addition
-  if( curr_if_addr_ptr_list_.Count() > 0 )
+
+  for( auto it2 = curr_if_addr_ptr_list_.cbegin(); it2 != curr_if_addr_ptr_list_.cend(); ++it2 )
   {
-    for( int i = 0; i < curr_if_addr_ptr_list_.Count(); i++ )
+    bool found{ false };
+
+    for( auto it = temp_old_if_addr_list.cbegin(); it != temp_old_if_addr_list.cend(); ++it )
     {
-      auto new_if = curr_if_addr_ptr_list_.GetItem( i );
-
-      if( new_if == nullptr )
+      if( *it == *it2 )
       {
-        continue;
+        found = true;
+        break;
       }
+    }
 
-      bool found{ false };
-
-      if( temp_old_if_addr_list.Count() > 0 )
-      {
-        for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
-        {
-          auto oldAddr = temp_old_if_addr_list.GetItem( i );
-
-          if( oldAddr == nullptr )
-          {
-            continue;
-          }
-
-          if( oldAddr == new_if )
-          {
-            found = true;
-            break;
-          }
-        }
-      }
-
-      if( !found )
-      {
-        auto newIfAddr = if_addr_store_.Alloc();
-        *newIfAddr = *new_if;
-
-        new_if_addr_ptr_list_.Add( newIfAddr );
-      }
+    if( !found )
+    {
+      auto newIfAddr = new InterfaceAddress( **it2 );
+      new_if_addr_ptr_list_.push_back( newIfAddr );
     }
   }
 
-  if( new_if_addr_ptr_list_.Count() > 0 )
+  if( !new_if_addr_ptr_list_.empty() )
   {
     notify_if_modified();
   }
 
-  if( temp_old_if_addr_list.Count() > 0 )
+  for( auto &if_addr : temp_old_if_addr_list )
   {
-    for( int i = 0; i < temp_old_if_addr_list.Count(); i++ )
-    {
-      auto oldAddr = temp_old_if_addr_list.GetItem( i );
-
-      if( oldAddr == nullptr )
-      {
-        continue;
-      }
-
-      if_addr_store_.Free( oldAddr );
-    }
+    delete if_addr;
   }
-  DBG_INFO("InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# EXIT", __LINE__);
+
+  temp_old_if_addr_list.clear();
+
+  DBG_INFO( "InterfaceMonitorImplWindowsData::handle_interface_addr_change:%d# EXIT", __LINE__ );
 }
 }
 }

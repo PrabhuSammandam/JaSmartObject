@@ -5,54 +5,55 @@
  *      Author: psammand
  */
 
-#ifndef UDPSOCKETIMPLWINDOWS_H_
-#define UDPSOCKETIMPLWINDOWS_H_
+#pragma once
 
 #ifdef _OS_WINDOWS_
 
 #include <i_udp_socket.h>
 #include <winsock2.h>
 
-namespace ja_iot {
-namespace network {
-class UdpSocketImplWindows : public IUdpSocket
+namespace ja_iot
 {
-  public:
+  namespace network
+  {
+    class UdpSocketImplWindows : public IUdpSocket
+    {
+    public:
 
-    UdpSocketImplWindows ();
+      UdpSocketImplWindows();
 
-    SocketError OpenSocket( ja_iot::base::IpAddrFamily ip_addr_family = ja_iot::base::IpAddrFamily::IPV4 ) override;
-    SocketError BindSocket( IpAddress &ip_address, uint16_t port = 0 ) override;
-    SocketError CloseSocket()                                            override;
+      SocketError OpenSocket(base::IpAddrFamily ip_addr_family = base::IpAddrFamily::IPv4) override;
+      SocketError BindSocket(base::IpAddress& ip_address, uint16_t port = 0) override;
+      SocketError CloseSocket() override;
 
-    SocketError JoinMulticastGroup( IpAddress &group_address, uint32_t if_index )  override;
-    SocketError LeaveMulticastGroup( IpAddress &group_address, uint32_t if_index ) override;
+      SocketError JoinMulticastGroup(base::IpAddress& group_address, uint32_t if_index) override;
+      SocketError LeaveMulticastGroup(base::IpAddress& group_address, uint32_t if_index) override;
 
-    SocketError SelectMulticastInterface( IpAddress &group_address, uint32_t if_index )  override;
+      SocketError SelectMulticastInterface(base::IpAddress& group_address, uint32_t if_index) override;
 
-    SocketError ReceiveData( IpAddress &remote_addr, uint16_t &port, uint8_t *data, int16_t &data_length ) override;
-    SocketError SendData( IpAddress &remote_addr, uint16_t port, uint8_t *data, uint16_t data_length ) override;
+      SocketError ReceiveData(base::IpAddress& remote_addr, uint16_t& port, uint8_t* data, int16_t& data_length)
+      override;
+      SocketError SendData(base::IpAddress& remote_addr, uint16_t port, uint8_t* data, uint16_t data_length) override;
 
-    SocketError EnableMulticastLoopback(bool is_enabled)  override;
-    SocketError EnableReuseAddr(bool is_enabled)  override;
-    SocketError EnableIpv6Only(bool is_enabled)  override;
-    SocketError EnablePacketInfo(bool is_enabled)  override;
+      SocketError EnableMulticastLoopback(bool is_enabled) override;
+      SocketError EnableReuseAddr(bool is_enabled) override;
+      SocketError EnableIpv6Only(bool is_enabled) override;
+      SocketError EnablePacketInfo(bool is_enabled) override;
 
-    SocketError SetBlocking(bool is_blocked)override;
+      SocketError SetBlocking(bool is_blocked) override;
 
-    uint16_t GetLocalPort() override;
+      uint16_t GetLocalPort() override;
 
-    ja_iot::base::IpAddrFamily GetAddrFamily() override;
+      base::IpAddrFamily GetAddrFamily() override;
 
 
-    SOCKET getSocket() { return ( socket_fd_ ); }
-    void   setSocket( SOCKET socket_fd ) { socket_fd_ = socket_fd; }
+      SOCKET get_socket() const { return _u32_socket_fd; }
+      void set_socket(const SOCKET socket_fd) { _u32_socket_fd = socket_fd; }
 
-  private:
-    SOCKET         socket_fd_      = INVALID_SOCKET;
-    ja_iot::base::IpAddrFamily   ip_addr_family_ = ja_iot::base::IpAddrFamily::IPV4;
-};
-}
+    private:
+      SOCKET _u32_socket_fd = INVALID_SOCKET;
+      base::IpAddrFamily _e_addr_family = base::IpAddrFamily::IPv4;
+    };
+  }
 }
 #endif //#ifdef _OS_WINDOWS_
-#endif /* UDPSOCKETIMPLWINDOWS_H_ */

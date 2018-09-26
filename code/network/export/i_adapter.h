@@ -5,125 +5,109 @@
  *      Author: psammand
  */
 
-#ifndef NETWORK_EXPORT_I_ADAPTER_H_
-#define NETWORK_EXPORT_I_ADAPTER_H_
+#pragma once
 
-#include <end_point.h>
-#include "PtrArray.h"
-#include <ErrCode.h>
-#include <data_types.h>
+#include <deque>
+#include <functional>
 #include <cstdint>
+#include "end_point.h"
+#include "ErrCode.h"
 
 namespace ja_iot {
 namespace network {
-using ErrCode = ja_iot::base::ErrCode;
 
-/***
- * Enum that defines the types of adapter event.
- */
-enum class AdapterEventType
-{
-  kNone,
-  kPacketReceived,
-  kErrorOccured,
-  kAdapterChanged,
-  kConnectionChanged
-};
+constexpr uint8_t ADAPTER_EVENT_TYPE_NONE               = 0;
+constexpr uint8_t ADAPTER_EVENT_TYPE_PACKET_RECEIVED    = 1;
+constexpr uint8_t ADAPTER_EVENT_TYPE_ERROR              = 2;
+constexpr uint8_t ADAPTER_EVENT_TYPE_ADAPTER_CHANGED    = 3;
+constexpr uint8_t ADAPTER_EVENT_TYPE_CONNECTION_CHANGED = 4;
 
 class AdapterEvent
 {
   public:
+    AdapterEvent( const uint8_t adapter_event_type ) : _event_type{ adapter_event_type }, _is_enabled{ false }, _is_connected{ false }, _reserved{ 0 }
+    {
+    }
+    AdapterEvent( const uint8_t event_type, Endpoint *endpoint, uint8_t *data, const uint16_t data_len, const uint16_t adapter_type )
+      : _event_type{ event_type },
+		_is_enabled{ false },
+		_is_connected{ false },
+		_reserved{ 0 },
+      end_point_{ endpoint },
+      data_{ data },
+      data_length_{ data_len },
+      adapter_type_{ adapter_type }
 
-    AdapterEvent( AdapterEventType adapter_event_type ) : adapter_event_type_{ adapter_event_type } {}
+    {
+    }
 
     uint16_t get_adapter_type() const { return ( adapter_type_ ); }
-    void     set_adapter_type( uint16_t adapter_type ) { adapter_type_ = adapter_type; }
+    void     set_adapter_type( const uint16_t adapter_type ) { adapter_type_ = adapter_type; }
 
     uint8_t* get_data() const { return ( data_ ); }
     void     set_data( uint8_t *data ) { data_ = data; }
 
     uint16_t get_data_length() const { return ( data_length_ ); }
-    void     set_data_length( uint16_t data_length ) { data_length_ = data_length; }
+    void     set_data_length( const uint16_t data_length ) { data_length_ = data_length; }
 
     const Endpoint* get_end_point() const { return ( end_point_ ); }
     void            set_end_point( Endpoint *end_point ) { end_point_ = end_point; }
 
-    ErrCode get_error_code() const { return ( error_code_ ); }
-    void    set_error_code( ErrCode error_code ) { error_code_ = error_code; }
+    base::ErrCode get_error_code() const { return ( error_code_ ); }
+    void          set_error_code( const base::ErrCode error_code ) { error_code_ = error_code; }
 
-    bool is_connected() const { return ( is_connected_ ); }
-    void set_connected( bool is_connected ) { is_connected_ = is_connected; }
+    bool is_connected() const { return ( _is_connected ); }
+    void set_connected( const bool is_connected ) { _is_connected = is_connected; }
 
-    bool is_enabled() const { return ( is_enabled_ ); }
-    void set_enabled( bool is_enabled ) { is_enabled_ = is_enabled; }
+    bool is_enabled() const { return ( _is_enabled ); }
+    void set_enabled( const bool is_enabled ) { _is_enabled = is_enabled; }
 
-    AdapterEventType get_adapter_event_type() const { return ( adapter_event_type_ ); }
-    void             set_adapter_event_type( AdapterEventType adapter_event_type ) { adapter_event_type_ = adapter_event_type; }
+    uint8_t get_adapter_event_type() const { return ( _event_type ); }
+    void    set_adapter_event_type( const uint8_t adapter_event_type )
+    {
+      _event_type = adapter_event_type;
+    }
 
   private:
-    bool               is_enabled_         = false;
-    bool               is_connected_       = false;
-    Endpoint *         end_point_          = nullptr;
-    uint8_t *          data_               = nullptr;
-    uint16_t           data_length_        = 0;
-    ErrCode            error_code_         = ErrCode::OK;
-    uint16_t           adapter_type_       = ja_iot::base::kAdapterType_ip;
-    AdapterEventType   adapter_event_type_ = AdapterEventType::kNone;
+    uint8_t         _event_type   : 3;
+    uint8_t         _is_enabled   : 1;
+    uint8_t         _is_connected : 1;
+    uint8_t         _reserved     : 3;
+    Endpoint *      end_point_    = nullptr;
+    uint8_t *       data_         = nullptr;
+    uint16_t        data_length_  = 0;
+    uint16_t        adapter_type_ = base::k_adapter_type_ip;
+    base::ErrCode   error_code_   = base::ErrCode::OK;
 };
 
-/***
- *
- */
-class IAdapterEventHandler
-{
-  public:
-
-    virtual ~IAdapterEventHandler () {}
-
-    virtual void handle_adapter_event( AdapterEvent *p_adapter_event ) = 0;
-};
+typedef void ( *pfn_adapter_event_cb ) ( AdapterEvent *pcz_adapter_event, void *pv_user_data );
 
 class IAdapter
 {
   public:
+    virtual ~IAdapter ()
+    {
+    }
 
-    virtual ~IAdapter () {}
+    virtual base::ErrCode initialize() = 0;
+    virtual base::ErrCode terminate()  = 0;
 
-    virtual ErrCode Initialize() = 0;
-    virtual ErrCode Terminate()  = 0;
+    virtual base::ErrCode start_adapter() = 0;
+    virtual base::ErrCode stop_adapter()  = 0;
 
-    virtual ErrCode StartAdapter() = 0;
-    virtual ErrCode StopAdapter()  = 0;
+    virtual base::ErrCode start_server() = 0;
+    virtual base::ErrCode stop_server()  = 0;
 
-    virtual ErrCode StartServer() = 0;
-    virtual ErrCode StopServer()  = 0;
+    virtual base::ErrCode start_listening() = 0;
+    virtual base::ErrCode stop_listening()  = 0;
 
-    virtual ErrCode StartListening() = 0;
-    virtual ErrCode StopListening()  = 0;
+    virtual int32_t send_unicast_data( Endpoint &endpoint, const uint8_t *data, uint16_t data_length )   = 0;
+    virtual int32_t send_multicast_data( Endpoint &endpoint, const uint8_t *data, uint16_t data_length ) = 0;
 
-    virtual int32_t SendUnicastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) = 0;
-
-    virtual int32_t SendMulticastData( Endpoint &end_point, const uint8_t *data, uint16_t data_length ) = 0;
-
-    virtual void ReadData() = 0;
-
-    virtual uint16_t GetType() = 0;
-
-    virtual void SetAdapterHandler( IAdapterEventHandler *adapter_event_handler ) = 0;
+    virtual void          read_data()                                                                                 = 0;
+    virtual uint16_t      get_type()                                                                                  = 0;
+    virtual void          set_adapter_event_cb( pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) = 0;
+    virtual base::ErrCode get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list )                             = 0;
 };
-
-using IAdapterPtrArray = ja_iot::base::PtrArray<IAdapter *>;
-
-#define DECLARE_ADAPTER_EVENT_HANDLER_CLASS( HNDLR_CLASS, HOST, HNDL_FUNC ) class HNDLR_CLASS : public ja_iot::network::IAdapterEventHandler \
-{ \
-    public: \
-      HNDLR_CLASS( HOST * host ) : host_{ host } {} \
-      void handle_adapter_event( AdapterEvent * p_adapter_event ) override{ host_->HNDL_FUNC( p_adapter_event ); } \
-    private: \
-      HOST * host_; \
-}; \
-
 }
 }
-
-#endif /* NETWORK_EXPORT_I_ADAPTER_H_ */

@@ -6,24 +6,28 @@
  */
 
 #ifdef _OS_FREERTOS_
-
+#include <functional>
 #include <esp_common.h>
+#include <ErrCode.h>
 #include <lwip/sockets.h>
 #include <lwip/ipv4/lwip/ip4_addr.h>
 #include <port/esp8266/inc/interface_monitor_esp8266.h>
 
 namespace ja_iot {
 namespace network {
+
+using namespace ja_iot::base;
+
 InterfaceMonitorImplEsp8266::InterfaceMonitorImplEsp8266 ()
 {
 }
 
-ErrCode InterfaceMonitorImplEsp8266::StartMonitor( uint16_t adapter_type )
+ErrCode InterfaceMonitorImplEsp8266::start_monitor( uint16_t adapter_type )
 {
   return ( ErrCode::OK );
 }
 
-ErrCode InterfaceMonitorImplEsp8266::StopMonitor( uint16_t adapter_type )
+ErrCode InterfaceMonitorImplEsp8266::stop_monitor( uint16_t adapter_type )
 {
   return ( ErrCode::OK );
 }
@@ -37,9 +41,9 @@ ErrCode InterfaceMonitorImplEsp8266::StopMonitor( uint16_t adapter_type )
  * @param skip_if_down	-	flag to indicate whether to include the interface which is DOWN.
  * @return ErrCode::OK	-	on success
  */
-ErrCode InterfaceMonitorImplEsp8266::GetInterfaceAddrList( InterfaceAddressPtrArray &if_ptr_array, bool skip_if_down )
+std::vector<InterfaceAddress*> InterfaceMonitorImplEsp8266::get_interface_addr_list(   bool skip_if_down )
 {
-  if_ptr_array.Clear();
+	std::vector<InterfaceAddress*> if_ptr_array{};
 
   if( !is_if_addr_valid_ )
   {
@@ -47,42 +51,43 @@ ErrCode InterfaceMonitorImplEsp8266::GetInterfaceAddrList( InterfaceAddressPtrAr
 
     if( !wifi_get_ip_info( STATION_IF, &ipv4_addr ) )
     {
-      return ( ErrCode::ERR );
+      return ( if_ptr_array );
     }
 
-    if_addr_.setFamily( IpAddrFamily::IPV4 );
-    if_addr_.setIndex( 1 );
-    if_addr_.setFlags( 0 );
+    if_addr_.set_family( IpAddrFamily::IPv4 );
+    if_addr_.set_index( 1 );
+    if_addr_.set_flags( 0 );
 
     char temp_str[16] = { 0 };
 
     ipaddr_ntoa_r( (const ip_addr_t *) &ipv4_addr.ip, &temp_str[0], 16 );
 
-    if_addr_.set_addr( &temp_str[0] );
+    if_addr_.set_addr(IpAddrFamily::IPv4, &temp_str[0] );
 
     is_if_addr_valid_ = true;
   }
 
   if( is_if_addr_valid_ )
   {
-    auto new_if_addr = new InterfaceAddress( if_addr_ );
-    if_ptr_array.Add( new_if_addr );
+	  if_ptr_array.push_back(new InterfaceAddress{if_addr_});
+//    auto new_if_addr = new InterfaceAddress( if_addr_ );
+//    if_ptr_array.Add( new_if_addr );
   }
-
-  return ( ErrCode::OK );
+  return ( if_ptr_array );
 }
 
-ErrCode InterfaceMonitorImplEsp8266::GetNewlyFoundInterface( InterfaceAddressPtrArray &if_addr_ptr_array )
+std::vector<InterfaceAddress *> InterfaceMonitorImplEsp8266::get_newly_found_interface(  )
 {
-	return ( ErrCode::OK );
+  return std::vector<InterfaceAddress *>();
 }
 
-void InterfaceMonitorImplEsp8266::AddInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )
+void InterfaceMonitorImplEsp8266::add_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_cb, void* pv_user_data )
 {
-}
 
-void InterfaceMonitorImplEsp8266::RemoveInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )
+}
+void InterfaceMonitorImplEsp8266::remove_interface_event_callback( pfn_interface_monitor_cb cz_if_monitor_callback )
 {
+
 }
 }
 }

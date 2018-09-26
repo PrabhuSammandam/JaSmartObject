@@ -9,23 +9,21 @@
 
 namespace ja_iot {
 namespace network {
-ConfigManager *ConfigManager::p_instance_{ nullptr };
+ConfigManager *ConfigManager::_pcz_instance{};
 
 ConfigManager & ConfigManager::Inst()
 {
-  if( p_instance_ == nullptr )
+  if( _pcz_instance == nullptr )
   {
-    static ConfigManager _instance{};
-    p_instance_ = &_instance;
+    static ConfigManager scz_instance{};
+    _pcz_instance = &scz_instance;
   }
 
-  return ( *p_instance_ );
+  return ( *_pcz_instance );
 }
-
 ConfigManager::ConfigManager ()
 {
 }
-
 ConfigManager::~ConfigManager ()
 {
 }

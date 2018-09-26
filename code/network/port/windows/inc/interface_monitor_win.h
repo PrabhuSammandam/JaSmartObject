@@ -5,43 +5,44 @@
  *      Author: psammand
  */
 
-#ifndef INTERFACEMONITORIMPLWINDOWS_H_
-#define INTERFACEMONITORIMPLWINDOWS_H_
+#pragma once
 
 #ifdef _OS_WINDOWS_
 
+#include <memory>
 #include <i_interface_monitor.h>
 #include <interface_addr.h>
-#include <data_types.h>
 #include <cstdint>
 
 constexpr uint16_t MAX_NO_OF_INTERFACE_EVENT_HANDLER = 2;
-constexpr uint16_t MAX_NO_OF_INTERFACE_ADDRESS       = 10;
+constexpr uint16_t MAX_NO_OF_INTERFACE_ADDRESS = 10;
 
-namespace ja_iot {
-namespace network {
-class InterfaceMonitorImplWindowsData;
-
-class InterfaceMonitorImplWindows : public IInterfaceMonitor
+namespace ja_iot
 {
-  public:
+  namespace network
+  {
+    class InterfaceMonitorImplWindowsData;
 
-    InterfaceMonitorImplWindows ();
+    class InterfaceMonitorImplWindows : public IInterfaceMonitor
+    {
+    public:
 
-    ErrCode StartMonitor( uint16_t adapter_type ) override;
-    ErrCode StopMonitor( uint16_t adapter_type )  override;
+      InterfaceMonitorImplWindows();
+      ~InterfaceMonitorImplWindows();
 
-    ErrCode GetInterfaceAddrList( InterfaceAddressPtrArray &interface_address_ptr_array, bool skip_if_down = true ) override;
-    ErrCode GetNewlyFoundInterface( InterfaceAddressPtrArray &if_addr_ptr_array ) override;
+      base::ErrCode start_monitor(uint16_t adapter_type) override;
+      base::ErrCode stop_monitor(uint16_t adapter_type) override;
 
-    void AddInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler )    override;
-    void RemoveInterfaceEventHandler( IInterfaceEventHandler *interface_event_handler ) override;
+      std::vector<InterfaceAddress*> get_interface_addr_list(bool skip_if_down = true) override;
+      std::vector<InterfaceAddress*> get_newly_found_interface() override;
 
-  private:
-    InterfaceMonitorImplWindowsData *pimpl_{ nullptr };
-};
-}
+      void add_interface_event_callback(pfn_interface_monitor_cb cz_if_monitor_cb, void* pv_user_data) override;
+      void remove_interface_event_callback(pfn_interface_monitor_cb cz_if_monitor_cb) override;
+
+    private:
+      std::unique_ptr<InterfaceMonitorImplWindowsData> pimpl_;
+    };
+  }
 }
 
 #endif //_OS_WINDOWS_
-#endif /* INTERFACEMONITORIMPLWINDOWS_H_ */

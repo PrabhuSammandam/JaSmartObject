@@ -6,37 +6,72 @@
  */
 
 #include <end_point.h>
-#include <konstants_network.h>
-#include <cstring>
+#include "base_utils.h"
 
 namespace ja_iot {
 namespace network {
-using namespace ja_iot::base;
-
-Endpoint & Endpoint::operator = ( _in_ const Endpoint &other )
+using namespace base;
+Endpoint::Endpoint( const uint16_t u16_adapter_type, const uint16_t u16_network_flags, const uint16_t u16_port, const uint32_t u32_if_index, const IpAddress &rcz_ip_addr ) : _u16_adapter_type{ u16_adapter_type },
+  _u16_network_flags{ u16_network_flags },
+  _u16_port{ u16_port },
+  _u32_if_index{ u32_if_index },
+  _cz_ip_addr{ rcz_ip_addr }
 {
-  this->_adapter_type  = other._adapter_type;
-  this->_network_flags = other._network_flags;
-  this->_port          = other._port;
-  this->_if_index      = other._if_index;
-  this->_addr          = other._addr;
-  return ( *this );
 }
 
-void Endpoint::set_addr( _in_ IpAddress *addr )
+void Endpoint::set_addr( _in_ const IpAddress &rcz_addr )
 {
-  if( addr != nullptr )
-  {
-    _addr = *addr;
-  }
+  this->_cz_ip_addr = rcz_addr;
 }
 
-bool Endpoint::set_ipv6_addr_by_scope( _in_ uint16_t ipv6_scope )
+bool Endpoint::set_ipv6_addr_by_scope( _in_ const uint16_t u16_ipv6_scope )
 {
-  bool ret_status = false;
+  const auto ret_status = false;
 
-  _addr.set_addr_by_scope( ipv6_scope, 158 );
+  _cz_ip_addr.set_addr_by_scope( u16_ipv6_scope, uint8_t( 158 ) );
   return ( ret_status );
+}
+
+uint16_t Endpoint::get_transport_scheme() const
+{
+  if( is_bit_set( _u16_adapter_type, k_adapter_type_ip ) && ( is_bit_set( _u16_network_flags, k_network_flag_ipv4 ) || is_bit_set(
+      _u16_network_flags, k_network_flag_ipv6 ) ) )
+  {
+    if( is_bit_set( _u16_network_flags, k_network_flag_secure ) )
+    {
+      return ( k_transport_scheme_coaps );
+    }
+
+    return ( k_transport_scheme_coap );
+  }
+
+  if( is_bit_set( _u16_adapter_type, k_adapter_type_tcp ) && ( is_bit_set( _u16_network_flags, k_network_flag_ipv4 ) || is_bit_set(
+      _u16_network_flags, k_network_flag_ipv6 ) ) )
+  {
+    if( is_bit_set( _u16_network_flags, k_network_flag_secure ) )
+    {
+      return ( k_transport_scheme_coaps_tcp );
+    }
+
+    return ( k_transport_scheme_coap_tcp );
+  }
+
+  return ( k_transport_scheme_none );
+}
+
+bool Endpoint::is_valid()
+{
+  return ( _cz_ip_addr.is_valid() );
+}
+
+bool Endpoint::is_multicast()
+{
+  return ( ( _u16_network_flags & k_network_flag_multicast ) != 0 );
+}
+
+bool operator == ( Endpoint &rcz_endpoint1, Endpoint &rcz_endpoint2 )
+{
+  return ( ( rcz_endpoint1.get_addr() == rcz_endpoint2.get_addr() ) && ( rcz_endpoint1.get_port() == rcz_endpoint2.get_port() ) );
 }
 }
 }

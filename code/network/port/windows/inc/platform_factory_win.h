@@ -5,27 +5,27 @@
  *      Author: psammand
  */
 
-#ifndef WINDOWSPLATFORMFACTORY_H_
-#define WINDOWSPLATFORMFACTORY_H_
+#pragma once
 
 #ifdef _OS_WINDOWS_
 
 #include <i_nwk_platform_factory.h>
 
-namespace ja_iot {
-namespace network {
-class WindowsPlatformFactory : public INetworkPlatformFactory
+namespace ja_iot
 {
-  public:
+  namespace network
+  {
+    class WindowsPlatformFactory : public INetworkPlatformFactory
+    {
+    public:
 
-    WindowsPlatformFactory ();
+      WindowsPlatformFactory();
 
-    IInterfaceMonitor* GetInterfaceMonitor()                  override;
-    IAdapter*          GetAdapter( uint16_t adapter_type ) override;
-    IUdpSocket*        AllocSocket() override;
-    void               FreeSocket( IUdpSocket *socket ) override;
-};
-}
+      IInterfaceMonitor* get_interface_monitor() override;
+      IAdapter* get_adapter(uint16_t adapter_type) override;
+      IUdpSocket* AllocSocket() override;
+      void free_socket(IUdpSocket* socket) override;
+    };
+  }
 }
 #endif //#ifdef _OS_WINDOWS_
-#endif /* WINDOWSPLATFORMFACTORY_H_ */

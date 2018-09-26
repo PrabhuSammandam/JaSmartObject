@@ -9,25 +9,25 @@
 
 #include <ip_adapter_config.h>
 
-namespace ja_iot {
-namespace network {
-class ConfigManager
+namespace ja_iot
 {
-  public:
-    static ConfigManager& Inst();
+  namespace network
+  {
+    class ConfigManager
+    {
+    public:
+      static ConfigManager& Inst();
 
-  public:
-    IpAdapterConfig* get_ip_adapter_config() { return ( &_cz_ip_adapter_config ); }
+      IpAdapterConfig* get_ip_adapter_config() { return &_cz_ip_adapter_config; }
 
-  private:
+    private:
 
-    ConfigManager ();
+      ConfigManager();
 
-    ~ConfigManager ();
+      ~ConfigManager();
 
-  private:
-    static ConfigManager * p_instance_;
-    IpAdapterConfig        _cz_ip_adapter_config;
-};
-}
+      static ConfigManager* _pcz_instance;
+      IpAdapterConfig _cz_ip_adapter_config;
+    };
+  }
 }

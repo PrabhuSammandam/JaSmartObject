@@ -1,92 +1,141 @@
+#include <algorithm>
+#include <functional>
+#include <bitset>
+#include <set>
+#include <cstring>
 #include <coap/coap_option_set.h>
+#include "coap/coap_consts.h"
 #include <common_defs.h>
-#include <string.h>
+#include <array>
 
 namespace ja_iot {
 namespace network {
-using namespace ja_iot::base;
+using namespace base;
 
-static uint16_t  nonRepeatableOption[] = { uint16_t( OptionType::URI_HOST ),
-                                           uint16_t( OptionType::IF_NONE_MATCH ),
-                                           uint16_t( OptionType::OBSERVE ),
-                                           uint16_t( OptionType::URI_PORT ),
-                                           uint16_t( OptionType::CONTENT_FORMAT ),
-                                           uint16_t( OptionType::MAX_AGE ),
-                                           uint16_t( OptionType::ACCEPT ),
-                                           uint16_t( OptionType::PROXY_URI ),
-                                           uint16_t( OptionType::PROXU_SCHEME ),
-                                           uint16_t( OptionType::SIZE1 ),
-                                           uint16_t( OptionType::SIZE2 ),
-                                           uint16_t( OptionType::BLOCK_1 ),
-                                           uint16_t( OptionType::BLOCK_2 ) };
-
-ErrCode OptionsSet::AddOption( uint16_t optionNo, uint16_t val_len, uint8_t *value )
+static std::array<uint16_t, 13> nonRepeatableOption = { { uint16_t( COAP_OPTION_URI_HOST ),
+                                                          uint16_t( COAP_OPTION_IF_NONE_MATCH ),
+                                                          uint16_t( COAP_OPTION_OBSERVE ),
+                                                          uint16_t( COAP_OPTION_URI_PORT ),
+                                                          uint16_t( COAP_OPTION_CONTENT_FORMAT ),
+                                                          uint16_t( COAP_OPTION_MAX_AGE ),
+                                                          uint16_t( COAP_OPTION_ACCEPT ),
+                                                          uint16_t( COAP_OPTION_PROXY_URI ),
+                                                          uint16_t( COAP_OPTION_PROXU_SCHEME ),
+                                                          uint16_t( COAP_OPTION_SIZE1 ),
+                                                          uint16_t( COAP_OPTION_SIZE2 ),
+                                                          uint16_t( COAP_OPTION_BLOCK_1 ),
+                                                          uint16_t( COAP_OPTION_BLOCK_2 ) } };
+OptionsSet::OptionsSet () : _options_set{}, _bits{}
 {
-  auto opt = Option::Allocate( optionNo, val_len, value );
-
-  if( opt != nullptr )
-  {
-    _optionList.Insert( opt );
-
-    return ( ErrCode::OK );
-  }
-
-  return ( ErrCode::OUT_OF_MEM );
+  _bits.reset();
+}
+OptionsSet::~OptionsSet ()
+{
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [] ( Option *option ) {
+        delete option;
+      } );
+  _bits.reset();
 }
 
-uint32_t OptionsSet::Get4ByteOption( OptionType optionNo ) const
+ErrCode OptionsSet::add_option( uint16_t u16_option_no, uint16_t u16_option_len, uint8_t *pu8_option_value )
+{
+  auto pcz_option = new Option{ u16_option_no, u16_option_len, pu8_option_value };
+
+  if( pcz_option == nullptr )
+  {
+    return ErrCode::OUT_OF_MEM;
+  }
+
+  _options_set.insert( pcz_option );
+  return ErrCode::OK;
+}
+
+ErrCode OptionsSet::add_option( uint16_t u16_option_no, uint32_t u32_value )
+{
+  uint8_t u8_value_len{};
+  uint8_t au8_temp_value[4] {};
+
+  for( uint8_t i = 0; i < 4; ++i )
+  {
+    uint32_t temp_max_value = ( 1 << i * 8 ) - 1;
+
+    if( u32_value > temp_max_value )
+    {
+      u8_value_len++;
+    }
+    else
+    {
+      break;
+    }
+  }
+
+  for( uint8_t i = 0; i < u8_value_len; ++i )
+  {
+    au8_temp_value[i] = u32_value >> ( u8_value_len - i - 1 ) * 8 & 0xFF;
+  }
+
+  return add_option( u16_option_no, u8_value_len, &au8_temp_value[0] );
+}
+
+uint32_t OptionsSet::get_value( uint16_t u16_option_no )
 {
   uint32_t value = 0;
-  auto     opt   = GetOption( optionNo );
+  auto     opt   = get_option( u16_option_no );
 
   if( opt != nullptr )
   {
-    for( auto i = 0; i < opt->GetLen(); i++ )
+    auto opt_len  = opt->get_len();
+    auto byte_val = opt->get_val();
+
+    for( auto i = 0; i < opt_len; i++ )
     {
-      value |= ( opt->GetVal()[i] & 0xFF ) << ( i * 8 );
+      value |= (uint32_t) ( byte_val[opt_len - i - 1] & 0xFF ) << i * 8;
     }
   }
 
-  return ( value );
+  return value;
 }
 
-Option * OptionsSet::GetOption( OptionType optionNo ) const
+Option * OptionsSet::get_option( uint16_t e_option_type ) const
 {
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
+  for( auto &option : _options_set )
   {
-    auto opt = *it;
-
-    if( opt->GetNo() == uint16_t( optionNo ) )
+    if( option->get_no() == (uint16_t) e_option_type )
     {
-      return ( opt );
+      return option;
     }
   }
 
-  return ( nullptr );
+  return nullptr;
+  // auto find_result = std::find_if( _options_set.cbegin(), _options_set.cend(), [&] ( const Option *pcz_option ) {
+  // return ( pcz_option->get_no() == (uint16_t) e_option_type );
+  // } );
+  //
+  // return ( find_result != _options_set.cend() ? *find_result : nullptr );
 }
 
-uint32_t OptionsSet::GetSize1() const
+uint32_t OptionsSet::GetSize1()
 {
-  return ( Get4ByteOption( OptionType::SIZE1 ) );
+  return get_value( COAP_OPTION_SIZE1 );
 }
 
-uint32_t OptionsSet::GetSize2() const
+uint32_t OptionsSet::GetSize2()
 {
-  return ( Get4ByteOption( OptionType::SIZE2 ) );
+  return get_value( COAP_OPTION_SIZE2 );
 }
 
-void OptionsSet::GetBlock1( BlockOption &blockOpt ) const
+void OptionsSet::GetBlock1( BlockOption &blockOpt )
 {
-  auto opt = GetOption( OptionType::BLOCK_1 );
+  auto opt = get_option( COAP_OPTION_BLOCK_1 );
 
-  blockOpt.decode( opt->GetVal(), opt->GetLen() );
+  blockOpt.decode( opt->get_val(), opt->get_len() );
 }
 
-void OptionsSet::GetBlock2( BlockOption &blockOpt ) const
+void OptionsSet::GetBlock2( BlockOption &blockOpt )
 {
-  auto opt = GetOption( OptionType::BLOCK_2 );
+  auto opt = get_option( COAP_OPTION_BLOCK_2 );
 
-  blockOpt.decode( opt->GetVal(), opt->GetLen() );
+  blockOpt.decode( opt->get_val(), opt->get_len() );
 }
 
 void OptionsSet::SetBlock1( const BlockOption &block1 )
@@ -95,8 +144,8 @@ void OptionsSet::SetBlock1( const BlockOption &block1 )
   uint8_t au8_encode_buf[8];
 
   block1.encode( &au8_encode_buf[0], len );
-  AddOption( uint16_t( OptionType::BLOCK_1 ), len, &au8_encode_buf[0] );
-  base::set_bit( _status, OptionBitmaskBlock1 );
+  add_option( uint16_t( COAP_OPTION_BLOCK_1 ), len, &au8_encode_buf[0] );
+  _bits.set( k_option_bit_Block1 );
 }
 
 void OptionsSet::SetBlock2( const BlockOption &block2 )
@@ -105,275 +154,287 @@ void OptionsSet::SetBlock2( const BlockOption &block2 )
   uint8_t au8_encode_buf[8];
 
   block2.encode( &au8_encode_buf[0], len );
-  AddOption( uint16_t( OptionType::BLOCK_2 ), len, &au8_encode_buf[0] );
-  base::set_bit( _status, OptionBitmaskBlock2 );
+  add_option( uint16_t( COAP_OPTION_BLOCK_2 ), len, &au8_encode_buf[0] );
+  _bits.set( k_option_bit_Block2 );
 }
 
 void OptionsSet::SetSize1( uint32_t size1 )
 {
-  AddOption( uint16_t( OptionType::SIZE1 ), size1 );
-  base::set_bit( _status, OptionBitmaskSize1 );
+  add_option( uint16_t( COAP_OPTION_SIZE1 ), size1 );
+  _bits.set( k_option_bit_Size1 );
 }
 
 void OptionsSet::SetSize2( uint32_t size2 )
 {
-  AddOption( uint16_t( OptionType::SIZE2 ), size2 );
-  base::set_bit( _status, OptionBitmaskSize2 );
+  add_option( uint16_t( COAP_OPTION_SIZE2 ), size2 );
+  _bits.set( k_option_bit_Size2 );
 }
 
-uint16_t OptionsSet::GetContentFormat() const
+void OptionsSet::SetObserve( uint32_t u32_observe_value )
 {
-  if( HasContentFormat() )
-  {
-    return ( static_cast<uint16_t>( Get4ByteOption( OptionType::CONTENT_FORMAT ) ) );
-  }
+  add_option( uint16_t( COAP_OPTION_OBSERVE ), u32_observe_value );
+  _bits.set( k_option_bit_Observe );
+}
 
-  return ( 0xFFFF );
+uint16_t OptionsSet::GetContentFormat()
+{
+  return _bits[k_option_bit_ContentFormat] ? get_value( COAP_OPTION_CONTENT_FORMAT ) : -1;
+}
+
+uint32_t OptionsSet::GetObserve()
+{
+  return _bits[k_option_bit_Observe] ? get_value( COAP_OPTION_OBSERVE ) : -1;
+}
+
+uint16_t OptionsSet::GetContentVersion()
+{
+  return _bits[k_option_bit_ContentVersion] ? get_value( COAP_OPTION_CONTENT_VERSION ) : -1;
+}
+
+uint16_t OptionsSet::GetAccept()
+{
+  return _bits[k_option_bit_Accept] ? get_value( COAP_OPTION_ACCEPT ) : -1;
+}
+
+uint16_t OptionsSet::GetAcceptVersion()
+{
+  return _bits[k_option_bit_AcceptVersion] ? get_value( COAP_OPTION_ACCEPT_VERSION ) : -1;
 }
 
 ErrCode OptionsSet::FreeOptions()
 {
-  _optionList.FreeList();
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [] ( Option *pcz_option ) {
+        delete pcz_option;
+      } );
 
-  return ( ErrCode::OK );
+  _options_set.clear();
+
+  return ErrCode::OK;
 }
 
 uint16_t OptionsSet::GetTotalSizeInBytes() const
 {
-  return ( 0 );
+  return 0;
 }
 
-bool OptionsSet::HasOpt( uint16_t optionNo ) const
+bool OptionsSet::has_option( uint16_t u16_option_no ) const
 {
-  if( _optionList.IsEmpty() )
-  {
-    return ( false );
-  }
-
-  auto it = _optionList.begin();
-
-  for(; it != _optionList.end(); ++it )
-  {
-    if( ( *it )->GetNo() == optionNo )
-    {
-      return ( true );
-    }
-  }
-
-  return ( false );
+  return get_option( (uint16_t) u16_option_no ) != nullptr;
 }
 
-static uint8_t find_option_no_in_repeat_array( _in_ uint16_t optNo )
+#if 1
+static uint8_t find_option_no_in_repeat_array( _in_ uint16_t u16_option_no )
 {
-  for( uint16_t i = 0; i < sizeof( nonRepeatableOption ) / sizeof( uint16_t ); i++ )
-  {
-    if( optNo == nonRepeatableOption[i] )
-    {
-      return ( i );
-    }
-  }
+  auto it_find_result = std::find( nonRepeatableOption.cbegin(), nonRepeatableOption.cend(), u16_option_no );
 
-  return ( 0xFF );
+  return it_find_result != nonRepeatableOption.cend() ? *it_find_result : 0xFF;
 }
 
-static void add_option_no_to_repeat_array( _in_ uint16_t optNo )
+static void add_option_no_to_repeat_array( _in_ uint16_t u16_option_no )
 {
-  for( uint16_t i = 0; i < sizeof( nonRepeatableOption ) / sizeof( uint16_t ); i++ )
+  for( uint16_t i = 0; i < nonRepeatableOption.size(); i++ )
   {
     if( 0 == nonRepeatableOption[i] )
     {
-      nonRepeatableOption[i] = optNo;
+      nonRepeatableOption[i] = u16_option_no;
       break;
     }
   }
 }
 
-static uint16_t check_option_no_repeated( _in_ uint16_t optNo )
+static uint16_t check_option_no_repeated( _in_ uint16_t u16_option_no )
 {
-  if( find_option_no_in_repeat_array( optNo ) == 0xFF )
+  if( find_option_no_in_repeat_array( u16_option_no ) == 0xFF )
   {
-    add_option_no_to_repeat_array( optNo );
+    add_option_no_to_repeat_array( u16_option_no );
   }
   else
   {
-    if( ( optNo & 0x01 ) == 0x01 )
+    if( ( u16_option_no & 0x01 ) == 0x01 )
     {
-      return ( OPTION_ERROR_CRITICAL_REPEAT_MORE );
+      return OPTION_ERROR_CRITICAL_REPEAT_MORE;
     }
 
-    return ( OPTION_ERROR_REPEAT_MORE );
+    return OPTION_ERROR_REPEAT_MORE;
   }
 
-  return ( 0 );
+  return 0;
 }
 
-static uint16_t check_option_for_length( _in_ Option *option, _in_ uint16_t min, _in_ uint16_t max )
+static uint16_t check_option_for_length( _in_ Option *pcz_option, _in_ uint16_t min, _in_ uint16_t max )
 {
-  uint16_t optLen = option->GetLen();
+  uint16_t optLen = pcz_option->get_len();
 
-  if( ( optLen < min ) || ( optLen > max ) )
+  if( optLen < min || optLen > max )
   {
-    if( ( option->GetNo() & 0x01 ) == 0x01 )
+    if( ( pcz_option->get_no() & 0x01 ) == 0x01 )
     {
-      return ( OPTION_ERROR_CRITICAL_LEN_RANGE_OUT );
+      return OPTION_ERROR_CRITICAL_LEN_RANGE_OUT;
     }
 
-    return ( OPTION_ERROR_LEN_RANGE_OUT );
+    return OPTION_ERROR_LEN_RANGE_OUT;
   }
 
-  return ( 0 );
+  return 0;
 }
 
 uint16_t OptionsSet::CheckOptions()
 {
-  for( uint16_t i = 0; i < ( sizeof( nonRepeatableOption ) / sizeof( uint16_t ) ); i++ )
-  {
-    nonRepeatableOption[i] = 0;
-  }
+  nonRepeatableOption.fill( 0 );
 
   uint16_t errMask = 0;
 
-  for( auto it = _optionList.begin(); ( it != _optionList.end() ); ++it )
+  for( auto it = _options_set.cbegin(); it != _options_set.cend(); ++it )
   {
     auto p_cur_option  = *it;
-    auto cur_option_no = p_cur_option->GetNo();
+    auto cur_option_no = p_cur_option->get_no();
 
-    switch( OptionType( cur_option_no ) )
+    switch( uint16_t( cur_option_no ) )
     {
-      case OptionType::IF_MATCH:
+      case COAP_OPTION_IF_MATCH:
       {
-        base::set_bit( _status, OptionBitmaskIfMatch );
+        _bits.set( k_option_bit_IfMatch );
         errMask |= check_option_for_length( p_cur_option, 0, 8 );
       }
       break;
 
-      case OptionType::URI_HOST:
+      case COAP_OPTION_URI_HOST:
       {
-        base::set_bit( _status, OptionBitmaskUriHost );
+        _bits.set( k_option_bit_UriHost );
         errMask |= check_option_for_length( p_cur_option, 1, 255 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
 
-      case OptionType::ETAG:
+      case COAP_OPTION_ETAG:
       {
-        base::set_bit( _status, OptionBitmaskEtag );
+        _bits.set( k_option_bit_Etag );
         errMask |= check_option_for_length( p_cur_option, 1, 8 );
       }
       break;
-      case OptionType::IF_NONE_MATCH:
+      case COAP_OPTION_IF_NONE_MATCH:
       {
-        base::set_bit( _status, OptionBitmaskIfNoneMatch );
+        _bits.set( k_option_bit_IfNoneMatch );
         errMask |= check_option_for_length( p_cur_option, 0, 0 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::OBSERVE:
+      case COAP_OPTION_OBSERVE:
       {
-        base::set_bit( _status, OptionBitmaskObserve );
+        _bits.set( k_option_bit_Observe );
         errMask |= check_option_for_length( p_cur_option, 0, 3 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::URI_PORT:
+      case COAP_OPTION_URI_PORT:
       {
-        base::set_bit( _status, OptionBitmaskUriPort );
+        _bits.set( k_option_bit_UriPort );
         errMask |= check_option_for_length( p_cur_option, 0, 2 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::LOCATION_PATH:
+      case COAP_OPTION_LOCATION_PATH:
       {
-        base::set_bit( _status, OptionBitmaskLocationPath );
+        _bits.set( k_option_bit_LocationPath );
         errMask |= check_option_for_length( p_cur_option, 0, 255 );
       }
       break;
-      case OptionType::URI_PATH:
+      case COAP_OPTION_URI_PATH:
       {
-        base::set_bit( _status, OptionBitmaskUriPath );
+        _bits.set( k_option_bit_UriPath );
         errMask |= check_option_for_length( p_cur_option, 0, 255 );
       }
       break;
-      case OptionType::CONTENT_FORMAT:
+      case COAP_OPTION_CONTENT_FORMAT:
       {
-        base::set_bit( _status, OptionBitmaskContentFormat );
+        _bits.set( k_option_bit_ContentFormat );
         errMask |= check_option_for_length( p_cur_option, 0, 2 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::MAX_AGE:
+      case COAP_OPTION_MAX_AGE:
       {
-        base::set_bit( _status, OptionBitmaskMaxAge );
+        _bits.set( k_option_bit_MaxAge );
         errMask |= check_option_for_length( p_cur_option, 0, 4 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::URI_QUERY:
+      case COAP_OPTION_URI_QUERY:
       {
-        base::set_bit( _status, OptionBitmaskUriQuery );
+        _bits.set( k_option_bit_UriQuery );
         errMask |= check_option_for_length( p_cur_option, 0, 255 );
       }
       break;
-      case OptionType::ACCEPT:
+      case COAP_OPTION_ACCEPT:
       {
-        base::set_bit( _status, OptionBitmaskAccept );
+        _bits.set( k_option_bit_Accept );
         errMask |= check_option_for_length( p_cur_option, 0, 2 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::LOCATION_QUERY:
+      case COAP_OPTION_LOCATION_QUERY:
       {
-        base::set_bit( _status, OptionBitmaskLocationQuery );
+        _bits.set( k_option_bit_LocationQuery );
         errMask |= check_option_for_length( p_cur_option, 0, 255 );
       }
       break;
-      case OptionType::PROXY_URI:
+      case COAP_OPTION_PROXY_URI:
       {
-        base::set_bit( _status, OptionBitmaskProxyUri );
+        _bits.set( k_option_bit_ProxyUri );
         errMask |= check_option_for_length( p_cur_option, 1, 1034 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::PROXU_SCHEME:
+      case COAP_OPTION_PROXU_SCHEME:
       {
-        base::set_bit( _status, OptionBitmaskProxyScheme );
+        _bits.set( k_option_bit_ProxyScheme );
         errMask |= check_option_for_length( p_cur_option, 1, 255 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::SIZE1:
+      case COAP_OPTION_SIZE1:
       {
-        base::set_bit( _status, OptionBitmaskSize1 );
+        _bits.set( k_option_bit_Size1 );
         errMask |= check_option_for_length( p_cur_option, 0, 4 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
 
-      case OptionType::SIZE2:
+      case COAP_OPTION_SIZE2:
       {
-        base::set_bit( _status, OptionBitmaskSize2 );
+        _bits.set( k_option_bit_Size2 );
         errMask |= check_option_for_length( p_cur_option, 0, 4 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::BLOCK_1:
+      case COAP_OPTION_BLOCK_1:
       {
-        base::set_bit( _status, OptionBitmaskBlock1 );
+        _bits.set( k_option_bit_Block1 );
         errMask |= check_option_for_length( p_cur_option, 0, 3 );
         errMask |= check_option_no_repeated( cur_option_no );
       }
       break;
-      case OptionType::BLOCK_2:
+      case COAP_OPTION_BLOCK_2:
       {
-        base::set_bit( _status, OptionBitmaskBlock2 );
+        _bits.set( k_option_bit_Block2 );
         errMask |= check_option_for_length( p_cur_option, 0, 3 );
         errMask |= check_option_no_repeated( cur_option_no );
+      }
+      break;
+      case COAP_OPTION_CONTENT_VERSION:
+      {
+        _bits.set( k_option_bit_ContentVersion );
+      }
+      break;
+      case COAP_OPTION_ACCEPT_VERSION:
+      {
+        _bits.set( k_option_bit_AcceptVersion );
       }
       break;
 
       default:
       {
-        if( ( p_cur_option->GetNo() & 0x01 ) == 0x01 )
+        if( ( p_cur_option->get_no() & 0x01 ) == 0x01 )
         {
           errMask |= OPTION_ERROR_CRITICAL_UNKNOWN;
         }
@@ -386,74 +447,68 @@ uint16_t OptionsSet::CheckOptions()
     }
   }
 
-  return ( errMask );
+  return errMask;
 }
 
 /***
  * TODO : need to test with unit test.
  * Returns the total length of the uri query with ';' for each segment and also returns the total no of the segments.
- * @param u16_no_of_segments - holds the no of uri_query options.
+ * @param ru16_no_of_segments - holds the no of uri_query options.
  * @return total length of the uri query string with including the count for ';' for each segment.
  */
 
-uint16_t OptionsSet::get_uri_query_length( uint16_t &u16_no_of_segments )
+uint16_t OptionsSet::get_uri_query_length( uint16_t &ru16_no_of_segments ) const
 {
   uint16_t u16_cur_len = 0;
 
-  u16_no_of_segments = 0;
+  ru16_no_of_segments = 0;
 
-  if( _optionList.Size() == 0 )
+  if( _options_set.empty() )
   {
-    return ( 1 );
+    return 1;
   }
 
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
-  {
-    auto opt = *it;
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [&] ( Option *option ) {
+        if( option->get_no() == (uint16_t) COAP_OPTION_URI_QUERY )
+        {
+          ru16_no_of_segments++;
+          u16_cur_len += option->get_len() + 1;                               // +1 is for the ';'
+        }
+      } );
 
-    if( opt->GetNo() == uint16_t( OptionType::URI_QUERY ) )
-    {
-      u16_no_of_segments++;
-      u16_cur_len += ( opt->GetLen() + 1 );                 // +1 is for the ';'
-    }
-  }
-
-  return ( u16_cur_len );
+  return u16_cur_len;
 }
 
 /***
  * Returns the total length of the uri path with '\' for each segment and also returns the total no of the segments.
  * If there are no uri_path options in the list then length of 1 is returned for '\'.
- * @param u16_no_of_segments - holds the no of uri_path options.
+ * @param ru16_no_of_segments - holds the no of uri_path options.
  * @return total length of the uri path string with including the count for '\' for each segment.
  */
-uint16_t OptionsSet::get_uri_path_length( uint16_t &u16_no_of_segments )
+uint16_t OptionsSet::get_uri_path_length( uint16_t &ru16_no_of_segments ) const
 {
   uint16_t u16_cur_len = 0;
 
-  u16_no_of_segments = 0;
+  ru16_no_of_segments = 0;
 
-  if( _optionList.Size() == 0 )
+  if( _options_set.empty() )
   {
-    return ( 1 );
+    return 1;
   }
 
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
-  {
-    auto opt = *it;
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [&] ( Option *option ) {
+        if( option->get_no() == (uint16_t) COAP_OPTION_URI_PATH )
+        {
+          ru16_no_of_segments++;
+          u16_cur_len += option->get_len() + 1;                                       // +1 is for the '/'
+        }
+      } );
 
-    if( opt->GetNo() == uint16_t( OptionType::URI_PATH ) )
-    {
-      u16_no_of_segments++;
-      u16_cur_len += ( opt->GetLen() + 1 );         // +1 is for the '/'
-    }
-  }
-
-  return ( u16_cur_len );
+  return u16_cur_len;
 }
 
 /***
- * Returns the uri path with '/' appended. If there is no uri_path option in the list then single '\' is returned.
+ * Returns the uri path with '/' appended. If there is no uri_path option in the list then single '/' is returned.
  * the total length if the uri path is also returned.
  *
  * @param cz_uri_path_byte_array - ByteArray which holds the memory to copy the full uri.
@@ -464,7 +519,7 @@ void OptionsSet::GetUriPathString( ByteArray &cz_uri_path_byte_array ) const
   uint16_t u16_cur_byte_index = 0;
   auto     pu8_byte_array     = cz_uri_path_byte_array.get_array();
 
-  if( _optionList.Size() == 0 )
+  if( _options_set.empty() )
   {
     pu8_byte_array[0] = '/';
     pu8_byte_array[1] = '\0';
@@ -472,16 +527,16 @@ void OptionsSet::GetUriPathString( ByteArray &cz_uri_path_byte_array ) const
     return;
   }
 
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
+  for( auto it = _options_set.cbegin(); it != _options_set.cend(); ++it )
   {
     auto opt = *it;
 
-    if( ( opt->GetNo() == uint16_t( OptionType::URI_PATH ) ) && ( opt->GetLen() > 0 ) )
+    if( opt->get_no() == uint16_t( COAP_OPTION_URI_PATH ) && opt->get_len() > 0 )
     {
       pu8_byte_array[u16_cur_byte_index++] = '/';
-      memcpy( &pu8_byte_array[u16_cur_byte_index], opt->GetVal(), opt->GetLen() );
+      std::memcpy( &pu8_byte_array[u16_cur_byte_index], opt->get_val(), opt->get_len() );
 
-      u16_cur_byte_index += opt->GetLen();
+      u16_cur_byte_index += opt->get_len();
     }
   }
 
@@ -489,6 +544,91 @@ void OptionsSet::GetUriPathString( ByteArray &cz_uri_path_byte_array ) const
 
   cz_uri_path_byte_array.set_len( u16_cur_byte_index );
 }
+
+void OptionsSet::get_uri( std::string &rcz_uri ) const
+{
+  rcz_uri.clear();
+
+  if( _options_set.empty() )
+  {
+    rcz_uri.append( "/" );
+    return;
+  }
+
+  uint16_t no_of_segments;
+  auto     total_length = get_uri_path_length( no_of_segments );
+
+  rcz_uri.reserve( total_length );
+
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [&] ( Option *option ) {
+        if( option->get_no() == uint16_t( COAP_OPTION_URI_PATH ) && option->get_len() > 0 )
+        {
+          rcz_uri.append( "/" );
+          rcz_uri.append( (const char *) option->get_val(), option->get_len() );
+        }
+      } );
+}
+
+void OptionsSet::get_query( std::string &rcz_query ) const
+{
+  rcz_query.clear();
+
+  if( _options_set.empty() )
+  {
+    return;
+  }
+
+  bool     is_first = true;
+  uint16_t no_of_segments;
+  auto     total_length = get_uri_query_length( no_of_segments );
+
+  rcz_query.reserve( total_length );
+
+  std::for_each( _options_set.cbegin(), _options_set.cend(), [&] ( Option *option ) {
+        if( option->get_no() == uint16_t( COAP_OPTION_URI_QUERY ) && option->get_len() > 0 )
+        {
+          if( is_first )
+          {
+            is_first = false;
+          }
+          else
+          {
+            rcz_query.append( ";" );
+          }
+
+          rcz_query.append( (const char *) option->get_val(), option->get_len() );
+        }
+      } );
+}
+
+void OptionsSet::get_full_uri( std::string &rcz_full_uri ) const
+{
+  rcz_full_uri.clear();
+
+  if( _options_set.empty() )
+  {
+    rcz_full_uri.append( "/" );
+    return;
+  }
+
+  uint16_t no_of_segments;
+  auto     query_len = get_uri_query_length( no_of_segments );
+  auto     path_len  = get_uri_path_length( no_of_segments );
+
+  rcz_full_uri.reserve( path_len + query_len + ( query_len > 0 ) ? 1 : 0 );       // +1 for &
+
+  get_uri( rcz_full_uri );
+
+  if( query_len > 0 )
+  {
+    rcz_full_uri.append( "?" );
+
+    std::string query{};
+    get_query( query );
+    rcz_full_uri.append( query );
+  }
+}
+
 
 /***
  * Returns the full uri of the resource request including the uri_path and uri_query.
@@ -501,11 +641,11 @@ void OptionsSet::get_uri( ByteArray &cz_uri_byte_array ) const
   bool     is_first_uri_query_found = false;
   uint8_t *pu8_uri_string           = cz_uri_byte_array.get_array();
 
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
+  for( auto it = _options_set.cbegin(); it != _options_set.cend(); ++it )
   {
     auto opt = *it;
 
-    if( ( opt->GetLen() > 0 ) && ( ( opt->GetNo() == uint16_t( OptionType::URI_PATH ) ) || ( opt->GetNo() == uint16_t( OptionType::URI_QUERY ) ) ) )
+    if( opt->get_len() > 0 && ( opt->get_no() == uint16_t( COAP_OPTION_URI_PATH ) || opt->get_no() == uint16_t( COAP_OPTION_URI_QUERY ) ) )
     {
       if( is_first_uri_path_found == false )
       {
@@ -513,10 +653,10 @@ void OptionsSet::get_uri( ByteArray &cz_uri_byte_array ) const
         pu8_uri_string[u16_uri_string_index] = '/';
         u16_uri_string_index++;
 
-        if( ( u16_uri_string_index + opt->GetLen() ) < cz_uri_byte_array.get_len() )
+        if( u16_uri_string_index + opt->get_len() < cz_uri_byte_array.get_len() )
         {
-          memcpy( &pu8_uri_string[u16_uri_string_index], opt->GetVal(), opt->GetLen() );
-          u16_uri_string_index += opt->GetLen();
+        	std::memcpy( &pu8_uri_string[u16_uri_string_index], opt->get_val(), opt->get_len() );
+          u16_uri_string_index += opt->get_len();
         }
         else
         {
@@ -525,7 +665,7 @@ void OptionsSet::get_uri( ByteArray &cz_uri_byte_array ) const
       }
       else
       {
-        if( opt->GetNo() == uint16_t( OptionType::URI_PATH ) )
+        if( opt->get_no() == uint16_t( COAP_OPTION_URI_PATH ) )
         {
           if( u16_uri_string_index < cz_uri_byte_array.get_len() )
           {
@@ -537,7 +677,7 @@ void OptionsSet::get_uri( ByteArray &cz_uri_byte_array ) const
             goto exit_label_;
           }
         }
-        else if( opt->GetNo() == uint16_t( OptionType::URI_QUERY ) )
+        else if( opt->get_no() == uint16_t( COAP_OPTION_URI_QUERY ) )
         {
           if( is_first_uri_query_found == false )
           {
@@ -567,10 +707,10 @@ void OptionsSet::get_uri( ByteArray &cz_uri_byte_array ) const
           }
         }
 
-        if( ( u16_uri_string_index + opt->GetLen() ) < cz_uri_byte_array.get_len() )
+        if( u16_uri_string_index + opt->get_len() < cz_uri_byte_array.get_len() )
         {
-          memcpy( &pu8_uri_string[u16_uri_string_index], opt->GetVal(), opt->GetLen() );
-          u16_uri_string_index += opt->GetLen();
+        	std::memcpy( &pu8_uri_string[u16_uri_string_index], opt->get_val(), opt->get_len() );
+          u16_uri_string_index += opt->get_len();
         }
         else
         {
@@ -588,58 +728,37 @@ exit_label_:
 
 void OptionsSet::Copy( OptionsSet &src )
 {
-  if( src.GetNoOfOptions() == 0 )
-  {
-    return;
-  }
-
-  for( auto it = _optionList.begin(); it != _optionList.end(); ++it )
-  {
-    auto opt = *it;
-    AddOption( opt->GetNo(), opt->GetLen(), opt->GetVal() );
-  }
-
-  this->_status = src._status;
 }
 
 void OptionsSet::Print() const
 {
-  _optionList.Print();
 }
 
 void OptionsSet::Init()
 {
-  _status = 0;
+  FreeOptions();
+  _bits.reset();
 }
 
 void OptionsSet::Release()
 {
-  _optionList.FreeList();
   Init();
 }
 
-OptionsSet::OptionsSet () :
-  _optionList()
-{
-}
-
-OptionsSet::~OptionsSet ()
-{
-  Release();
-}
+#endif
 
 #if 0
-ErrCode OptionsSet::AddOption( uint16_t optionNo, uint16_t val )
+ErrCode OptionsSet::add_option( uint16_t optionNo, uint16_t val )
 {
   uint8_t temp_byte[2] {};
 
   temp_byte[0] = ( val >> 8 ) & 0xFF;
   temp_byte[1] = val & 0xFF;
 
-  return ( AddOption( optionNo, sizeof( uint16_t ), &temp_byte[0] ) );
+  return ( add_option( optionNo, sizeof( uint16_t ), &temp_byte[0] ) );
 }
 
-ErrCode OptionsSet::AddOption( uint16_t optionNo, uint32_t val )
+ErrCode OptionsSet::add_option( uint16_t optionNo, uint32_t val )
 {
   uint8_t temp_byte[4] {};
 
@@ -648,10 +767,10 @@ ErrCode OptionsSet::AddOption( uint16_t optionNo, uint32_t val )
     temp_byte[i] = ( val >> ( ( 3 - i ) * 8 ) ) & 0xFF;
   }
 
-  return ( AddOption( optionNo, sizeof( uint32_t ), &temp_byte[0] ) );
+  return ( add_option( optionNo, sizeof( uint32_t ), &temp_byte[0] ) );
 }
 
-ErrCode OptionsSet::AddOption( uint16_t optionNo, uint64_t val )
+ErrCode OptionsSet::add_option( uint16_t optionNo, uint64_t val )
 {
   uint8_t temp_byte[8] {};
 
@@ -660,8 +779,25 @@ ErrCode OptionsSet::AddOption( uint16_t optionNo, uint64_t val )
     temp_byte[i] = ( val >> ( ( 7 - i ) * 8 ) ) & 0xFF;
   }
 
-  return ( AddOption( optionNo, sizeof( uint64_t ), &temp_byte[0] ) );
+  return ( add_option( optionNo, sizeof( uint64_t ), &temp_byte[0] ) );
 }
+
+uint32_t OptionsSet::Get4ByteOption( uint16_t optionNo ) const
+{
+  uint32_t value = 0;
+  auto     opt   = get_option( optionNo );
+
+  if( opt != nullptr )
+  {
+    for( auto i = 0; i < opt->get_len(); i++ )
+    {
+      value |= ( opt->get_val()[i] & 0xFF ) << ( i * 8 );
+    }
+  }
+
+  return ( value );
+}
+
 #endif
 }
 }

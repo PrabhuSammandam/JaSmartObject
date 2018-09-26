@@ -5,126 +5,78 @@
  *      Author: psammand
  */
 
-#ifndef NETWORK_EXPORT_IP_ADAPTER_CONFIG_H_
-#define NETWORK_EXPORT_IP_ADAPTER_CONFIG_H_
-
-#include <config_network.h>
-#include <konstants_network.h>
+#pragma once
+#include <bitset>
+#include <array>
 #include <cstdint>
+#include <konstants_network.h>
 
 namespace ja_iot {
 namespace network {
-#define SET_BIT( VAL, MASK ) VAL   |= MASK
-#define CLEAR_BIT( VAL, MASK ) VAL &= ( ~MASK )
-#define IS_BIT_SET( VAL, MASK ) ( ( VAL & MASK ) == MASK )
-
-enum IpAdapterConfigFlag
-{
-  IPV4_UCAST_ENABLED        = 0x01,
-  IPV4_UCAST_SECURE_ENABLED = 0x02,
-  IPV4_MCAST_ENABLED        = 0x04,
-  IPV4_MCAST_SECURE_ENABLED = 0x08,
-  IPV6_UCAST_ENABLED        = 0x10,
-  IPV6_UCAST_SECURE_ENABLED = 0x20,
-  IPV6_MCAST_ENABLED        = 0x40,
-  IPV6_MCAST_SECURE_ENABLED = 0x80,
-  DEVICE_TYPE_CLIENT        = 0x100,
-  DEVICE_TYPE_SERVER        = 0x200,
-};
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV4_UCAST         = 0;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV4_UCAST_SECURE  = 1;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV4_MCAST         = 2;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE  = 3;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV6_UCAST         = 4;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV6_UCAST_SECURE  = 5;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV6_MCAST         = 6;
+constexpr uint8_t IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE  = 7;
+constexpr uint8_t IP_ADAPTER_CONFIG_DEVICE_TYPE_CLIENT = 8;
+constexpr uint8_t IP_ADAPTER_CONFIG_DEVICE_TYPE_SERVER = 9;
 
 class IpAdapterConfig
 {
   public:
-
-    IpAdapterConfig () { set_config_flag( DEVICE_TYPE_SERVER, true ); }
-
-    void set_config_flag( IpAdapterConfigFlag config_flag, bool value )
+    IpAdapterConfig ()
     {
-      if( value ){ SET_BIT( _flags_bitmask, config_flag ); }
-      else{ CLEAR_BIT( _flags_bitmask, config_flag ); }
+      set_flag( IP_ADAPTER_CONFIG_DEVICE_TYPE_SERVER, true );
+      set_port( IP_ADAPTER_CONFIG_IPV4_MCAST, COAP_PORT );
+      set_port( IP_ADAPTER_CONFIG_IPV6_MCAST, COAP_PORT );
+      set_port( IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE, COAP_SECURE_PORT );
+      set_port( IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE, COAP_SECURE_PORT );
     }
 
-    bool is_config_flag_set( IpAdapterConfigFlag config_flag ) { return ( IS_BIT_SET( _flags_bitmask, config_flag ) ); }
+    void set_flag( const uint8_t config_flag, const bool value ) { _flags.set( config_flag, value ); }
+    bool is_flag_set( const uint8_t config_flag ) const { return ( _flags[config_flag] ); }
 
-    bool is_device_client() { return ( is_config_flag_set( DEVICE_TYPE_CLIENT ) ); }
-    bool is_device_server() { return ( is_config_flag_set( DEVICE_TYPE_SERVER ) ); }
+    bool is_device_client() const { return ( is_flag_set( IP_ADAPTER_CONFIG_DEVICE_TYPE_CLIENT ) ); }
+    bool is_device_server() const { return ( is_flag_set( IP_ADAPTER_CONFIG_DEVICE_TYPE_SERVER ) ); }
 
-    uint16_t getIpv4MulticastPort() const { return ( ipv4_multicast_port_ ); }
-    void     setIpv4MulticastPort( uint16_t ipv4MulticastPort ) { ipv4_multicast_port_ = ipv4MulticastPort; }
+    uint16_t get_port( const uint8_t u8_config_type ) const { return ( _ports[u8_config_type] ); }
+    void     set_port( const uint8_t u8_config_type, const uint16_t u16_port ) { _ports[u8_config_type] = u16_port; }
+    uint16_t get_current_port( const uint8_t u8_config_type ) const { return ( _cur_ports[u8_config_type] ); }
+    void     set_current_port( const uint8_t u8_config_type, const uint16_t u16_port ) { _cur_ports[u8_config_type] = u16_port; }
 
-    uint16_t getIpv4MulticastSecurePort() const { return ( ipv4_multicast_secure_port_ ); }
-    void     setIpv4MulticastSecurePort( uint16_t ipv4MulticastSecurePort ) { ipv4_multicast_secure_port_ = ipv4MulticastSecurePort; }
+    bool is_ipv4_ucast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV4_UCAST ) ); }
+    bool is_ipv4_mcast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV4_MCAST ) ); }
+    bool is_ipv4_secure_ucast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV4_UCAST_SECURE ) ); }
+    bool is_ipv4_secure_mcast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE ) ); }
 
-    uint16_t getIpv4UnicastPort() const { return ( ipv4_unicast_port_ ); }
-    void     setIpv4UnicastPort( uint16_t ipv4UnicastPort ) { ipv4_unicast_port_ = ipv4UnicastPort; }
+    bool is_ipv6_ucast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV6_UCAST ) ); }
+    bool is_ipv6_mcast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV6_MCAST ) ); }
+    bool is_ipv6_secure_ucast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV6_UCAST_SECURE ) ); }
+    bool is_ipv6_secure_mcast_enabled() { return ( is_flag_set( IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE ) ); }
 
-    uint16_t getIpv4UnicastSecurePort() const { return ( ipv4_unicast_secure_port_ ); }
-    void     setIpv4UnicastSecurePort( uint16_t ipv4UnicastSecurePort ) { ipv4_unicast_secure_port_ = ipv4UnicastSecurePort; }
-
-    uint16_t getIpv6MulticastPort() const { return ( ipv6_multicast_port_ ); }
-    void     setIpv6MulticastPort( uint16_t ipv6MulticastPort ) { ipv6_multicast_port_ = ipv6MulticastPort; }
-
-    uint16_t getIpv6MulticastSecurePort() const { return ( ipv6_multicast_secure_port_ ); }
-    void     setIpv6MulticastSecurePort( uint16_t ipv6MulticastSecurePort ) { ipv6_multicast_secure_port_ = ipv6MulticastSecurePort; }
-
-    uint16_t getIpv6UnicastPort() const { return ( ipv6_unicast_port_ ); }
-    void     setIpv6UnicastPort( uint16_t ipv6UnicastPort ) { ipv6_unicast_port_ = ipv6UnicastPort; }
-
-    uint16_t getIpv6UnicastSecurePort() const { return ( ipv6_unicast_secure_port_ ); }
-    void     setIpv6UnicastSecurePort( uint16_t ipv6UnicastSecurePort ) { ipv6_unicast_secure_port_ = ipv6UnicastSecurePort; }
-
-    uint16_t get_cur_ipv4_unicast_port() const { return ( ipv4_cur_unicast_port_ ); }
-    void     set_cur_ipv4_unicast_port( uint16_t ipv4UnicastPort ) { ipv4_cur_unicast_port_ = ipv4UnicastPort; }
-
-    uint16_t get_cur_ipv4_unicast_secure_port() const { return ( ipv4_cur_unicast_secure_port_ ); }
-    void     set_cur_ipv4_unicast_secure_port( uint16_t ipv4UnicastSecurePort ) { ipv4_cur_unicast_secure_port_ = ipv4UnicastSecurePort; }
-
-    uint16_t get_cur_ipv6_unicast_port() const { return ( ipv6_cur_unicast_port_ ); }
-    void     set_cur_ipv6_unicast_port( uint16_t ipv6UnicastPort ) { ipv6_cur_unicast_port_ = ipv6UnicastPort; }
-
-    uint16_t get_cur_ipv6_unicast_secure_port() const { return ( ipv6_cur_unicast_secure_port_ ); }
-    void     set_cur_ipv6_unicast_secure_port( uint16_t ipv6UnicastSecurePort ) { ipv6_cur_unicast_secure_port_ = ipv6UnicastSecurePort; }
-
-    bool is_ipv4_enabled()
+    bool is_ipv4_enabled() const
     {
-      return (
-        is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV4_UCAST_SECURE_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_SECURE_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV4_MCAST_ENABLED )
-             );
+      return ( is_flag_set( IP_ADAPTER_CONFIG_IPV4_UCAST )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV4_UCAST_SECURE )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV4_MCAST ) );
     }
-    bool is_ipv6_enabled()
+
+    bool is_ipv6_enabled() const
     {
-      return (
-        is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV6_UCAST_SECURE_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_SECURE_ENABLED )
-             || is_config_flag_set( IpAdapterConfigFlag::IPV6_MCAST_ENABLED )
-             );
+      return ( is_flag_set( IP_ADAPTER_CONFIG_IPV6_UCAST )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV6_UCAST_SECURE )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE )
+             || is_flag_set( IP_ADAPTER_CONFIG_IPV6_MCAST ) );
     }
 
   private:
-    uint16_t   _flags_bitmask = 0;
-
-    uint16_t   ipv4_unicast_port_        = 0;
-    uint16_t   ipv4_unicast_secure_port_ = 0;
-    uint16_t   ipv6_unicast_port_        = 0;
-    uint16_t   ipv6_unicast_secure_port_ = 0;
-
-    uint16_t   ipv4_cur_unicast_port_        = 0;
-    uint16_t   ipv4_cur_unicast_secure_port_ = 0;
-    uint16_t   ipv6_cur_unicast_port_        = 0;
-    uint16_t   ipv6_cur_unicast_secure_port_ = 0;
-
-    uint16_t   ipv4_multicast_port_        = COAP_PORT;
-    uint16_t   ipv4_multicast_secure_port_ = COAP_SECURE_PORT;
-    uint16_t   ipv6_multicast_port_        = COAP_PORT;
-    uint16_t   ipv6_multicast_secure_port_ = COAP_SECURE_PORT;
+    std::bitset<16> _flags{};
+    std::array<uint16_t, 8> _ports{};
+    std::array<uint16_t, 8> _cur_ports{};
 };
 }
 }
-
-
-
-#endif /* NETWORK_EXPORT_IP_ADAPTER_CONFIG_H_ */

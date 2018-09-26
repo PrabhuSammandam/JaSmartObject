@@ -11,14 +11,15 @@
 #include <windows.h>
 #include <ws2ipdef.h>
 #include <ws2tcpip.h>
-#include <port/windows/inc/udp_socket_win.h>
 #include <climits>
+
+#include "ip_addr.h"
+#include "i_udp_socket.h"
+#include "port/windows/inc/udp_socket_win.h"
 
 namespace ja_iot {
 namespace network {
-
-using namespace ja_iot::base;
-
+using namespace base;
 UdpSocketImplWindows::UdpSocketImplWindows ()
 {
   WSADATA wsa_data{};
@@ -26,56 +27,55 @@ UdpSocketImplWindows::UdpSocketImplWindows ()
   WSAStartup( MAKEWORD( 2, 2 ), &wsa_data );
 }
 
-SocketError UdpSocketImplWindows::OpenSocket( IpAddrFamily ip_addr_family )
+SocketError UdpSocketImplWindows::OpenSocket( const IpAddrFamily e_addr_family )
 {
-  ip_addr_family_ = ip_addr_family;
-  socket_fd_      = socket( ( ip_addr_family == IpAddrFamily::IPV4 ) ? PF_INET : PF_INET6, SOCK_DGRAM, IPPROTO_UDP );
+  _e_addr_family = e_addr_family;
+  _u32_socket_fd = socket( e_addr_family == IpAddrFamily::IPv4 ? PF_INET : PF_INET6, SOCK_DGRAM, IPPROTO_UDP );
 
-  if( socket_fd_ == INVALID_SOCKET )
-  {
-    return ( SocketError::SOCKET_NOT_VALID );
-  }
-
-  return ( SocketError::OK );
+  return ( ( _u32_socket_fd == INVALID_SOCKET ) ? SocketError::SOCKET_NOT_VALID : SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, uint16_t port )
+int select_sock_addr( IpAddrFamily e_addr_family, sockaddr * &pst_sock_addr, sockaddr_in *pst_ipv4_sock_addr, sockaddr_in6 *pst_ipv6_sock_addr, const uint16_t u16_port, IpAddress &ip_address )
 {
-  if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != ip_address.get_addr_family() ) )
+  if( e_addr_family == IpAddrFamily::IPv4 )
   {
-    return ( SocketError::SOCKET_NOT_VALID );
-  }
+    pst_ipv4_sock_addr->sin_family           = AF_INET;
+    pst_ipv4_sock_addr->sin_port             = htons( u16_port );
+    pst_ipv4_sock_addr->sin_addr.S_un.S_addr = htonl( ip_address.as_u32() );             // already taken care about network byte order
 
-  const sockaddr *p_sock_addr  = nullptr;
-  int             sockaddr_len = 0;
-
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
-  {
-    struct sockaddr_in ipv4_sock_addr = { 0 };
-
-    ipv4_sock_addr.sin_family           = AF_INET;
-    ipv4_sock_addr.sin_port             = htons( port );
-    ipv4_sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.as_u32() );             // already taken care about network byte order
-
-    p_sock_addr  = (const sockaddr *) &ipv4_sock_addr;
-    sockaddr_len = sizeof( struct sockaddr_in );
+    pst_sock_addr = reinterpret_cast<sockaddr *>( pst_ipv4_sock_addr );
+    return ( sizeof( struct sockaddr_in ) );
   }
   else
   {
-    struct sockaddr_in6 ipv6_sock_addr = { 0 };
+    pst_ipv6_sock_addr->sin6_family = AF_INET6;
+    pst_ipv6_sock_addr->sin6_port   = htons( u16_port );
+    memcpy( &pst_ipv6_sock_addr->sin6_addr, ip_address.get_addr(), sizeof pst_ipv6_sock_addr->sin6_addr );
 
-    ipv6_sock_addr.sin6_family = AF_INET6;
-    ipv6_sock_addr.sin6_port   = htons( port );
-    memcpy( &ipv6_sock_addr.sin6_addr, ip_address.get_addr(), sizeof( ipv6_sock_addr.sin6_addr ) );
+    pst_sock_addr = reinterpret_cast<sockaddr *>( pst_ipv6_sock_addr );
+    return ( sizeof( struct sockaddr_in6 ) );
+  }
+}
 
-    p_sock_addr  = (const sockaddr *) &ipv6_sock_addr;
-    sockaddr_len = sizeof( struct sockaddr_in6 );
+SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, const uint16_t u16_port )
+{
+  if( ( _u32_socket_fd == INVALID_SOCKET ) || ( _e_addr_family != ip_address.get_addr_family() ) )
+  {
+    return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  SocketError ret_status = SocketError::OK;
+  sockaddr *          pst_sock_addr     = nullptr;
+  struct sockaddr_in  st_ipv4_sock_addr = { 0 };
 
-  if( bind( socket_fd_, p_sock_addr, sockaddr_len ) == SOCKET_ERROR )
+  struct sockaddr_in6 st_ipv6_sock_addr = { 0 };
+
+  int                 i32_sockaddr_len = select_sock_addr( _e_addr_family, pst_sock_addr, &st_ipv4_sock_addr, &st_ipv6_sock_addr, u16_port, ip_address );
+
+  SocketError         ret_status = SocketError::OK;
+
+  if( bind( _u32_socket_fd, pst_sock_addr, i32_sockaddr_len ) == SOCKET_ERROR )
   {
+    auto const socket_error = WSAGetLastError();
     ret_status = SocketError::BIND_FAILED;
   }
 
@@ -84,30 +84,30 @@ SocketError UdpSocketImplWindows::BindSocket( IpAddress &ip_address, uint16_t po
 
 SocketError UdpSocketImplWindows::CloseSocket()
 {
-  if( socket_fd_ != INVALID_SOCKET )
+  if( _u32_socket_fd != INVALID_SOCKET )
   {
-    closesocket( socket_fd_ );
-    socket_fd_ = INVALID_SOCKET;
+    closesocket( _u32_socket_fd );
+    _u32_socket_fd = INVALID_SOCKET;
   }
 
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &group_address, uint32_t if_index )
+SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &rcz_group_address, const uint32_t u32_if_index )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( _e_addr_family == IpAddrFamily::IPv4 )
   {
-    struct ip_mreq mreq {};
+    struct ip_mreq st_ipv4_mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
-    mreq.imr_interface.s_addr = htonl( if_index );
+    st_ipv4_mreq.imr_multiaddr.s_addr = htonl( rcz_group_address.as_u32() );
+    st_ipv4_mreq.imr_interface.s_addr = htonl( u32_if_index );
 
-    auto ret_status = setsockopt( socket_fd_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq ) );
+    const auto ret_status = setsockopt( _u32_socket_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<const char *>( &st_ipv4_mreq ), sizeof st_ipv4_mreq );
 
     if( ret_status )
     {
@@ -117,12 +117,12 @@ SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &group_address, 
   }
   else
   {
-    struct ipv6_mreq mreq {};
+    struct ipv6_mreq st_ipv6_mreq {};
 
-    memcpy( &mreq.ipv6mr_multiaddr, group_address.get_addr(), sizeof( mreq.ipv6mr_multiaddr ) );
-    mreq.ipv6mr_interface = if_index;
+    memcpy( &st_ipv6_mreq.ipv6mr_multiaddr, rcz_group_address.get_addr(), sizeof st_ipv6_mreq.ipv6mr_multiaddr );
+    st_ipv6_mreq.ipv6mr_interface = u32_if_index;
 
-    if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_JOIN_GROUP, (const char *) &mreq, sizeof( mreq ) ) )
+    if( setsockopt( _u32_socket_fd, IPPROTO_IPV6, IPV6_JOIN_GROUP, reinterpret_cast<const char *>( &st_ipv6_mreq ), sizeof st_ipv6_mreq ) )
     {
       return ( SocketError::OPTION_SET_FAILED );
     }
@@ -131,33 +131,33 @@ SocketError UdpSocketImplWindows::JoinMulticastGroup( IpAddress &group_address, 
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::LeaveMulticastGroup( IpAddress &group_address, uint32_t if_index )
+SocketError UdpSocketImplWindows::LeaveMulticastGroup( IpAddress &rcz_group_address, const uint32_t u32_if_index )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( _e_addr_family == IpAddrFamily::IPv4 )
   {
-    struct ip_mreq mreq {};
+    struct ip_mreq st_ipv4_mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
-    mreq.imr_interface.s_addr = htonl( if_index );
+    st_ipv4_mreq.imr_multiaddr.s_addr = htonl( rcz_group_address.as_u32() );
+    st_ipv4_mreq.imr_interface.s_addr = htonl( u32_if_index );
 
-    if( setsockopt( socket_fd_, IPPROTO_IP, IP_DROP_MEMBERSHIP, (const char *) &mreq, sizeof( mreq ) ) )
+    if( setsockopt( _u32_socket_fd, IPPROTO_IP, IP_DROP_MEMBERSHIP, reinterpret_cast<const char *>( &st_ipv4_mreq ), sizeof st_ipv4_mreq ) )
     {
       return ( SocketError::OPTION_SET_FAILED );
     }
   }
   else
   {
-    struct ipv6_mreq mreq {};
+    struct ipv6_mreq st_ipv6_mreq {};
 
-    mreq.ipv6mr_interface = if_index;
-    memcpy( &mreq.ipv6mr_multiaddr, group_address.get_addr(), sizeof( mreq.ipv6mr_multiaddr ) );
+    st_ipv6_mreq.ipv6mr_interface = u32_if_index;
+    memcpy( &st_ipv6_mreq.ipv6mr_multiaddr, rcz_group_address.get_addr(), sizeof st_ipv6_mreq.ipv6mr_multiaddr );
 
-    if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_LEAVE_GROUP, (const char *) &mreq, sizeof( mreq ) ) )
+    if( setsockopt( _u32_socket_fd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, reinterpret_cast<const char *>( &st_ipv6_mreq ), sizeof st_ipv6_mreq ) )
     {
       return ( SocketError::OPTION_SET_FAILED );
     }
@@ -166,30 +166,31 @@ SocketError UdpSocketImplWindows::LeaveMulticastGroup( IpAddress &group_address,
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::SelectMulticastInterface( IpAddress &group_address, uint32_t if_index )
+SocketError UdpSocketImplWindows::SelectMulticastInterface( IpAddress &rcz_group_address, const uint32_t u32_if_index )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPV4 )
+  if( _e_addr_family == IpAddrFamily::IPv4 )
   {
-    struct ip_mreq mreq {};
+    struct ip_mreq st_ipv4_mreq {};
 
-    mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
-    mreq.imr_interface.s_addr = htonl( if_index );
+    st_ipv4_mreq.imr_multiaddr.s_addr = htonl( rcz_group_address.as_u32() );
+    st_ipv4_mreq.imr_interface.s_addr = htonl( u32_if_index );
 
-    if( setsockopt( socket_fd_, IPPROTO_IP, IP_MULTICAST_IF, (const char *) &mreq, sizeof( mreq ) ) )
+    if( setsockopt( _u32_socket_fd, IPPROTO_IP, IP_MULTICAST_IF, reinterpret_cast<const char *>( &st_ipv4_mreq ), sizeof st_ipv4_mreq ) )
     {
       return ( SocketError::OPTION_SET_FAILED );
     }
   }
   else
   {
-    int index = if_index;
+    int i32_temp_if_index = u32_if_index;
 
-    if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_MULTICAST_IF, (const char *) &index, sizeof( index ) ) )
+    if( setsockopt( _u32_socket_fd, IPPROTO_IPV6, IPV6_MULTICAST_IF, reinterpret_cast<const char *>( &i32_temp_if_index ),
+      sizeof i32_temp_if_index ) )
     {
       return ( SocketError::OPTION_SET_FAILED );
     }
@@ -198,17 +199,17 @@ SocketError UdpSocketImplWindows::SelectMulticastInterface( IpAddress &group_add
   return ( SocketError::ERR );
 }
 
-SocketError UdpSocketImplWindows::EnableMulticastLoopback( bool is_enabled )
+SocketError UdpSocketImplWindows::EnableMulticastLoopback( const bool is_enabled )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::ERR );
   }
 
-  auto level = ( ip_addr_family_ == IpAddrFamily::IPV4 ) ? IPPROTO_IP : IPPROTO_IPV6;
-  int  on    = ( is_enabled ) ? 1 : 0;
+  const auto level = _e_addr_family == IpAddrFamily::IPv4 ? IPPROTO_IP : IPPROTO_IPV6;
+  int        on    = is_enabled ? 1 : 0;
 
-  if( setsockopt( socket_fd_, level, IP_MULTICAST_LOOP, (const char *) &on, sizeof( on ) ) )
+  if( setsockopt( _u32_socket_fd, level, IP_MULTICAST_LOOP, reinterpret_cast<const char *>( &on ), sizeof on ) )
   {
     return ( SocketError::OPTION_SET_FAILED );
   }
@@ -216,111 +217,63 @@ SocketError UdpSocketImplWindows::EnableMulticastLoopback( bool is_enabled )
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::ReceiveData( IpAddress &remote_addr, uint16_t &port, uint8_t *data, int16_t &data_length )
+SocketError UdpSocketImplWindows::ReceiveData( IpAddress &rcz_remote_addr, uint16_t &u16_port, uint8_t *pu8_data, int16_t &ru16_data_length )
 {
   SocketError ret_status = SocketError::OK;
 
-  if( ( data == nullptr ) || ( socket_fd_ == INVALID_SOCKET ) )
+  if( ( pu8_data == nullptr ) || ( _u32_socket_fd == INVALID_SOCKET ) )
   {
     return ( SocketError::ERR );
   }
 
-  struct sockaddr_storage sock_store = { 0 };
+  struct sockaddr_storage st_sock_storage = { 0 };
 
-  int                     sockaddr_len = sizeof( struct sockaddr_storage );
+  int                     i32_sockaddr_len   = sizeof( struct sockaddr_storage );
+  auto                    i32_received_bytes = recvfrom( _u32_socket_fd,
+      reinterpret_cast<char *>( &pu8_data[0] ),
+      ru16_data_length,
+      0,
+      reinterpret_cast<struct sockaddr *>( &st_sock_storage ),
+      &i32_sockaddr_len );
 
-  auto                    received_bytes = recvfrom( socket_fd_, (char *) &data[0], data_length, 0, (struct sockaddr *) &sock_store, &sockaddr_len );
-
-  data_length = received_bytes;
+  ru16_data_length = i32_received_bytes;
 
   return ( ret_status );
 }
 
 
-SocketError UdpSocketImplWindows::SendData( IpAddress &ip_address, uint16_t port, uint8_t *data, uint16_t data_length )
+SocketError UdpSocketImplWindows::SendData( IpAddress &rcz_ip_address, const uint16_t u16_port, uint8_t *pu8_data, const uint16_t u16_data_length )
 {
   SocketError ret_status = SocketError::OK;
 
-  if( ( data == nullptr ) || ( data_length == 0 )
-    || ( socket_fd_ == INVALID_SOCKET ) )
+  if( ( pu8_data == nullptr ) || ( u16_data_length == 0 )
+    || ( _u32_socket_fd == INVALID_SOCKET ) )
   {
     return ( SocketError::ERR );
   }
 
-  const sockaddr *p_sock_addr{ nullptr };
-  int sockaddr_len{ 0 };
+  sockaddr *pst_sock_addr{};
+  struct sockaddr_in  st_ipv4_sock_addr = { 0 };
 
-  if( ip_address.get_addr_family() == IpAddrFamily::IPV4 )
-  {
-    struct sockaddr_in sock_addr = { 0 };
+  struct sockaddr_in6 st_ipv6_sock_addr = { 0 };
 
-    sock_addr.sin_family           = AF_INET;
-    sock_addr.sin_port             = htons( port );
-    sock_addr.sin_addr.S_un.S_addr = htonl( ip_address.as_u32() );     // already taken care about network byte order
+  int                 i32_sockaddr_len = select_sock_addr( _e_addr_family, pst_sock_addr, &st_ipv4_sock_addr, &st_ipv6_sock_addr, u16_port, rcz_ip_address );
 
-    p_sock_addr  = (const sockaddr *) &sock_addr;
-    sockaddr_len = sizeof( struct sockaddr_in );
-  }
-  else
-  {
-    struct sockaddr_in6 sock_addr6 = { 0 };
+  auto                i32_sent_len = sendto( _u32_socket_fd, reinterpret_cast<char *>( pu8_data ), u16_data_length, 0, pst_sock_addr, i32_sockaddr_len );
 
-    sock_addr6.sin6_family = AF_INET6;
-    sock_addr6.sin6_port   = htons( port );
-    memcpy( &sock_addr6.sin6_addr, ip_address.get_addr(),
-      sizeof( sock_addr6.sin6_addr ) );
-
-    p_sock_addr  = (const sockaddr *) &sock_addr6;
-    sockaddr_len = sizeof( struct sockaddr_in6 );
-  }
-
-  int err{ 0 };
-  int len{ 0 };
-  size_t currently_no_of_bytes_sent = 0;
-
-  do
-  {
-    int remaining_bytes_to_send = ( ( data_length - currently_no_of_bytes_sent ) > INT_MAX ) ? INT_MAX : (int) ( data_length - currently_no_of_bytes_sent );
-
-    len = sendto( socket_fd_, ( (char *) data ) + currently_no_of_bytes_sent,
-        remaining_bytes_to_send, 0, p_sock_addr, sockaddr_len );
-
-    if( SOCKET_ERROR == len )
-    {
-      err = WSAGetLastError();
-
-      if( ( WSAEWOULDBLOCK != err ) && ( WSAENOBUFS != err ) )
-      {
-        ret_status = SocketError::SEND_FAILED;
-      }
-    }
-    else
-    {
-      currently_no_of_bytes_sent += len;
-
-      if( currently_no_of_bytes_sent != (size_t) len )
-      {
-      }
-      else
-      {
-      }
-    }
-  } while( ( ( SOCKET_ERROR == len ) && ( WSAEWOULDBLOCK == err ) )
-         || ( WSAENOBUFS == err ) || ( currently_no_of_bytes_sent < data_length ) );
-
-  return ( ret_status );
+  return ( ( SOCKET_ERROR == i32_sent_len ) ? SocketError::SEND_FAILED : SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::EnableReuseAddr( bool is_enabled )
+SocketError UdpSocketImplWindows::EnableReuseAddr( const bool is_enabled )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = ( is_enabled ) ? 1 : 0;
+  auto on = is_enabled ? 1 : 0;
 
-  if( setsockopt( socket_fd_, SOL_SOCKET, SO_REUSEADDR, (const char *) &on, sizeof( on ) ) )
+  if( setsockopt( _u32_socket_fd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>( &on ), sizeof on ) )
   {
     return ( SocketError::OPTION_SET_FAILED );
   }
@@ -328,16 +281,16 @@ SocketError UdpSocketImplWindows::EnableReuseAddr( bool is_enabled )
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::EnableIpv6Only( bool is_enabled )
+SocketError UdpSocketImplWindows::EnableIpv6Only( const bool is_enabled )
 {
-  if( ( socket_fd_ == INVALID_SOCKET ) || ( ip_addr_family_ != IpAddrFamily::IPv6 ) )
+  if( ( _u32_socket_fd == INVALID_SOCKET ) || ( _e_addr_family != IpAddrFamily::IPv6 ) )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = ( is_enabled ) ? 1 : 0;
+  auto on = is_enabled ? 1 : 0;
 
-  if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_V6ONLY, (const char *) &on, sizeof( on ) ) )
+  if( setsockopt( _u32_socket_fd, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>( &on ), sizeof on ) )
   {
     return ( SocketError::OPTION_SET_FAILED );
   }
@@ -345,28 +298,20 @@ SocketError UdpSocketImplWindows::EnableIpv6Only( bool is_enabled )
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplWindows::EnablePacketInfo( bool is_enabled )
+SocketError UdpSocketImplWindows::EnablePacketInfo( const bool is_enabled )
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( SocketError::SOCKET_NOT_VALID );
   }
 
-  int on = ( is_enabled ) ? 1 : 0;
+  int on           = is_enabled ? 1 : 0;
+  int i32_level    = ( _e_addr_family == IpAddrFamily::IPv6 ) ? IPPROTO_IPV6 : IPPROTO_IP;
+  int i32_opt_name = ( _e_addr_family == IpAddrFamily::IPv6 ) ? IPV6_PKTINFO : IP_PKTINFO;
 
-  if( ip_addr_family_ == IpAddrFamily::IPv6 )
+  if( setsockopt( _u32_socket_fd, i32_level, i32_opt_name, reinterpret_cast<const char *>( &on ), sizeof on ) )
   {
-    if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_PKTINFO, (const char *) &on, sizeof( on ) ) )
-    {
-      return ( SocketError::OPTION_SET_FAILED );
-    }
-  }
-  else
-  {
-    if( setsockopt( socket_fd_, IPPROTO_IP, IP_PKTINFO, (const char *) &on, sizeof( on ) ) )
-    {
-      return ( SocketError::OPTION_SET_FAILED );
-    }
+    return ( SocketError::OPTION_SET_FAILED );
   }
 
   return ( SocketError::OK );
@@ -374,32 +319,32 @@ SocketError UdpSocketImplWindows::EnablePacketInfo( bool is_enabled )
 
 uint16_t UdpSocketImplWindows::GetLocalPort()
 {
-  if( socket_fd_ == INVALID_SOCKET )
+  if( _u32_socket_fd == INVALID_SOCKET )
   {
     return ( 0 );
   }
 
-  struct sockaddr_storage sa {};
+  struct sockaddr_storage st_sockaddr_storage {};
 
-  socklen_t               socklen = ( ip_addr_family_ == IpAddrFamily::IPv6 ) ? sizeof( struct sockaddr_in6 ) : sizeof( struct sockaddr_in );
+  socklen_t               i32_sockaddr_len = _e_addr_family == IpAddrFamily::IPv6 ? sizeof( struct sockaddr_in6 ) : sizeof( struct sockaddr_in );
 
-  if( getsockname( socket_fd_, (struct sockaddr *) &sa, &socklen ) )
+  if( getsockname( _u32_socket_fd, reinterpret_cast<struct sockaddr *>( &st_sockaddr_storage ), &i32_sockaddr_len ) )
   {
     return ( 0 );
   }
 
-  uint16_t binded_port = 0;
+  uint16_t u16_binded_port = 0;
 
-  if( sa.ss_family == AF_INET6 )
+  if( st_sockaddr_storage.ss_family == AF_INET6 )
   {
-    binded_port = ( ( (struct sockaddr_in6 *) &sa )->sin6_port );
+    u16_binded_port = reinterpret_cast<struct sockaddr_in6 *>( &st_sockaddr_storage )->sin6_port;
   }
   else
   {
-    binded_port = ( ( (struct sockaddr_in *) &sa )->sin_port );
+    u16_binded_port = reinterpret_cast<struct sockaddr_in *>( &st_sockaddr_storage )->sin_port;
   }
 
-  return ( ntohs( binded_port ) );
+  return ( ntohs( u16_binded_port ) );
 }
 
 SocketError UdpSocketImplWindows::SetBlocking( bool is_blocked )
@@ -409,7 +354,7 @@ SocketError UdpSocketImplWindows::SetBlocking( bool is_blocked )
 
 IpAddrFamily UdpSocketImplWindows::GetAddrFamily()
 {
-  return ( ip_addr_family_ );
+  return ( _e_addr_family );
 }
 }
 }
