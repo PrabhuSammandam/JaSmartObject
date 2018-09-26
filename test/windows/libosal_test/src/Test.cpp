@@ -5,7 +5,7 @@
 #include "mutex_test.h"
 #include "semaphore_test.h"
 
-bool runAllTests( int argc, char const *argv[] )
+bool run_all_tests( int argc, char const *argv[] )
 {
   cute::xml_file_opener                     xmlfile( argc, argv );
   cute::xml_listener<cute::ide_listener<> > lis( xmlfile.out );
@@ -24,5 +24,5 @@ bool runAllTests( int argc, char const *argv[] )
 
 int main_( int argc, char const *argv[] )
 {
-  return ( runAllTests( argc, argv ) ? EXIT_SUCCESS : EXIT_FAILURE );
+  return ( run_all_tests( argc, argv ) ? EXIT_SUCCESS : EXIT_FAILURE );
 }

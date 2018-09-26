@@ -10,6 +10,41 @@
 
 #include "esp_libc.h"
 
+namespace std
+{
+
+void __throw_length_error(const char*)
+{
+	while(1);
+}
+
+void __throw_length_error(char* const str)
+{
+	while(1);
+}
+
+void __throw_bad_function_call()
+{
+	while(1);
+}
+
+void __throw_logic_error(const char*)
+{
+	while(1);
+}
+
+void __throw_bad_alloc()
+{
+	while(1);
+}
+void
+  __throw_out_of_range_fmt(const char*, ...)
+{
+	while(1);
+}
+}
+
+
 void* ICACHE_FLASH_ATTR operator new(size_t size)
 {
 	return os_malloc(size);

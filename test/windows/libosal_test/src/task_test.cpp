@@ -5,6 +5,8 @@
  *      Author: prabhu
  */
 
+#include <functional>
+#include <iostream>
 #include <OsalError.h>
 #include <OsalMgr.h>
 #include <PtrMsgQ.h>
@@ -17,41 +19,30 @@
 
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
+using namespace std;
 
-class ConsumerThreadMsgHandler : public ITaskMsgHandler
+PtrMsgQ<10> gs_thread_consumer_msg_q;
+
+void producer_thread_function( void *arg )
 {
-  public:
-    void HandleMsg( void *msg ) override
-    {
-      printf( "Got msg %d\n", *((uint16_t*)msg) );
-    }
+  uint16_t count           = 0;
+  Task *   consumer_thread = (Task *) arg;
 
-    void DeleteMsg( void *msg ) override
-    {
-    }
-};
+  while( true )
+  {
+    sleep( 1 );
+    consumer_thread->SendMsg( &count );
+    count++;
+  }
+}
 
-PtrMsgQ<10>              gs_thread_consumer_msg_q;
-ConsumerThreadMsgHandler consumer_thread_msg_q_handler;
-
-class ProducerThread : public ITaskRoutine
+void consumer_task_handle_msg_cb( void *pv_task_arg, void *pv_user_data )
 {
-  public:
-    void Run( void *arg ) override
-    {
-    	uint16_t count = 0;
-      Task *consumer_thread = (Task *) arg;
-
-      while( true )
-      {
-        sleep( 1 );
-        consumer_thread->SendMsg(&count);
-        count++;
-      }
-    }
-};
-
-ProducerThread producer_thread_routine;
+	cout << "Got new message " << *( (uint16_t *) pv_task_arg ) << endl;
+}
+void consumer_task_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
+{
+}
 
 int main()
 {
@@ -65,12 +56,9 @@ int main()
     return ( 1 );
   }
 
-  TaskMsgQParam consumer_task_msg_q_param;
+  consumer_thread->Init( { "consumer", 0, 0, &gs_thread_consumer_msg_q,
+                           consumer_task_handle_msg_cb, nullptr, consumer_task_delete_msg_cb, nullptr } );
 
-  consumer_task_msg_q_param.msgQ           = &gs_thread_consumer_msg_q;
-  consumer_task_msg_q_param.taskMsgHandler = &consumer_thread_msg_q_handler;
-
-  consumer_thread->InitWithMsgQ( (uint8_t *) "consumer", 0, 0, &consumer_task_msg_q_param, nullptr );
   consumer_thread->Start();
 
   auto producer_thread = OsalMgr::Inst()->AllocTask();
@@ -81,7 +69,7 @@ int main()
     return ( 1 );
   }
 
-  producer_thread->Init( (uint8_t *) "producer", 0, 0, &producer_thread_routine, consumer_thread );
+  producer_thread->Init({"producer", 0, 0, producer_thread_function, consumer_thread});
   producer_thread->Start();
 
   Semaphore *sema = OsalMgr::Inst()->alloc_semaphore();
@@ -89,9 +77,9 @@ int main()
   sema->Init( 0, 1 );
   sema->Wait();
 
-  while(true)
+  while( true )
   {
-	  sleep(10);
+    sleep( 10 );
   }
 
   return ( 0 );

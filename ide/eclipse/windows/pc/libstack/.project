@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>win_pc_libstack</name>
+	<name>libstack</name>
 	<comment></comment>
 	<projects>
+		<project>libbase</project>
+		<project>libmemory</project>
+		<project>libnetwork</project>
+		<project>libosal</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

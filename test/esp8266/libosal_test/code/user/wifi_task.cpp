@@ -38,7 +38,7 @@ bool WifiTask::create_task()
     return ( false );
   }
 
-  dbg( "WifiTask::create_task=>Creating mutex\n");
+  dbg( "WifiTask::create_task=>Creating mutex\n" );
   access_mutex_ = OsalMgr::Inst()->AllocMutex();
 
   if( access_mutex_ == nullptr )
@@ -47,13 +47,18 @@ bool WifiTask::create_task()
     return ( false );
   }
 
-  TaskMsgQParam task_msg_q_param;
+  task_creation_params_t st_task_creation_params = {};
 
-  task_msg_q_param.msgQ           = &wifi_task_msg_q_;
-  task_msg_q_param.taskMsgHandler = &wifi_task_msg_handler_;
+  st_task_creation_params.cz_name               = WIFI_TASK_NAME;
+  st_task_creation_params.u16_stack_size        = WIFI_TASK_STACK_LENGTH;
+  st_task_creation_params.u32_priority          = WIFI_TASK_PRIORITY;
+  st_task_creation_params.pcz_msg_queue         = &wifi_task_msg_q_;
+  st_task_creation_params.pfn_handle_msg        = task_handle_msg_cb;
+  st_task_creation_params.pv_handle_msg_cb_data = this;
+  st_task_creation_params.pfn_delete_msg        = task_delete_msg_cb;
+  st_task_creation_params.pv_delete_msg_cb_data = this;
 
-  dbg( "WifiTask::create_task=>Initing task\n");
-  osal_status = wifi_task_->InitWithMsgQ( (uint8_t *) WIFI_TASK_NAME, WIFI_TASK_PRIORITY, WIFI_TASK_STACK_LENGTH, &task_msg_q_param, this );
+  osal_status = wifi_task_->Init( &st_task_creation_params );
 
   if( osal_status != OsalError::OK )
   {
@@ -63,7 +68,7 @@ bool WifiTask::create_task()
 
   wifi_task_->Start();
 
-  dbg( "WifiTask::create_task=>Connecting as station\n");
+  dbg( "WifiTask::create_task=>Connecting as station\n" );
   wifi_set_event_handler_cb( wifi_task_cb );
   wifi_set_opmode( STATION_MODE );
   wifi_station_connect();
@@ -182,4 +187,13 @@ static void wifi_task_cb( System_Event_t *evt )
     }
     break;
   }
+}
+void WifiTask::task_handle_msg_cb( void *pv_msg, void *pv_user_data )
+{
+  static_cast<WifiTask *>( pv_user_data )->handle_msg( (WifiTaskMsg *) pv_msg );
+}
+
+void WifiTask::task_delete_msg_cb( void *pv_msg, void *pv_user_data )
+{
+  static_cast<WifiTask *>( pv_user_data )->delete_msg( (WifiTaskMsg *) pv_msg );
 }

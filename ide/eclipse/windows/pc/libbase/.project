@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>win_pc_libbase</name>
+	<name>libbase</name>
 	<comment></comment>
 	<projects>
-		<project>win_pc_libmemory</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

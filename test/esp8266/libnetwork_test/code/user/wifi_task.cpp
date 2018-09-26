@@ -5,6 +5,7 @@
  *      Author: psammand
  */
 
+#if 1
 #include <cstdint>
 #include "esp_common.h"
 #include <OsalError.h>
@@ -19,15 +20,19 @@
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
 
-#define dbg( format, ... ) printf( format "\n", ## __VA_ARGS__ )
-#define DBG_INFO( format, ... ) printf( format "\n", ## __VA_ARGS__ )
-#define DBG_WARN( format, ... ) printf( format "\n", ## __VA_ARGS__ )
-#define DBG_ERROR( format, ... ) printf( format "\n", ## __VA_ARGS__ )
-#define DBG_FATAL( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+
+#define PSTR( s ) ( __extension__( { static const char __c[] __attribute__( ( section( ".irom0.text" ) ) ) = ( s ); &__c[0]; } ) )
+// #define	PSTR(s) s
+
+#define dbg( format, ... ) printf( PSTR( format "\n" ), ## __VA_ARGS__ )
+#define DBG_INFO( format, ... ) printf( PSTR( format "\n" ), ## __VA_ARGS__ )
+#define DBG_WARN( format, ... ) printf( PSTR( format "\n" ), ## __VA_ARGS__ )
+#define DBG_ERROR( format, ... ) printf( PSTR( format "\n" ), ## __VA_ARGS__ )
+#define DBG_FATAL( format, ... ) printf( PSTR( format "\n" ), ## __VA_ARGS__ )
 
 static void wifi_task_cb( System_Event_t *evt );
 
-AdapterTask gs_adapter_task;
+AdapterTask                     gs_adapter_task;
 extern WifiTask                 gs_wifi_task;
 PtrMsgQ<WIFI_TASK_MSG_Q_LENGTH> wifi_task_msg_q_;
 
@@ -54,12 +59,18 @@ bool WifiTask::create_task()
 
   access_mutex_->Lock();
 
-  TaskMsgQParam task_msg_q_param;
+  task_creation_params_t st_task_creation_params = {};
 
-  task_msg_q_param.msgQ           = &wifi_task_msg_q_;
-  task_msg_q_param.taskMsgHandler = &wifi_task_msg_handler_;
+  st_task_creation_params.cz_name = WIFI_TASK_NAME;
+  st_task_creation_params.u16_stack_size = WIFI_TASK_STACK_LENGTH;
+  st_task_creation_params.u32_priority = WIFI_TASK_PRIORITY;
+  st_task_creation_params.pcz_msg_queue = &wifi_task_msg_q_;
+  st_task_creation_params.pfn_handle_msg = task_handle_msg_cb;
+  st_task_creation_params.pv_handle_msg_cb_data = this;
+  st_task_creation_params.pfn_delete_msg = task_delete_msg_cb;
+  st_task_creation_params.pv_delete_msg_cb_data = this;
 
-  osal_status = wifi_task_->InitWithMsgQ( (uint8_t *) WIFI_TASK_NAME, WIFI_TASK_PRIORITY, WIFI_TASK_STACK_LENGTH, &task_msg_q_param, this );
+  osal_status = wifi_task_->Init( &st_task_creation_params);
 
   if( osal_status != OsalError::OK )
   {
@@ -76,11 +87,11 @@ bool WifiTask::create_task()
   wifi_set_opmode( STATION_MODE );
 
   struct station_config config;
-  bzero(&config, sizeof(struct station_config));
-//  sprintf((char*)config.ssid, (char*)"Cisco17377");
-  sprintf((char*)config.ssid, (char*)"JinjuAmla");
-  sprintf((char*)config.password, (char*)"Jinju124Amla");
-  wifi_station_set_config(&config);
+  bzero( &config, sizeof( struct station_config ) );
+  // sprintf((char*)config.ssid, (char*)"Cisco17377");
+//  sprintf( (char *) config.ssid, (char *) "JinjuAmla" );
+//  sprintf( (char *) config.password, (char *) "Jinju124Amla" );
+//  wifi_station_set_config( &config );
 
   wifi_station_connect();
 
@@ -126,10 +137,10 @@ void WifiTask::handle_msg( WifiTaskMsg *msg )
 {
   dbg( "Got msg, type %d", (int) msg->msgType );
 
-  if(WifiTaskMsgType::STATION_GOT_IP == msg->msgType)
+  if( WifiTaskMsgType::STATION_GOT_IP == msg->msgType )
   {
-	  DBG_INFO("WifiTask::handle_msg:%d# Starting adapter_task", __LINE__);
-	  gs_adapter_task.create_task();
+    DBG_INFO( "WifiTask::handle_msg:%d# Starting adapter_task", __LINE__ );
+    gs_adapter_task.create_task();
   }
 }
 
@@ -145,7 +156,7 @@ static void wifi_task_cb( System_Event_t *evt )
 {
   WifiTaskMsg msg{};
 
-  DBG_INFO("wifi_task_cb:%d# Callback event[%d]", __LINE__, evt->event_id);
+  DBG_INFO( "wifi_task_cb:%d# Callback event[%d]", __LINE__, evt->event_id );
 
   switch( evt->event_id )
   {
@@ -180,7 +191,7 @@ static void wifi_task_cb( System_Event_t *evt )
       msg.msgType = WifiTaskMsgType::STATION_GOT_IP;
       msg.msgData = NULL;
 
-      DBG_INFO("wifi_task_cb:%d# Sending msg to WiFi Task", __LINE__);
+      DBG_INFO( "wifi_task_cb:%d# Sending msg to WiFi Task", __LINE__ );
       gs_wifi_task.send_msg( &msg );
     }
     break;
@@ -203,3 +214,15 @@ static void wifi_task_cb( System_Event_t *evt )
     break;
   }
 }
+
+void WifiTask::task_handle_msg_cb(void *pv_msg, void *pv_user_data)
+{
+	static_cast<WifiTask*>(pv_user_data)->handle_msg((WifiTaskMsg *)pv_msg);
+}
+
+void WifiTask::task_delete_msg_cb(void *pv_msg, void *pv_user_data)
+{
+	static_cast<WifiTask*>(pv_user_data)->delete_msg((WifiTaskMsg *)pv_msg);
+}
+
+#endif

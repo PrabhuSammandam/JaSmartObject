@@ -1,27 +1,7 @@
-/*
- * ESPRSSIF MIT License
- *
- * Copyright (c) 2015 <ESPRESSIF SYSTEMS (SHANGHAI) PTE LTD>
- *
- * Permission is hereby granted for use on ESPRESSIF SYSTEMS ESP8266 only, in which case,
- * it is free of charge, to any person obtaining a copy of this software and associated
- * documentation files (the "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished
- * to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
+#include <string>
+#include <functional>
+#include <algorithm>
+#include <vector>
 #include <c_types.h>
 #include <esp_misc.h>
 #include <esp_system.h>
@@ -126,8 +106,29 @@ void print_system_info()
 
 WifiTask gs_wifi_task;
 
+#include <experimental/optional>
+
+typedef std::function<void ( const int *interface_event )> InterfaceMonitorCallback;
+
+void test_function()
+{
+  InterfaceMonitorCallback callback;
+  int                      sum = 0;
+  std::string str("test");
+
+  std::vector<int> int_vector{};
+
+  int_vector.push_back( 10 );
+
+  std::for_each( int_vector.cbegin(), int_vector.cend(), [&] ( int i ) {
+    sum += i;
+  } );
+}
+
 extern "C" void user_init( void )
 {
+  test_function();
+
   OsalMgr::Inst()->Init();
   print_system_info();
 

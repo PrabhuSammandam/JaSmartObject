@@ -10,7 +10,7 @@
 
 #include <export/Task.h>
 
-class AdapterTask : public ja_iot::osal::ITaskRoutine
+class AdapterTask
 {
   public:
 
@@ -18,7 +18,7 @@ class AdapterTask : public ja_iot::osal::ITaskRoutine
 
     bool create_task();
 
-    void Run( void *arg ) override;
+    static void Run( void *arg );
 
   private:
 

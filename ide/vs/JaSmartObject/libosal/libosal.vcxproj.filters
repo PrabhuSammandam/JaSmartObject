@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\export">
+      <UniqueIdentifier>{ce0b1922-a5dd-4f7d-9eeb-d27594b0ea8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{3e029ee9-8442-4d5c-84a0-bd378c6c8b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\inc">
+      <UniqueIdentifier>{3eb8d84b-c4ab-424f-ac57-b8c03ab5c86c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port">
+      <UniqueIdentifier>{2446b526-c5a0-403a-9e60-d4c415c4c128}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port\freertos">
+      <UniqueIdentifier>{34cadf09-d2b7-4b2b-b532-28a527cd4d76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port\linux">
+      <UniqueIdentifier>{cd981bd9-3980-4433-88f6-f2cd4fc07c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port\windows">
+      <UniqueIdentifier>{416288d1-9b3c-4774-a867-2965806245f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{e2f59f84-e7da-4d57-9fb7-ab8b30cbf8b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\src">
+      <UniqueIdentifier>{30767e95-def2-41d9-b0df-c0f36aa6a3cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\port">
+      <UniqueIdentifier>{b1b5c026-a572-40dd-9855-37a5d6215304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\port\freertos">
+      <UniqueIdentifier>{d4c3e972-70ec-4a0e-80d0-9369aef26445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\port\linux">
+      <UniqueIdentifier>{4084a87f-00db-4a7a-9b44-cb7247a34918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\port\windows">
+      <UniqueIdentifier>{09d9862b-b9c7-4b2f-a57a-e4613c8cd39f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\osal\export\Condition.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\Mutex.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\Sem.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\Task.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\OsalError.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\OsalMgr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\ScopedMutex.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\common\inc\TaskBase.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\freertos\inc\MutexImplFreertos.h">
+      <Filter>Header Files\port\freertos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\freertos\inc\OsalBuilderImplFreertos.h">
+      <Filter>Header Files\port\freertos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\freertos\inc\SemaphoreImplFreertos.h">
+      <Filter>Header Files\port\freertos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\freertos\inc\TaskImplFreertos.h">
+      <Filter>Header Files\port\freertos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\windows\inc\ConditionImplWindows.h">
+      <Filter>Header Files\port\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\linux\inc\MutexImplLinux.h">
+      <Filter>Header Files\port\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\windows\inc\MutexImplWindows.h">
+      <Filter>Header Files\port\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\linux\inc\OsalBuilderImplLinux.h">
+      <Filter>Header Files\port\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\windows\inc\OsalBuilderImplWindows.h">
+      <Filter>Header Files\port\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\linux\inc\SemaphoreImplLinux.h">
+      <Filter>Header Files\port\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\windows\inc\SemaphoreImplWindows.h">
+      <Filter>Header Files\port\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\linux\inc\TaskImplLinux.h">
+      <Filter>Header Files\port\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\port\windows\inc\TaskImplWindows.h">
+      <Filter>Header Files\port\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\OsTime.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\common\inc\OsalBuilder.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\OsalTimer.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\common\inc\OsalTimerMgr.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\export\OsalRandom.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\osal\common\inc\OsalRandomImpl.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\osal\common\src\OsalMgr.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\common\src\TaskBase.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\ConditionImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\MutexImplFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\linux\src\MutexImplLinux.cpp">
+      <Filter>Source Files\port\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\MutexImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\OsalBuilderImplFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\linux\src\OsalBuilderImplLinux.cpp">
+      <Filter>Source Files\port\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\OsalBuilderImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\SemaphoreImplFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\linux\src\SemaphoreImplLinux.cpp">
+      <Filter>Source Files\port\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\SemaphoreImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\TaskImplFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\linux\src\TaskImplLinux.cpp">
+      <Filter>Source Files\port\linux</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\TaskImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\OsTimeFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\common\src\OsalTimerMgr.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\common\src\OsalTimer.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\OsalRandomImplWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\common\src\OsalRandom.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\windows\src\OsTimeWindows.cpp">
+      <Filter>Source Files\port\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\osal\port\freertos\src\OsalRandomImplFreertos.cpp">
+      <Filter>Source Files\port\freertos</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

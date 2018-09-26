@@ -58,6 +58,7 @@
 									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
 									<listOptionValue builtIn="false" value="LWIP_COMPAT_SOCKETS"/>
 									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="_GLIBCXX_USE_CXX11_ABI=0"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.1765887085" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.other.624882344" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -std=gnu90 -Wpointer-arith -Wundef -Werror -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -mno-serialize-volatile -D__ets__ -DICACHE_FLASH" valueType="string"/>
@@ -97,8 +98,9 @@
 									<listOptionValue builtIn="false" value="_DEBUG_"/>
 									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
 									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="_GLIBCXX_USE_CXX11_ABI=0"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.212986128" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -Wpointer-arith -Wundef -Werror -Wswitch -Wsign-compare -Wl,-EL -fcheck-new -finline-functions -nostdlib -mlongcalls -mtext-section-literals -fdata-sections -ffunction-sections -mno-serialize-volatile -D__ets__ -DICACHE_FLASH -fno-rtti -fno-exceptions -felide-constructors -std=c++14 -fshort-enums -Wno-unused-function -Wno-literal-suffix -fno-threadsafe-statics" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.212986128" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -Wpointer-arith -Wno-unused-label -Wno-error=unused-label -Wundef -Werror -Wswitch -Wsign-compare -Wl,-EL -fcheck-new -finline-functions -nostdlib -mlongcalls -mtext-section-literals -fdata-sections -ffunction-sections -mno-serialize-volatile -D__ets__ -DICACHE_FLASH -fno-rtti -fno-exceptions -felide-constructors -std=c++14 -fshort-enums -Wno-unused-function -Wno-literal-suffix -fno-threadsafe-statics" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.127978485" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.364011197" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
@@ -157,7 +159,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="network/port/windows|osal/port/windows|osal/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="network/common/src/ip_adapter_base.cpp|network/port/windows|osal/port/windows|osal/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -166,8 +168,8 @@
 				<options/>
 			</storageModule>
 		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960" moduleId="org.eclipse.cdt.core.settings" name="Release">
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993" moduleId="org.eclipse.cdt.core.settings" name="Release">
 				<externalSettings>
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/esp8266_win_libnetwork"/>
@@ -182,17 +184,17 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="a" artifactName="network" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960" name="Release" parent="cdt.managedbuild.config.gnu.cross.lib.debug">
-					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960." name="/" resourcePath="">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.166808688" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.1927165388" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="xtensa-lx106-elf-" valueType="string"/>
-							<option id="cdt.managedbuild.option.gnu.cross.path.1298494329" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="${ESP8266_COMPILER_ROOT}" valueType="string"/>
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.236278793" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<builder autoBuildTarget="all" buildPath="${workspace_loc:/esp8266_win_libnetwork}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.449478033" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.947252122" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1187811191" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.debugging.level.1076487137" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.1994747427" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+				<configuration artifactExtension="a" artifactName="network" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993" name="Release" parent="cdt.managedbuild.config.gnu.cross.lib.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1543198113" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.320115624" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="xtensa-lx106-elf-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.760892756" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="${ESP8266_COMPILER_ROOT}" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.960145257" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/esp8266_win_libnetwork}/Debug" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.1587104403" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.303329904" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1076160422" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.size" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1159529805" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.973763032" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/extra_include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/driver_lib/include&quot;"/>
@@ -208,7 +210,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libdebug/debug/export}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1546583906" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1703862358" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
 									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
 									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
@@ -219,16 +221,17 @@
 									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
 									<listOptionValue builtIn="false" value="LWIP_COMPAT_SOCKETS"/>
 									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="_GLIBCXX_USE_CXX11_ABI=0"/>
 								</option>
-								<option id="gnu.c.compiler.option.dialect.std.664599288" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.other.9822089" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -std=gnu90 -Wpointer-arith -Wundef -Werror -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -mno-serialize-volatile -D__ets__ -DICACHE_FLASH" valueType="string"/>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1175350065" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+								<option id="gnu.c.compiler.option.dialect.std.1616991812" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.1466067560" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -std=gnu90 -Wpointer-arith -Wundef -Werror -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -mno-serialize-volatile -D__ets__ -DICACHE_FLASH" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1862639722" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool commandLinePattern="${COMMAND} ${FLAGS} -Wl,--start-group  ${INPUTS} -Wl,--end-group  ${OUTPUT_FLAG}  ${OUTPUT_PREFIX}${OUTPUT}" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1648504978" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
-								<option id="gnu.cpp.compiler.option.optimization.level.1811236355" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.debugging.level.1664198628" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.1470068104" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.549511915" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+							<tool commandLinePattern="${COMMAND} ${FLAGS} -Wl,--start-group  ${INPUTS} -Wl,--end-group  ${OUTPUT_FLAG}  ${OUTPUT_PREFIX}${OUTPUT}" id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1991620518" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1625839058" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.size" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1144889531" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1311880385" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.544750826" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/espressif&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include&quot;"/>
@@ -244,7 +247,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libdebug/debug/export}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.2099054549" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1905452392" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
 									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
 									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
@@ -255,18 +258,17 @@
 									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
 									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
 									<listOptionValue builtIn="false" value="LWIP_COMPAT_SOCKETS"/>
-									<listOptionValue builtIn="false" value="_DEBUG_"/>
-									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
 									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="_GLIBCXX_USE_CXX11_ABI=0"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.607657058" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -Wpointer-arith -Wundef -Werror -Wswitch -Wsign-compare -Wl,-EL -fcheck-new -finline-functions -nostdlib -mlongcalls -mtext-section-literals -fdata-sections -ffunction-sections -mno-serialize-volatile -D__ets__ -DICACHE_FLASH -fno-rtti -fno-exceptions -felide-constructors -std=c++14 -fshort-enums -Wno-unused-function -Wno-literal-suffix -fno-threadsafe-statics" valueType="string"/>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2070725197" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+								<option id="gnu.cpp.compiler.option.other.other.1515702671" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -Wpointer-arith -fno-inline -Wundef -Werror -Wswitch -Wsign-compare -Wl,-EL -fcheck-new  -nostdlib -mlongcalls -mtext-section-literals -fdata-sections -ffunction-sections -mno-serialize-volatile -D__ets__ -DICACHE_FLASH -fno-rtti -fno-exceptions -felide-constructors -std=c++14 -fshort-enums -Wno-unused-function -Wno-literal-suffix -fno-threadsafe-statics" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.840772418" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1603062462" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.200480718" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1471330650" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1127281124" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
-								<option id="gnu.both.asm.option.include.paths.459111615" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.2140174707" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.210002177" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1111805249" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.519434900" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.719448377" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libosal/osal/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libbase/base/export}&quot;"/>
@@ -275,50 +277,50 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libnetwork/network}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/esp8266_win_libdebug/debug/export}&quot;"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2089922048" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.975856462" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960.osal/port/windows" name="/" resourcePath="osal/port/windows">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.448381567" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893.785668780.474031884" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.1649827893"/>
-							<option id="cdt.managedbuild.option.gnu.cross.path.572388678.1617874516.1849162493" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path.572388678"/>
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.916012970" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.97741908" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.947252122">
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.590156430" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993.osal/port/windows" name="/" resourcePath="osal/port/windows">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1436993743" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893.785668780.1054985723" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.1649827893"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.572388678.1617874516.936589461" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path.572388678"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1769384835" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1058164385" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.303329904">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1977961153" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.2064079175" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1648504978">
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.448993001" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.724970609" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1991620518">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1571762358" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1886050796" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.1603062462"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.2118362945" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.200480718"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.605912005" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.1471330650"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.166649450" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.1127281124">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.669648841" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.2111058389" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.2140174707"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1864527809" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.210002177"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1131846793" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.1111805249"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.266541067" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.519434900">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1952078443" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960.network/port/windows" name="/" resourcePath="network/port/windows">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.600331056" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893.1744155847.852709546" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.1649827893"/>
-							<option id="cdt.managedbuild.option.gnu.cross.path.572388678.524872190.507578677" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path.572388678"/>
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1060534392" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.239726522" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.947252122">
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.454735708" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993.network/port/windows" name="/" resourcePath="network/port/windows">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.205538554" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1649827893.1744155847.116757615" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.1649827893"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.572388678.524872190.1782098957" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path.572388678"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.54207842" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.1358949680" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.303329904">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1037825499" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.406061985" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1648504978">
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.625471241" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1476111724" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1991620518">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1711184279" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.924513358" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.1603062462"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.793620961" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.200480718"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1603910352" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.1471330650"/>
-							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1086200303" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.1127281124">
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.201601913" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1946797219" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.2140174707"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.2052222996" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.210002177"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1990192036" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.1111805249"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.751811253" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.519434900">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1216997618" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="network/port/windows|osal/port/windows|osal/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="network/common/src/coap/coap_option_set.cpp|network/port/windows|osal/port/windows|osal/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -351,7 +353,13 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.;cdt.managedbuild.tool.gnu.cross.c.compiler.1439963223;cdt.managedbuild.tool.gnu.c.compiler.input.2082141960">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1991620518;cdt.managedbuild.tool.gnu.cpp.compiler.input.840772418">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.357649960.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.1648504978;cdt.managedbuild.tool.gnu.cpp.compiler.input.2070725197">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993;cdt.managedbuild.config.gnu.cross.lib.debug.1019886892.1598497993.;cdt.managedbuild.tool.gnu.cross.c.compiler.303329904;cdt.managedbuild.tool.gnu.c.compiler.input.1862639722">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.release.1070357500;cdt.managedbuild.config.gnu.cross.lib.release.1070357500.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.160379226;cdt.managedbuild.tool.gnu.cpp.compiler.input.5327907">

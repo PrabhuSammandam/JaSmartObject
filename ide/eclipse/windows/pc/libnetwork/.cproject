@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317" moduleId="org.eclipse.cdt.core.settings" name="Debug_Windows">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libnetwork"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libnetwork/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="network" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libnetwork"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libnetwork/Debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libnetwork" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -17,76 +17,69 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="a" artifactName="network" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089" name="Debug" parent="cdt.managedbuild.config.gnu.mingw.lib.debug">
-					<folderInfo id="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089." name="/" resourcePath="">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.lib.debug.1097393770" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.lib.debug">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.debug.1802716415" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.debug"/>
-							<builder buildPath="${workspace_loc:/win_pc_libnetwork}/Debug" id="org.eclipse.cdt.build.core.internal.builder.1575593786" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug.996222203" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug">
-								<option id="gnu.both.asm.option.include.paths.1687046085" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
+				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317" name="Debug_Windows" parent="cdt.managedbuild.config.gnu.mingw.lib.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.lib.debug.1788414038" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.lib.debug">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.debug.1117717119" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.debug"/>
+							<builder buildPath="${workspace_loc:/libnetwork}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.763675551" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug.209108803" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.debug">
+								<option id="gnu.both.asm.option.include.paths.161752434" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1865853845" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.57700431" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug.1364425742" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug">
-								<outputType id="cdt.managedbuild.tool.gnu.archiver.output.1477209003" outputPrefix="lib" superClass="cdt.managedbuild.tool.gnu.archiver.output"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.2140487401" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug">
-								<option id="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level.1902792539" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level.1881520455" name="Debug Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.dialect.std.759687483" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.199536934" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.676369892" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug.343383205" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.47925544" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug">
+								<option id="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level.1157786916" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level.616658708" name="Debug Level" superClass="gnu.cpp.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.893619396" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" useByScannerDiscovery="true" value="-std=c++1y" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.337140086" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Wno-attributes" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.309570194" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
 									<listOptionValue builtIn="false" value="_WIN32_WINNT=0x0600"/>
-									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
-									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
-									<listOptionValue builtIn="false" value="_DEBUG_"/>
-									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.106635767" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+								<option id="gnu.cpp.compiler.option.include.paths.2089822858" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.36720245" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1511015939" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.lib.debug.option.optimization.level.985520805" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
-								<option id="gnu.c.compiler.mingw.lib.debug.option.debugging.level.182171681" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.1356959431" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
-								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.376108980" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1418873106" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.lib.debug.option.optimization.level.211623486" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.mingw.lib.debug.option.debugging.level.680998335" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.debug.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1040849361" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
 									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
-									<listOptionValue builtIn="false" value="_WIN32_WINNT=0x0600"/>
-									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
-									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
-									<listOptionValue builtIn="false" value="_DEBUG_"/>
-									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_WIN32_WINNT"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1990426986" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+								<option id="gnu.c.compiler.option.include.paths.1803799713" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1924946049" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.319285675" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.1229567805" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.2063766836" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.11652603" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -94,153 +87,276 @@
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
-				<externalSettings containerId="win_pc_libbase;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
-					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libbase"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libbase/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="base" srcPrefixMapping="" srcRootPath=""/>
-					</externalSetting>
-				</externalSettings>
-				<externalSettings containerId="win_pc_libmemory;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
-					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libmemory"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libmemory/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="memory" srcPrefixMapping="" srcRootPath=""/>
-					</externalSetting>
-				</externalSettings>
-				<externalSettings containerId="win_pc_libosal;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
-					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libosal"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libosal/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="osal" srcPrefixMapping="" srcRootPath=""/>
-					</externalSetting>
-				</externalSettings>
-			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
-		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807" moduleId="org.eclipse.cdt.core.settings" name="Release">
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847" moduleId="org.eclipse.cdt.core.settings" name="Debug_Raspberry">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/win_pc_libnetwork"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/win_pc_libnetwork/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="win_pc_libnetwork" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libnetwork"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libnetwork/Debug_Raspberry"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="network_debug_rp" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="a" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807" name="Release" parent="cdt.managedbuild.config.gnu.mingw.lib.release">
-					<folderInfo id="cdt.managedbuild.config.gnu.mingw.lib.release.168752807." name="/" resourcePath="">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.lib.release.1835187857" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.lib.release">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.lib.release.10505872" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.lib.release"/>
-							<builder buildPath="${workspace_loc:/win_pc_libnetwork}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.828848559" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release.600553908" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.lib.release">
-								<option id="gnu.both.asm.option.include.paths.609594875" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
+				<configuration artifactExtension="a" artifactName="network_debug_rp" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847" name="Debug_Raspberry" parent="cdt.managedbuild.config.gnu.cross.lib.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1429361822" name="Cross GCC" nonInternalBuilderId="cdt.managedbuild.builder.gnu.cross" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.640605179" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="arm-linux-gnueabihf-" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.645576503" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/libnetwork}/Debug_Raspberry" cleanBuildTarget="clean" id="org.eclipse.cdt.build.core.internal.builder.535992250" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.977196076" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.766420765" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.461834148" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.293943985" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1892489991" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
-							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.lib.release.1779556165" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.lib.release"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.release.1362478857" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.release">
-								<option id="gnu.cpp.compiler.mingw.lib.release.option.optimization.level.402347494" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.lib.release.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.mingw.lib.release.option.debugging.level.285555970" name="Debug Level" superClass="gnu.cpp.compiler.mingw.lib.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.1223772480" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
-								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.736255382" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
-									<listOptionValue builtIn="false" value="_WIN32_WINNT=0x0600"/>
-									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
-									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1727404559" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
 									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
+									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1810767817" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.181291516" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.release.1457458509" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.mingw.lib.release.option.optimization.level.1942350706" name="Optimization Level" superClass="gnu.c.compiler.mingw.lib.release.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
-								<option id="gnu.c.compiler.mingw.lib.release.option.debugging.level.423681134" name="Debug Level" superClass="gnu.c.compiler.mingw.lib.release.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.1873618028" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network/export}&quot;"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.399980404" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1387479315" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1721680030" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1335804921" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libnetwork/network}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libbase/base/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libmemory/memory/export}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/win_pc_libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.72663420" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
-									<listOptionValue builtIn="false" value="_WIN32_WINNT=0x0600"/>
-									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
-									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.401433988" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
 									<listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
+									<listOptionValue builtIn="false" value="_OS_LINUX_"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.726705840" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.1066921556" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2085760284" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1751679797" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.1030119082" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1469177539" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1414170609" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.588761365" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1557020135" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.1457788480" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.109255315" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847.146448964" name="/" resourcePath="network/port/esp8266">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.2016807211" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug" unusedChildren="">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.640605179.303481452" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix.640605179"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.936479552" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.977196076">
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1983285012" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1395656028" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler.399980404">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1989140347" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.901344742" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker.1469177539"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1919109030" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker.1414170609"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1261796982" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver.588761365"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.1703548657" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler.1557020135">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.377462404" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="network/port/esp8266|network/port/windows" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716" moduleId="org.eclipse.cdt.core.settings" name="Debug_ESP8266">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libnetwork"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libnetwork/Debug_ESP8266"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="network_debug_esp8266" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="network_debug_esp8266" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716" name="Debug_ESP8266" parent="cdt.managedbuild.config.gnu.cross.lib.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.lib.debug.1343003904" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.lib.debug">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.1034468498" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="xtensa-lx106-elf-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.77869920" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" useByScannerDiscovery="false" value="" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1809842016" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/libbase}/Debug_ESP8266" id="org.eclipse.cdt.build.core.internal.builder.1821090534" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="org.eclipse.cdt.build.core.internal.builder"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.13254973" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.2244695" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1419668991" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1159372113" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
+									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
+									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
+									<listOptionValue builtIn="false" value="FREERTOS_ARCH_ESP8266"/>
+									<listOptionValue builtIn="false" value="__ets__"/>
+									<listOptionValue builtIn="false" value="_OS_FREERTOS_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
+									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="LWIP_COMPAT_SOCKETS"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.343217053" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/extra_include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/driver_lib/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/espressif&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv6&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.misc.other.1565114042" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -std=gnu90 -Wpointer-arith -Wundef -Werror -Wl,-EL -fno-inline-functions -nostdlib -mlongcalls -mtext-section-literals -mno-serialize-volatile -D__ets__ -DICACHE_FLASH" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.491011537" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.2032428737" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1511477605" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.71778690" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.std.93463110" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.c++1y" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.318625207" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ICACHE_FLASH"/>
+									<listOptionValue builtIn="false" value="_GLIBCXX_USE_CXX11_ABI=0"/>
+									<listOptionValue builtIn="false" value="__STDC_NO_ATOMICS__=1"/>
+									<listOptionValue builtIn="false" value="ESP8266_RTOS"/>
+									<listOptionValue builtIn="false" value="__STDC_VERSION__=201112L"/>
+									<listOptionValue builtIn="false" value="FREERTOS_ARCH_ESP8266"/>
+									<listOptionValue builtIn="false" value="__ets__"/>
+									<listOptionValue builtIn="false" value="_OS_FREERTOS_"/>
+									<listOptionValue builtIn="false" value="_LITTLE_ENDIAN_"/>
+									<listOptionValue builtIn="false" value="_DEBUG_"/>
+									<listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
+									<listOptionValue builtIn="false" value="_SINGLE_THREAD_"/>
+									<listOptionValue builtIn="false" value="LWIP_COMPAT_SOCKETS"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.826557728" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/espressif&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/extra_include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/driver_lib/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ESP8266_RTOS_SDK_ROOT}/include/lwip/ipv6&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libdebug/debug/export}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.other.other.1767286798" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Os -Wpointer-arith -Wundef -Werror -Wswitch -Wsign-compare -Wl,-EL -fcheck-new -finline-functions -nostdlib -mlongcalls -mtext-section-literals -fdata-sections -ffunction-sections -mno-serialize-volatile -D__ets__ -DICACHE_FLASH -fno-rtti -fno-exceptions -felide-constructors -std=c++14 -fshort-enums -Wno-literal-suffix -fno-threadsafe-statics -fno-inline" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.746374286" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1790724750" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.129071069" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1006261183" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.260407646" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<option id="gnu.both.asm.option.include.paths.5092031" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false"/>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1624146072" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="network/port/windows|network/port/linux" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="libbase;cdt.managedbuild.config.gnu.cross.lib.debug.462171335" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libbase"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libbase/Debug_ESP8266"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="base_debug_esp8266" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="libmemory;cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1868692899" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libmemory"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libmemory/Debug_ESP8266"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="memory_debug_esp8266" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<externalSettings containerId="libosal;cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libosal"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libosal/Debug_ESP8266"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="osal_debug_esp8266" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
+		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="win_pc_libnetwork.cdt.managedbuild.target.gnu.mingw.lib.1219957211" name="Static Library" projectType="cdt.managedbuild.target.gnu.mingw.lib"/>
-	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089;cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.2140487401;cdt.managedbuild.tool.gnu.cpp.compiler.input.106635767">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.release.168752807;cdt.managedbuild.config.gnu.mingw.lib.release.168752807.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.release.1362478857;cdt.managedbuild.tool.gnu.cpp.compiler.input.1810767817">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089;cdt.managedbuild.config.gnu.mingw.lib.debug.1089674089.;cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1511015939;cdt.managedbuild.tool.gnu.c.compiler.input.1990426986">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.release.168752807;cdt.managedbuild.config.gnu.mingw.lib.release.168752807.;cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.release.1457458509;cdt.managedbuild.tool.gnu.c.compiler.input.726705840">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
+		<project id="libnetwork.cdt.managedbuild.target.gnu.mingw.lib.891335838" name="Static Library" projectType="cdt.managedbuild.target.gnu.mingw.lib"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug_Raspberry"/>
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/win_pc_libnetwork"/>
-		</configuration>
-		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/win_pc_libnetwork"/>
+			<resource resourceType="PROJECT" workspacePath="/libnetwork"/>
 		</configuration>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
-		<buildTargets/>
-	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings">
-		<doc-comment-owner id="org.eclipse.cdt.ui.doxygen">
-			<path value=""/>
-		</doc-comment-owner>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716;cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.2032428737;cdt.managedbuild.tool.gnu.cpp.compiler.input.746374286">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317;cdt.managedbuild.config.gnu.mingw.lib.debug.341469317.;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.lib.debug.47925544;cdt.managedbuild.tool.gnu.cpp.compiler.input.36720245">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847;cdt.managedbuild.config.gnu.cross.lib.debug.1268380847.;cdt.managedbuild.tool.gnu.cross.c.compiler.977196076;cdt.managedbuild.tool.gnu.c.compiler.input.181291516">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.341469317;cdt.managedbuild.config.gnu.mingw.lib.debug.341469317.;cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1418873106;cdt.managedbuild.tool.gnu.c.compiler.input.1924946049">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716;cdt.managedbuild.config.gnu.cross.lib.debug.462171335.1633656514.1526718716.;cdt.managedbuild.tool.gnu.cross.c.compiler.13254973;cdt.managedbuild.tool.gnu.c.compiler.input.491011537">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.cross.lib.debug.1268380847;cdt.managedbuild.config.gnu.cross.lib.debug.1268380847.;cdt.managedbuild.tool.gnu.cross.cpp.compiler.399980404;cdt.managedbuild.tool.gnu.cpp.compiler.input.2085760284">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>

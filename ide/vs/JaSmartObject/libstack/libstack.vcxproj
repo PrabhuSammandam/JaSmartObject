@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\stack\common\src\BaseInteraction.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\BaseResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\BlockTransferStatus.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborCodec.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborEncoding.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborItem.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborItemBuilder.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborPrettyPrinter.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborStreaming.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\ClientInteraction.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\DeviceResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\Exchange.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\InteractionStore.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\MessageIdProvider.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\MessageSender.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\MsgStack.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\MulticastClientInteraction.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\QueryContainer.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\ResourceMgr.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\ResPropValue.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\ServerInteraction.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigCONResponse.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigNONResponse.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigPbResponse.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\SmallNonResponseResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\SmallPiggybackResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\SmallSlowResponseResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\TokenProvider.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\WellKnownResource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\BaseInteraction.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\BlockTransferStatus.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\ClientInteraction.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\DeviceResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\InteractionStore.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\MessageIdProvider.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\MulticastClientInteraction.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\ServerInteraction.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\BigCONResponse.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\BigNONResponse.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\BigPbResponse.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\SmallNonResponseResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\SmallPiggyBackResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TestResource\SmallSlowResponseResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\TokenProvider.h" />
+    <ClInclude Include="..\..\..\..\code\stack\common\inc\WellKnownResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\BaseResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborCodec.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborDecoder.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborDecoderBuffer.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoder.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoderBuffer.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoding.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborItem.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborItemBuilder.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborListener.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborPrettyPrinter.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborStreaming.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborTypedefs.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\cbor\ICborDecoderListener.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\DeviceInfo.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\Exchange.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\Interaction.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\IResource.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\MessageSender.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\MsgStack.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\QueryContainer.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\ResourceConsts.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\ResourceMgr.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\ResPropValue.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\StackConfig.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\StackConsts.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\StackEvents.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\StackMessage.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\TransactionKeys.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{11642C3A-9558-41A1-9342-4FC0B6E20AE0}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libstack</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>REPRESENTATION_PRETTY_PRINT;_LITTLE_ENDIAN_;_IP_ADAPTER_;_OS_WINDOWS_;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\..\..\..\code\stack\common\inc;..\..\..\..\code\base\export;..\..\..\..\code\memory\export;..\..\..\..\code\osal\export;..\..\..\..\code\network\export;..\..\..\..\code\stack;..\..\..\..\code\stack\common\inc;..\..\..\..\code\stack\export</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

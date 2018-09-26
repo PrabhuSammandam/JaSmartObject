@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\export">
+      <UniqueIdentifier>{ced03ec8-3ffe-4cbb-9408-0ed6cadb4c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{47592dfb-36a8-42f0-ac63-660c25097549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\inc">
+      <UniqueIdentifier>{ddcaff1f-6570-4f20-a2c4-c744d22114c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{347a5d78-8253-45bd-9de5-3acfd3e47dbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\common\src">
+      <UniqueIdentifier>{d6745989-8a71-4ec2-b645-c5e7cb812aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\inc\core_resources">
+      <UniqueIdentifier>{050963dd-87d4-42ae-8090-640cf6122e37}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfHeaderOption.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfMsgHeader.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfMsgToken.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfRequest.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfObserveInfo.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfResponse.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfExchange.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfResource.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfDeviceInfo.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfPlatformInfo.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\ResPropValue.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfIServer.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfIResource.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfFacade.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfPlatformConfig.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfQueryContainer.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfResourceConsts.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfResourceMgr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfBaseCollectionResource.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfBaseServer.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\common\inc\OcfDeviceResource.h">
+      <Filter>Header Files\common\inc\core_resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\common\inc\OcfWellKnownResource.h">
+      <Filter>Header Files\common\inc\core_resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\export\OcfStack.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\common\src\OcfStackImpl.h">
+      <Filter>Source Files\common\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\ocfstack\common\inc\OcfStackRequestHandler.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfResource.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\ResPropValue.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfQueryContainer.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfResourceMgr.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfBaseServer.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfFacade.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfDeviceResource.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfWellKnownResource.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfStack.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\ocfstack\common\src\OcfStackRequestHandler.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

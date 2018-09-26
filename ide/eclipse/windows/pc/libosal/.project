@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>win_pc_libosal</name>
+	<name>libosal</name>
 	<comment></comment>
 	<projects>
+		<project>libbase</project>
+		<project>libmemory</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

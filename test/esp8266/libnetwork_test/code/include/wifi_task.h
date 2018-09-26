@@ -52,25 +52,11 @@ class WifiTask
     void delete_msg( WifiTaskMsg *msg );
 
   private:
-    class WifiTaskMsgHandler : public ja_iot::osal::ITaskMsgHandler
-    {
-      private:
-        WifiTask * host_ = nullptr;
-
-      public:
-        void HandleMsg( void *msg ) override
-        {
-          host_->handle_msg( (WifiTaskMsg *) msg );
-        }
-        void DeleteMsg( void *msg ) override
-        {
-          host_->delete_msg( (WifiTaskMsg *) msg );
-        }
-    };
+    static void task_handle_msg_cb(void *pv_msg, void *pv_user_data);
+    static void task_delete_msg_cb(void *pv_msg, void *pv_user_data);
 
   private:
     //ja_iot::base::SimpleList<WifiTaskMsg, WIFI_TASK_MSG_Q_LENGTH>   msg_list_;
-    WifiTaskMsgHandler                                              wifi_task_msg_handler_;
     ja_iot::osal::Task *                                            wifi_task_    = nullptr;
     ja_iot::osal::Mutex *                                           access_mutex_ = nullptr;
 };
