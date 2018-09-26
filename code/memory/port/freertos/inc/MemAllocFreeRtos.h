@@ -5,27 +5,24 @@
  *      Author: psammand
  */
 
-#ifndef MEMORY_PORT_FREERTOS_INC_MEMALLOCFREERTOS_H_
-#define MEMORY_PORT_FREERTOS_INC_MEMALLOCFREERTOS_H_
+#pragma once
 
+#ifdef _OS_FREERTOS_
 #include <IMemAllocator.h>
 
 namespace ja_iot {
-namespace memory {
-class MemAllocFreeRtos : public IMemAllocator
-{
-  public:
+  namespace memory {
+    class MemAllocFreeRtos : public IMemAllocator
+    {
+    public:
 
-    MemAllocFreeRtos ();
+      MemAllocFreeRtos();
 
-    virtual ~MemAllocFreeRtos ();
+      virtual ~MemAllocFreeRtos();
 
-    void* alloc( size_t mem_size ) override;
-    void  free( void *p_memory )   override;
-};
+      void* alloc(size_t mem_size) override;
+      void  free(void *p_memory)   override;
+    };
+  }
 }
-}
-
-
-
-#endif /* MEMORY_PORT_FREERTOS_INC_MEMALLOCFREERTOS_H_ */
+#endif

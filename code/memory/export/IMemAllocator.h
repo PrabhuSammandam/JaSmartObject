@@ -5,82 +5,90 @@
  *      Author: psammand
  */
 
-#ifndef IMEMALLOCATOR_H_
-#define IMEMALLOCATOR_H_
+#pragma once
 
-#include <stdio.h>
 #include <cstdint>
+#include <cstddef>
 
-namespace ja_iot {
-namespace memory {
-// #define JAIOT_ENABLE_MEM_DEBUG
+namespace ja_iot
+{
+  namespace memory
+  {
+    // #define JAIOT_ENABLE_MEM_DEBUG
 #define JAIOT_MEM_FILE_NAME( x ) static const char *const _jaiot_file_name = _x_;
 
-enum class MemAlloctorType
-{
-  kWindows,
-  kLinux,
-  kFreeRTOS
-};
+    enum class MemAlloctorType
+    {
+      kWindows,
+      kLinux,
+      kFreeRTOS
+    };
 
-class IMemAllocator
-{
-  public:
+    class IMemAllocator
+    {
+    public:
 
-    virtual ~IMemAllocator () {}
-    virtual void* alloc( size_t mem_size ) = 0;
-    virtual void  free( void *p_memory )   = 0;
+      virtual ~IMemAllocator()
+      {
+      }
 
-    void* alloc( const char *file_name, const uint32_t line_no, size_t mem_size );
-    void  free( const char *file_name, const uint32_t line_no, void *p_memory );
-};
+      virtual void* alloc(size_t mem_size) = 0;
+      virtual void free(void* p_memory) = 0;
 
-class MemStamp
-{
-  public:
-    char const *const   _fileName;
-    int const           _lineNum;
+      void* alloc(const char* file_name, const uint32_t line_no, size_t mem_size) const;
+      void free(const char* file_name, const uint32_t line_no, void* p_memory) const;
+    };
 
-  public:
+    class MemStamp
+    {
+    public:
+      char const*const _fileName;
+      int const _lineNum;
+      const int line_no_;
 
-    MemStamp( char const *filename, int lineNo ) : _fileName( filename ), _lineNum( lineNo ) {}
+      MemStamp(char const* filename, const int lineNo) : _fileName(filename), _lineNum(lineNo), line_no_{lineNo}
+      {
+      }
 
-    ~MemStamp () {}
-};
+      ~MemStamp()
+      {
+      }
+    };
 
-class MemAllocatorFactory
-{
-  public:
+    class MemAllocatorFactory
+    {
+    public:
 
-    MemAllocatorFactory ();
+      MemAllocatorFactory();
 
-    ~MemAllocatorFactory ();
+      ~MemAllocatorFactory();
 
-  public:
-    static IMemAllocator* create_mem_allocator( MemAlloctorType mem_allocator_type );
-    static IMemAllocator& get() { return ( *cur_mem_allocator_factory_ ); }
-    static void         set( IMemAllocator *p_mem_allocator_factory ) { cur_mem_allocator_factory_ = p_mem_allocator_factory; }
+      static IMemAllocator* create_mem_allocator(MemAlloctorType mem_allocator_type);
+      static IMemAllocator& get() { return *cur_mem_allocator_factory_; }
+      static void set(IMemAllocator* p_mem_allocator_factory) { cur_mem_allocator_factory_ = p_mem_allocator_factory; }
 
-  private:
-    static IMemAllocator * cur_mem_allocator_factory_;
-};
+    private:
+      static IMemAllocator* cur_mem_allocator_factory_;
+    };
 
 
-template<class T> inline T * operator + ( const MemStamp &memStamp, T *p )
-{
+    template <class T>
+    T* operator +(const MemStamp& memStamp, T* p)
+    {
 #ifdef JAIOT_ENABLE_MEM_DEBUG
-  printf( "P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum );
+      printf("P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum);
 #endif
-  return ( p );
-}
+      return (p);
+    }
 
-template<class T> inline void operator - ( const MemStamp &memStamp, T *p )
-{
-  delete p;
+    template <class T>
+    void operator -(const MemStamp& memStamp, T* p)
+    {
+      delete p;
 #ifdef JAIOT_ENABLE_MEM_DEBUG
-  printf( "P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum );
+      printf("P[%p] F[%-20s] L[%-6u]\n", p, memStamp._fileName, memStamp._lineNum);
 #endif
-}
+    }
 
 #ifdef JAIOT_ENABLE_MEM_DEBUG
 #define mnew ja_iot::memory::MemStamp( _jaiot_file_name, __LINE__ ) + new
@@ -126,7 +134,5 @@ template<class T> inline void operator - ( const MemStamp &memStamp, T *p )
 #define DEFINE_DELETE_OPERATOR( __x__ ) void operator delete ( void *ptr ) { jaiot_mem_free( ptr ); }
 
 #define DEFINE_MEMORY_OPERATORS( __x__ ) DEFINE_NEW_OPERATOR( __x__ ) DEFINE_DELETE_OPERATOR( __x__ )
+  }
 }
-}
-
-#endif /* IMEMALLOCATOR_H_ */

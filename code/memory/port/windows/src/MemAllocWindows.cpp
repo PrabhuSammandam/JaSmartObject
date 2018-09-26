@@ -9,22 +9,28 @@
 
 #include "port/windows/inc/MemAllocWindows.h"
 
-namespace ja_iot {
-namespace memory {
-MemAllocWindows::MemAllocWindows() {
-}
+namespace ja_iot
+{
+  namespace memory
+  {
+    MemAllocWindows::MemAllocWindows()
+    {
+    }
 
-MemAllocWindows::~MemAllocWindows() {
-}
+    MemAllocWindows::~MemAllocWindows()
+    {
+    }
 
-void * MemAllocWindows::alloc(size_t mem_size) {
-	return (::operator new(mem_size));
-}
+    void* MemAllocWindows::alloc(const size_t mem_size)
+    {
+      return operator new(mem_size);
+    }
 
-void MemAllocWindows::free(void *p_memory) {
-	::operator delete(p_memory);
-}
-}
+    void MemAllocWindows::free(void* p_memory)
+    {
+      operator delete(p_memory);
+    }
+  }
 }
 
 #endif /* _OS_WINDOWS_ */
