@@ -2,34 +2,36 @@
 
 #include <ip_addr.h>
 
-namespace ja_iot {
-namespace base {
-class IpSocketAddr
+namespace ja_iot
 {
-  IpAddress   _ipAddr;
-  uint16_t    _port = 0;
+  namespace base
+  {
+    class IpSocketAddr
+    {
+      IpAddress _ip_addr;
+      uint16_t _port = 0;
 
-  public:
+    public:
 
-    IpSocketAddr ();
+      IpSocketAddr();
 
-    IpSocketAddr( const IpAddress &ipAddr, uint16_t port );
+      IpSocketAddr(const IpAddress& ip_addr, uint16_t port);
 
-    IpSocketAddr( const uint8_t *ipAddr, uint16_t port );
+      IpSocketAddr(const uint8_t* ip_addr, uint16_t port);
 
-    ~IpSocketAddr ();
+      ~IpSocketAddr();
 
-    uint16_t Port() const { return ( _port ); }
-    void     Port( uint16_t port ) { _port = port; }
+      uint16_t Port() const { return _port; }
+      void Port(const uint16_t port) { _port = port; }
 
-    IpAddress* IpAddr() { return ( &_ipAddr ); }
-    void       IpAddr( const IpAddress &ipAddr ) { _ipAddr = ipAddr; }
+      IpAddress* IpAddr() { return &_ip_addr; }
+      void IpAddr(const IpAddress& ipAddr) { _ip_addr = ipAddr; }
 
-    bool operator == ( const IpSocketAddr &other );
+      bool operator ==(const IpSocketAddr& other);
 
-    void Print();
+      void print() const;
 
-    uint32_t GetHashValue();
-};
-}
+      uint32_t get_hash_value();
+    };
+  }
 }

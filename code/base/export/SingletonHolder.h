@@ -10,153 +10,163 @@
 
 namespace ja_iot
 {
-namespace base
-{
-typedef void ( *atexit_pfn_t ) ();
-////////////////////////////////////////////////////////////////////////////////
-// class template NoDestroy
-// Implementation of the LifetimePolicy used by SingletonHolder
-// Never destroys the object
-////////////////////////////////////////////////////////////////////////////////
+  namespace base
+  {
+    typedef void ( *atexit_pfn_t )();
 
-template<class T>
-struct NoDestroy
-{
-    static void ScheduleDestruction( T *, atexit_pfn_t pFun ) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    // class template NoDestroy
+    // Implementation of the LifetimePolicy used by SingletonHolder
+    // Never destroys the object
+    ////////////////////////////////////////////////////////////////////////////////
 
-    static void OnDeadReference() {}
-};
-
-
-////////////////////////////////////////////////////////////////////////////////
-// class template CreateUsingNew
-// Implementation of the CreationPolicy used by SingletonHolder
-// Creates objects using a straight call to the new operator
-////////////////////////////////////////////////////////////////////////////////
-
-template<class T> struct CreateUsingNew
-{
-    static T* Create() { return ( new T{} ); }
-
-    static void Destroy( T *p ) { delete p; }
-};
-
-
-template<class T> struct CreateStatic
-{
-    union MaxAlign
+    template <class T>
+    struct NoDestroy
     {
-        char        t_[sizeof( T )];
-        short int   shortInt_;
-        int         int_;
-        long int    longInt_;
-        float       float_;
-        double      double_;
+      static void ScheduleDestruction(T*, atexit_pfn_t pFun)
+      {
+      }
+
+      static void OnDeadReference()
+      {
+      }
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // class template CreateUsingNew
+    // Implementation of the CreationPolicy used by SingletonHolder
+    // Creates objects using a straight call to the new operator
+    ////////////////////////////////////////////////////////////////////////////////
+
+    template <class T>
+    struct CreateUsingNew
+    {
+      static T* Create() { return (new T{}); }
+
+      static void Destroy(T* p) { delete p; }
+    };
+
+
+    template <class T>
+    struct CreateStatic
+    {
+      union MaxAlign
+      {
+        char t_[sizeof( T)];
+        short int shortInt_;
+        int int_;
+        long int longInt_;
+        float float_;
+        double double_;
         long double longDouble_;
         struct Test;
 
-        int Test::  *pMember_;
-        int (Test::*pMemberFn_) ( int );
-    };
+        int Test::* pMember_;
+        int (Test::*pMemberFn_)(int);
+      };
 
-    static T* Create()
-    {
+      static T* Create()
+      {
         static MaxAlign staticMemory_{};
 
-        return ( new(&staticMemory_) T{} );
-    }
+        return (new(&staticMemory_) T{});
+      }
 
-    static void Destroy( T *p )
+      static void Destroy(T* p)
+      {
+        p->~T();
+      }
+    };
+
+    template
+    <
+      typename T,
+      template<class> class CreationPolicy = CreateStatic,
+      template<class> class LifetimePolicy = NoDestroy
+    >
+    class SingletonHolder
     {
-        p->~T ();
-    }
-};
+    public:
+      static T& Inst();
 
-template
-<
-    typename T,
-    template<class> class CreationPolicy = CreateStatic,
-    template<class> class LifetimePolicy = NoDestroy
->
-class SingletonHolder
-{
-public:
-    static T& Inst();
+    private:
+      static void MakeInstance();
+      static void DestroySingleton();
 
-private:
-    static void MakeInstance();
-    static void DestroySingleton();
-    SingletonHolder ();
+      SingletonHolder()
+      {
+      }
 
-    static T       *_pInstance;
-    static bool    _destroyed;
-};
+      static T* _pInstance;
+      static bool _destroyed;
+    };
 
-template
-<
-    class T,
-    template<class> class C,
-    template<class> class L
->
-T * SingletonHolder<T, C, L>::_pInstance{ nullptr };
+    template
+    <
+      class T,
+      template<class> class C,
+      template<class> class L
+    >
+    T* SingletonHolder<T, C, L>::_pInstance{nullptr};
 
-template
-<
-    class T,
-    template<class> class C,
-    template<class> class L
->
-bool SingletonHolder<T, C, L>::_destroyed{ false };
+    template
+    <
+      class T,
+      template<class> class C,
+      template<class> class L
+    >
+    bool SingletonHolder<T, C, L>::_destroyed{false};
 
-template
-<
-    class T,
-    template<class> class CreationPolicy,
-    template<class> class LifetimePolicy
->
-inline T &SingletonHolder<T, CreationPolicy, LifetimePolicy>::Inst()
-{
-    if( !_pInstance )
+    template
+    <
+      class T,
+      template<class> class CreationPolicy,
+      template<class> class LifetimePolicy
+    >
+    T& SingletonHolder<T, CreationPolicy, LifetimePolicy>::Inst()
     {
+      if (!_pInstance)
+      {
         MakeInstance();
+      }
+
+      return (*_pInstance);
     }
 
-    return ( *_pInstance );
-}
-
-template
-<
-    class T,
-    template<class> class CreationPolicy,
-    template<class> class LifetimePolicy
->
-void SingletonHolder<T, CreationPolicy, LifetimePolicy>::MakeInstance()
-{
-    if( !_pInstance )
+    template
+    <
+      class T,
+      template<class> class CreationPolicy,
+      template<class> class LifetimePolicy
+    >
+    void SingletonHolder<T, CreationPolicy, LifetimePolicy>::MakeInstance()
     {
-        if( _destroyed )
+      if (!_pInstance)
+      {
+        if (_destroyed)
         {
-            LifetimePolicy<T>::OnDeadReference();
-            _destroyed = false;
+          LifetimePolicy<T>::OnDeadReference();
+          _destroyed = false;
         }
 
         _pInstance = CreationPolicy<T>::Create();
-        LifetimePolicy<T>::ScheduleDestruction( _pInstance, &DestroySingleton );
+        LifetimePolicy<T>::ScheduleDestruction(_pInstance, &DestroySingleton);
+      }
     }
-}
 
-template
-<
-    class T,
-    template<class> class CreationPolicy,
-    template<class> class LifetimePolicy
->
-void SingletonHolder<T, CreationPolicy, LifetimePolicy>::DestroySingleton()
-{
-    CreationPolicy<T>::Destroy( _pInstance );
-    _pInstance = 0;
-    _destroyed = true;
-}
-}
+    template
+    <
+      class T,
+      template<class> class CreationPolicy,
+      template<class> class LifetimePolicy
+    >
+    void SingletonHolder<T, CreationPolicy, LifetimePolicy>::DestroySingleton()
+    {
+      CreationPolicy<T>::Destroy(_pInstance);
+      _pInstance = 0;
+      _destroyed = true;
+    }
+  }
 }
 #endif /* NETWORK_EXPORT_SINGLETONHOLDER_H_ */

@@ -5,11 +5,4 @@
  *      Author: psammand
  */
 
-#ifndef BASEOBJECT_H_
-#define BASEOBJECT_H_
-
-
-
-
-
-#endif /* BASEOBJECT_H_ */
+#pragma once

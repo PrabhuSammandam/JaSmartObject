@@ -15,33 +15,36 @@ namespace ja_iot {
 namespace base {
 static int inet_pton4( const char *src, uint8_t *dst, int pton );
 static int inet_pton6( const char *src, uint8_t *dst );
-
-IpAddress::IpAddress( IpAddrFamily ip_address_family )
-  : address_family_{ ip_address_family }
+IpAddress::IpAddress( const IpAddrFamily ip_address_family ) : address_family_{ ip_address_family }
 {
 }
-
-IpAddress::IpAddress( const char *ascii_addr, IpAddrFamily ip_address_family )
-  : address_family_{ ip_address_family }
+IpAddress::IpAddress( const char *ascii_addr, const IpAddrFamily ip_address_family ) : address_family_{
+    ip_address_family
+                                                                                                      }
 {
   if( ascii_addr != nullptr )
   {
-    strcpy( (char *) &address_[0], ascii_addr );
+    strcpy( reinterpret_cast<char *>( &address_[0] ), ascii_addr );
   }
 }
-
-IpAddress::IpAddress( const IpAddress &other )
+IpAddress::IpAddress( uint8_t *pu8_addr, const IpAddrFamily ip_address_family ) : address_family_{ ip_address_family }
 {
-  this->address_family_ = other.address_family_;
-  this->scope_id_       = other.scope_id_;
-
-  for( int i = 0; i < 16; ++i )
+  if( pu8_addr != nullptr )
   {
-    address_[i] = other.address_[i];
+    if( address_family_ == IpAddrFamily::IPv4 )
+    {
+      address_[0] = pu8_addr[0];
+      address_[1] = pu8_addr[1];
+      address_[2] = pu8_addr[2];
+      address_[3] = pu8_addr[3];
+    }
+    else
+    {
+      memcpy( static_cast<void *>( &address_[0] ), static_cast<void *>( pu8_addr ), 16 );
+    }
   }
 }
-
-IpAddress::IpAddress( uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4 )
+IpAddress::IpAddress( const uint8_t byte1, const uint8_t byte2, const uint8_t byte3, const uint8_t byte4 )
 {
   address_[0] = byte1;
   address_[1] = byte2;
@@ -49,14 +52,13 @@ IpAddress::IpAddress( uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4
   address_[3] = byte4;
   address_[4] = '\0';
 
-  address_family_ = IpAddrFamily::IPV4;
+  address_family_ = IpAddrFamily::IPv4;
 }
-
-IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : address_family_{ IpAddrFamily::IPv6 }, scope_id_{ scope }
+IpAddress::IpAddress( Ipv6AddrScope scope, uint16_t address ) : address_family_{ IpAddrFamily::IPv6 },
+  scope_id_{ (uint8_t) scope }
 {
   set_addr_by_scope( scope, address );
 }
-
 IpAddress::~IpAddress ()
 {
 }
@@ -68,6 +70,37 @@ bool IpAddress::is_broadcast()
 
 bool IpAddress::is_multicast()
 {
+  if( address_family_ == IpAddrFamily::IPv4 )
+  {
+    if( ( address_[0] >= 224 ) && ( address_[0] <= 239 ) )
+    {
+      return ( true );
+    }
+  }
+  else
+  {
+    if( address_[0] == 0xFF )
+    {
+      switch( address_[1] )
+      {
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x04:
+        case 0x05:
+        case 0x08:
+        case 0x0E:
+        {
+          return ( true );
+        }
+        default:
+          return ( false );
+      }
+
+      return ( false );
+    }
+  }
+
   return ( false );
 }
 
@@ -78,7 +111,7 @@ bool IpAddress::is_unicast()
 
 bool IpAddress::is_ipv4()
 {
-  return ( address_family_ == IpAddrFamily::IPV4 );
+  return ( address_family_ == IpAddrFamily::IPv4 );
 }
 
 bool IpAddress::is_ipv6()
@@ -103,8 +136,8 @@ void IpAddress::set_addr_by_scope( uint8_t scope_id, uint16_t address )
   }
 
   address_[0]  = 0xFF;
-  address_[1]  = ( scope_id & 0xFF );
-  address_[14] = (uint8_t) ( ( address >> 8 ) & 0xFF );
+  address_[1]  = scope_id & 0xFF;
+  address_[14] = (uint8_t) ( address >> 8 & 0xFF );
   address_[15] = (uint8_t) address & 0xFF;
 }
 
@@ -114,19 +147,17 @@ Ipv6AddrScope IpAddress::get_addr_scope( const char *ipv6_ascii_addr )
   {
   }
 
-  return ( Ipv6AddrScope::NONE );
+  return ( NONE );
 }
 
 bool IpAddress::from_string( const char *addr_string, IpAddrFamily ip_addr_family, IpAddress &ip_address )
 {
-  if( ip_addr_family == IpAddrFamily::IPV4 )
+  if( ip_addr_family == IpAddrFamily::IPv4 )
   {
     return ( inet_pton4( addr_string, ip_address.get_addr(), 1 ) == 1 );
   }
-  else
-  {
-    return ( inet_pton6( addr_string, ip_address.get_addr() ) == 1 );
-  }
+
+  return ( inet_pton6( addr_string, ip_address.get_addr() ) == 1 );
 }
 
 /* int
@@ -142,12 +173,11 @@ bool IpAddress::from_string( const char *addr_string, IpAddrFamily ip_addr_famil
  */
 static int inet_pton4( const char *src, uint8_t *dst, int pton )
 {
-  uint32_t           val = 0;
-  uint32_t           digit = 0;
-  int                base, n;
-  unsigned char      c;
-  uint32_t           parts[4] = { 0 };
-  register uint32_t *pp       = parts;
+  uint32_t      val   = 0;
+  uint32_t      digit = 0;
+  unsigned char c;
+  uint32_t      parts[4] = { 0 };
+  uint32_t *    pp       = parts;
 
   c = *src;
 
@@ -163,8 +193,8 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
       return ( 0 );
     }
 
-    val  = 0;
-    base = 10;
+    val = 0;
+    int base = 10;
 
     if( c == '0' )
     {
@@ -197,7 +227,7 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
           break;
         }
 
-        val = ( val * base ) + digit;
+        val = val * base + digit;
         c   = *++src;
       }
       else if( ( base == 16 ) && isxdigit( c ) )
@@ -209,7 +239,7 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
           break;
         }
 
-        val = ( val << 4 ) | digit;
+        val = val << 4 | digit;
         c   = *++src;
       }
       else
@@ -253,7 +283,7 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
    * Concoct the address according to
    * the number of parts specified.
    */
-  n = pp - parts + 1;
+  int n = pp - parts + 1;
 
   /* inet_pton() takes dotted-quad only.  it does not take shorthand. */
   if( pton && ( n != 4 ) )
@@ -267,11 +297,12 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
     {
       return ( 0 ); /* initial nondigit */
     }
-    case 1: /* a -- 32 bits */
+    case 1:   /* a -- 32 bits */
     {
-    } break;
+    }
+    break;
 
-    case 2: /* a.b -- 8.24 bits */
+    case 2:   /* a.b -- 8.24 bits */
     {
       if( ( parts[0] > 0xff ) || ( val > 0xffffff ) )
       {
@@ -279,27 +310,31 @@ static int inet_pton4( const char *src, uint8_t *dst, int pton )
       }
 
       val |= parts[0] << 24;
-    } break;
+    }
+    break;
 
-    case 3: /* a.b.c -- 8.8.16 bits */
+    case 3:   /* a.b.c -- 8.8.16 bits */
     {
       if( ( ( parts[0] | parts[1] ) > 0xff ) || ( val > 0xffff ) )
       {
         return ( 0 );
       }
 
-      val |= ( parts[0] << 24 ) | ( parts[1] << 16 );
-    } break;
+      val |= parts[0] << 24 | parts[1] << 16;
+    }
+    break;
 
-    case 4: /* a.b.c.d -- 8.8.8.8 bits */
+    case 4:   /* a.b.c.d -- 8.8.8.8 bits */
     {
       if( ( parts[0] | parts[1] | parts[2] | val ) > 0xff )
       {
         return ( 0 );
       }
 
-      val |= ( parts[0] << 24 ) | ( parts[1] << 16 ) | ( parts[2] << 8 );
-    } break;
+      val |= parts[0] << 24 | parts[1] << 16 | parts[2] << 8;
+    }
+    break;
+    default:;
   }
 
   if( dst )
@@ -333,7 +368,7 @@ static int inet_pton6( const char *src, uint8_t *dst )
   int               ch, saw_xdigit;
   uint32_t          val;
 
-  memset( ( tp = tmp ), '\0', 16 );
+  memset( tp = tmp, '\0', 16 );
   endp   = tp + 16;
   colonp = nullptr;
 
@@ -354,15 +389,15 @@ static int inet_pton6( const char *src, uint8_t *dst )
   {
     const char *pch = nullptr;
 
-    if( ( pch = strchr( ( xdigits = xdigits_l ), ch ) ) == nullptr )
+    if( ( pch = strchr( xdigits = xdigits_l, ch ) ) == nullptr )
     {
-      pch = strchr( ( xdigits = xdigits_u ), ch );
+      pch = strchr( xdigits = xdigits_u, ch );
     }
 
     if( pch != nullptr )
     {
       val <<= 4;
-      val  |= ( pch - xdigits );
+      val  |= pch - xdigits;
 
       if( val > 0xffff )
       {
@@ -387,7 +422,8 @@ static int inet_pton6( const char *src, uint8_t *dst )
         colonp = tp;
         continue;
       }
-      else if( *src == '\0' )
+
+      if( *src == '\0' )
       {
         return ( 0 );
       }
@@ -404,11 +440,11 @@ static int inet_pton6( const char *src, uint8_t *dst )
       continue;
     }
 
-    if( ( ch == '.' ) && ( ( tp + 4 ) <= endp ) && ( inet_pton4( curtok, tp, 1 ) > 0 ) )
+    if( ( ch == '.' ) && ( tp + 4 <= endp ) && ( inet_pton4( curtok, tp, 1 ) > 0 ) )
     {
       tp        += 4;
       saw_xdigit = 0;
-      break; /* '\0' was seen by inet_pton4(). */
+      break;     /* '\0' was seen by inet_pton4(). */
     }
 
     return ( 0 );
@@ -503,7 +539,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
   struct
   {
     int   base, len;
-  } best, cur;
+  } best, cur = {};
 
   uint32_t words[16 / 2];
   int      i;
@@ -517,13 +553,13 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
 
   for( i = 0; i < 16; i++ )
   {
-    words[i / 2] |= ( src[i] << ( ( 1 - ( i % 2 ) ) << 3 ) );
+    words[i / 2] = ( src[i] << 8 ) | src[i + 1];
   }
 
   best.base = -1;
   cur.base  = -1;
 
-  for( i = 0; i < ( 16 / 2 ); i++ )
+  for( i = 0; i < 16 / 2; i++ )
   {
     if( words[i] == 0 )
     {
@@ -568,10 +604,10 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
    */
   tp = tmp;
 
-  for( i = 0; i < ( 16 / 2 ); i++ )
+  for( i = 0; i < 16 / 2; i++ )
   {
     /* Are we inside the best run of 0x00's? */
-    if( ( best.base != -1 ) && ( i >= best.base ) && ( i < ( best.base + best.len ) ) )
+    if( ( best.base != -1 ) && ( i >= best.base ) && ( i < best.base + best.len ) )
     {
       if( i == best.base )
       {
@@ -604,7 +640,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
   }
 
   /* Was it a trailing run of 0x00's? */
-  if( ( best.base != -1 ) && ( ( best.base + best.len ) == ( 16 / 2 ) ) )
+  if( ( best.base != -1 ) && ( best.base + best.len == 16 / 2 ) )
   {
     *tp++ = ':';
   }
@@ -625,15 +661,19 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
 
 void IpAddress::set_addr( _in_ uint32_t ipv4_addr )
 {
-  address_[0] = (uint8_t) ( ( ipv4_addr >> 24 ) & 0xFF );
-  address_[1] = (uint8_t) ( ( ipv4_addr >> 16 ) & 0xFF );
-  address_[2] = (uint8_t) ( ( ipv4_addr >> 8 ) & 0xFF );
+  this->address_family_ = IpAddrFamily::IPv4;
+
+  address_[0] = (uint8_t) ( ipv4_addr >> 24 & 0xFF );
+  address_[1] = (uint8_t) ( ipv4_addr >> 16 & 0xFF );
+  address_[2] = (uint8_t) ( ipv4_addr >> 8 & 0xFF );
   address_[3] = (uint8_t) ( ipv4_addr & 0xFF );
 }
 
 void IpAddress::set_addr( _in_ uint8_t *ip_addr, _in_ IpAddrFamily ip_addr_family )
 {
-  if( ip_addr_family == IpAddrFamily::IPV4 )
+  this->address_family_ = ip_addr_family;
+
+  if( ip_addr_family == IpAddrFamily::IPv4 )
   {
     address_[0] = ip_addr[0];
     address_[1] = ip_addr[1];
@@ -646,22 +686,44 @@ void IpAddress::set_addr( _in_ uint8_t *ip_addr, _in_ IpAddrFamily ip_addr_famil
   }
 }
 
-void IpAddress::to_string( uint8_t *buf, uint8_t buf_len )
+bool IpAddress::is_valid()
+{
+  uint8_t u8_no_of_bytes = 16;
+
+  if( address_family_ == IpAddrFamily::IPv4 )
+  {
+    u8_no_of_bytes = 4;
+  }
+
+  for( auto i = 0; i < u8_no_of_bytes; ++i )
+  {
+    if( address_[i] == 0 )
+    {
+      return ( false );
+    }
+  }
+
+  return ( true );
+}
+
+void IpAddress::to_string( _in_out_ uint8_t *buf, _in_ uint8_t buf_len )
 {
   buf[0] = '\0';
 
-  if( address_family_ == IpAddrFamily::IPV4 )
+  if( address_family_ == IpAddrFamily::IPv4 )
   {
     sprintf( (char *) buf, "%d.%d.%d.%d", address_[0], address_[1], address_[2], address_[3] );
   }
   else
   {
-    sprintf( (char *) buf, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", address_[0], address_[1], address_[2], address_[3],
+    sprintf( (char *) buf, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", address_[0],
+      address_[1], address_[2], address_[3],
       address_[4], address_[5], address_[6], address_[7],
       address_[8], address_[9], address_[10], address_[11],
       address_[12], address_[13], address_[14], address_[15] );
   }
 }
+
 bool IpAddress::operator == ( const IpAddress &other )
 {
   if( this->address_family_ != other.address_family_ )

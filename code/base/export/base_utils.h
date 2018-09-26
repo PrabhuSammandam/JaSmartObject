@@ -9,19 +9,32 @@
 
 namespace ja_iot {
 namespace base {
-template<typename T> bool is_bit_set( const T value, const T bitmask )
+template<typename T>
+bool is_bit_set( const T value, const T bitmask )
 {
   return ( ( value & bitmask ) == bitmask );
 }
 
-template<typename T1, typename T2> auto set_bit( T1 &&value, T2 &&bitmask )->decltype( ( value |= bitmask ) )
+template<typename T1, typename T2>
+auto set_bit( T1 &&value, T2 &&bitmask )->decltype( ( value |= bitmask ) )
 {
   return ( ( value |= bitmask ) );
 }
 
-template<typename T1, typename T2> auto clear_bit( T1 &&value, T2 &&bitmask )->decltype( ( value &= ( ~bitmask ) ) )
+template<typename T1, typename T2>
+auto clear_bit( T1 &&value, T2 &&bitmask )->decltype( ( value &= ( ~bitmask ) ) )
 {
   return ( ( value &= ( ~bitmask ) ) );
+}
+
+template<typename T>
+void delete_and_clear( T * &ptr_to_delete )
+{
+  if( ptr_to_delete != nullptr )
+  {
+    delete ptr_to_delete;
+    ptr_to_delete = nullptr;
+  }
 }
 }
 }

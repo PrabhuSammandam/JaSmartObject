@@ -2,45 +2,49 @@
 #include <Hash.h>
 #include <stdio.h>
 
-namespace ja_iot {
-namespace base {
-IpSocketAddr::IpSocketAddr () : _ipAddr{}
+namespace ja_iot
 {
-}
+  namespace base
+  {
+    IpSocketAddr::IpSocketAddr() : _ip_addr{}
+    {
+    }
 
-IpSocketAddr::IpSocketAddr( const IpAddress &ipAddr, uint16_t port ) : _ipAddr{ ipAddr }, _port{ port }
-{
-}
+    IpSocketAddr::IpSocketAddr(const IpAddress& ipAddr, const uint16_t port) : _ip_addr{ipAddr}, _port{port}
+    {
+    }
 
-IpSocketAddr::IpSocketAddr( const uint8_t *ipAddr, uint16_t port ) : _ipAddr{ (const char *)( ipAddr ) }, _port{ port }
-{
-}
+    IpSocketAddr::IpSocketAddr(const uint8_t* ipAddr, const uint16_t port) : _ip_addr{
+      reinterpret_cast<const char *>(ipAddr)
+    }, _port{port}
+    {
+    }
 
-IpSocketAddr::~IpSocketAddr ()
-{
-    _ipAddr.~IpAddress ();
-    _port = 0;
-}
+    IpSocketAddr::~IpSocketAddr()
+    {
+      _ip_addr.~IpAddress();
+      _port = 0;
+    }
 
-bool IpSocketAddr::operator == ( const IpSocketAddr &other )
-{
-    return ( ( _port == other._port ) && ( _ipAddr == other._ipAddr ) );
-}
+    bool IpSocketAddr::operator ==(const IpSocketAddr& other)
+    {
+      return _port == other._port && _ip_addr == other._ip_addr;
+    }
 
-void IpSocketAddr::Print()
-{
-    printf( "IP:" );
-//    _ipAddr.Print();
-    printf( "Port:%u\n", _port );
-}
+    void IpSocketAddr::print() const
+    {
+      printf("IP:");
+      //    _ipAddr.Print();
+      printf("Port:%u\n", _port);
+    }
 
-uint32_t IpSocketAddr::GetHashValue()
-{
-    auto hashVal = Hash::get_hash( _ipAddr.get_addr(), sizeof( IpAddress ) );
+    uint32_t IpSocketAddr::get_hash_value()
+    {
+      auto hashVal = Hash::get_hash(_ip_addr.get_addr(), sizeof( IpAddress));
 
-    hashVal = Hash::get_hash( &_port, sizeof( uint16_t ), hashVal );
+      hashVal = Hash::get_hash(&_port, sizeof( uint16_t), hashVal);
 
-    return ( hashVal );
-}
-}
+      return hashVal;
+    }
+  }
 }

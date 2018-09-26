@@ -10,53 +10,68 @@
 
 #include <cstdint>
 
-namespace ja_iot {
-namespace base {
+namespace ja_iot
+{
+  namespace base
+  {
+    template <typename T, uint16_t capacity>
+    class SimpleList
+    {
+      struct ListEntry
+      {
+        T item;
+        bool is_item_free;
 
-template <typename T, uint16_t capacity> class SimpleList {
-private:
-  struct ListEntry {
-    T item;
-    bool is_item_free;
-    ListEntry() : item{}, is_item_free{true} {}
-  };
+        ListEntry() : item{}, is_item_free{true}
+        {
+        }
+      };
 
-  ListEntry item_list_[capacity];
-  uint16_t item_count_ = 0;
+      ListEntry item_list_[capacity];
+      uint16_t item_count_ = 0;
 
-public:
-  SimpleList() {}
-
-  T *Alloc() {
-    for (uint16_t i = 0; i < capacity; i++) {
-      if (item_list_[i].is_item_free == true) {
-        item_list_[i].is_item_free = false;
-        item_count_++;
-        return (&item_list_[i].item);
+    public:
+      SimpleList()
+      {
       }
-    }
 
-    return (nullptr);
-  }
+      T* Alloc()
+      {
+        for (uint16_t i = 0; i < capacity; i++)
+        {
+          if (item_list_[i].is_item_free == true)
+          {
+            item_list_[i].is_item_free = false;
+            item_count_++;
+            return (&item_list_[i].item);
+          }
+        }
 
-  void Free(T *listEntry) {
-    if (listEntry != nullptr) {
-      for (uint16_t i = 0; i < capacity; i++) {
-        if (&item_list_[i].item == listEntry) {
-          item_count_--;
-          item_list_[i].is_item_free = true;
+        return nullptr;
+      }
+
+      void Free(T* list_entry)
+      {
+        if (list_entry != nullptr)
+        {
+          for (uint16_t i = 0; i < capacity; i++)
+          {
+            if (&item_list_[i].item == list_entry)
+            {
+              item_count_--;
+              item_list_[i].is_item_free = true;
+            }
+          }
         }
       }
-    }
+
+      uint16_t Count() { return item_count_; }
+
+      bool IsFull() { return capacity == item_count_; }
+
+      uint16_t Capacity() { return capacity; }
+    };
   }
-
-  uint16_t Count() { return (item_count_); }
-
-  bool IsFull() { return (capacity == item_count_); }
-
-  uint16_t Capacity() { return (capacity); }
-};
-}
 }
 
 #endif /* OSAL_EXPORT_SIMPLELIST_H_ */
