@@ -64,7 +64,7 @@ void handle_stack_event_send_client_request( ClientRequest *client_request, clie
 
 namespace ja_iot {
 namespace stack {
-MsgStack *MsgStack::_p_instance{ nullptr };
+MsgStack *MsgStack::_pcz_instance{ nullptr };
 
 OptionsCallback required_options_callback = [] ( uint16_t option_no ) -> bool {
     return ( true );
@@ -78,13 +78,13 @@ MsgStack::~MsgStack ()
 
 MsgStack & MsgStack::inst()
 {
-  if( _p_instance == nullptr )
+  if( _pcz_instance == nullptr )
   {
     static MsgStack _instance{};
-    _p_instance = &_instance;
+    _pcz_instance = &_instance;
   }
 
-  return ( *_p_instance );
+  return ( *_pcz_instance );
 }
 
 void MsgStack::initialize( const uint16_t adapter_type )
@@ -133,11 +133,11 @@ void MsgStack::initialize( const uint16_t adapter_type )
   _heart_beat_timer->start();
 }
 
-void MsgStack::send_stack_event( StackEvent *stack_msg ) 
+void MsgStack::send_stack_event( StackEvent *pcz_stack_msg ) 
 {
-  if( stack_msg != nullptr )
+  if( pcz_stack_msg != nullptr )
   {
-    _task->SendMsg( stack_msg );
+    _task->SendMsg( pcz_stack_msg );
   }
 }
 }
@@ -156,6 +156,15 @@ void handle_stack_event_heart_beat()
   // i_store.print_client_interactions();
 }
 
+/*
+This API is used by the client to send the request.
+The request may be unicast or multicast request. Then handling of the request will be different  based on the 
+request type.
+
+1. UNICAST request
+2. MULTICAST request
+
+*/
 void handle_stack_event_send_client_request( ClientRequest *client_request, client_response_cb response_cb )
 {
   if( client_request->get_endpoint().is_multicast() )
@@ -169,6 +178,7 @@ void handle_stack_event_send_client_request( ClientRequest *client_request, clie
   }
   else
   {
+    /* thi is unicast request */
     auto client_interaction = InteractionStore::inst().create_client_interaction( client_request );
 
     client_interaction->set_response_cb( response_cb );

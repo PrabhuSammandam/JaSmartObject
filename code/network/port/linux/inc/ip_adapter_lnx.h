@@ -53,8 +53,8 @@ class IpAdapterImplLinux : public IpAdapterBase
     int        netlink_fd      = -1;      /**< netlink */
     int        shutdown_fds[2] = { -1 };    /**< fds used to signal threads to stop */
     int        max_fd          = -1;
-    int        socket_fd_array[MAX_NO_SOCKET_FD];
-    uint16_t   socket_fd_count = 0;
+    //    int        socket_fd_array[MAX_NO_SOCKET_FD];
+    //    uint16_t   socket_fd_count = 0;
     uint8_t    _pu8_receive_buffer[COAP_MAX_PDU_SIZE];
 
     osal::Mutex *                     _access_mutex = nullptr;

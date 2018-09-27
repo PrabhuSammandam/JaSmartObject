@@ -9,13 +9,11 @@ namespace osal {
 class OsalTimer;
 class Task;
 } /* namespace osal */
-} /* namespace ja_iot */
-
-namespace ja_iot {
 namespace stack {
 class StackEvent;
 }
-}
+} /* namespace ja_iot */
+
 constexpr uint16_t SIMPLE_STACK_TASK_MAX_NO_MSGS = 10;
 constexpr uint16_t SIMPLE_STACK_TASK_STACK_SIZE  = 512;
 constexpr uint16_t SIMPLE_STACK_TASK_PRIORITY    = 5;
@@ -39,7 +37,7 @@ class MsgStack
   private:
     MsgStack ();
     ~MsgStack ();
-    static MsgStack * _p_instance;
+    static MsgStack * _pcz_instance;
     MsgStack( const MsgStack &other )                   = delete;
     MsgStack( MsgStack &&other ) noexcept               = delete;
     MsgStack & operator = ( const MsgStack &other )     = delete;
