@@ -5,6 +5,10 @@
  *      Author: prabhu
  */
 
+#pragma once
+
+#ifdef _OS_LINUX_
+
 #include <common/inc/ip_adapter_base.h>
 #include <config_network.h>
 #include <ErrCode.h>
@@ -17,11 +21,6 @@ namespace network {
 class UdpSocketImplLinux;
 } /* namespace network */
 } /* namespace ja_iot */
-
-
-#ifdef _OS_LINUX_
-
-#pragma once
 
 namespace ja_iot {
 namespace network {
@@ -47,8 +46,9 @@ class IpAdapterImplLinux : public IpAdapterBase
 
   private:
     void                            handle_received_socket_data( int &selected_fd, uint16_t &u16_network_flag );
-    void                            send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint &endpoint, const uint8_t *data, const uint16_t data_length ) const;
+    void                            send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint &rcz_endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length ) const;
     std::vector<InterfaceAddress *> get_newly_found_interface_address();
+    void							update_max_fd(int new_fd);
 
     int        netlink_fd      = -1;      /**< netlink */
     int        shutdown_fds[2] = { -1 };    /**< fds used to signal threads to stop */

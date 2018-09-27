@@ -38,7 +38,7 @@ using namespace ja_iot::base;
 using namespace ja_iot::network;
 using namespace ja_iot::osal;
 
-void                              add_socket_to_fd_array( UdpSocketImplLinux *udp_socket, fd_set *readFds, int *max_fd );
+void                              intl_add_socket_to_fd_array( UdpSocketImplLinux *pcz_udp_socket, fd_set *readFds, int *max_fd );
 IpAdapterImplLinux::IpAdapterImplLinux ()
 {
 }
@@ -86,19 +86,19 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
 {
   char ascii_addr_buf[64] = { 0 };
 
-  std::vector<InterfaceAddress *> if_ptr_array{};
+  std::vector<InterfaceAddress *> pcz_interface_ptr_vector{};
 
   DBG_INFO2( "ENTER index %d", u8_index );
 
-  struct ifaddrs *ifp = nullptr;
+  struct ifaddrs *pst_interface_addr_list = nullptr;
 
-  if( -1 != getifaddrs( &ifp ) )
+  if( -1 != getifaddrs( &pst_interface_addr_list ) )
   {
     struct ifaddrs *ifa = nullptr;
 
     DBG_INFO2( "Iterating interfaces START" );
 
-    for( ifa = ifp; ifa; ifa = ifa->ifa_next )
+    for( ifa = pst_interface_addr_list; ifa; ifa = ifa->ifa_next )
     {
       if( !ifa->ifa_addr )
       {
@@ -114,25 +114,25 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
         continue;
       }
 
-      IpAddrFamily      addr_family = ( AF_INET6 == ifa->ifa_addr->sa_family ) ? IpAddrFamily::IPv6 : IpAddrFamily::IPv4;
+      IpAddrFamily      e_addr_family = ( AF_INET6 == ifa->ifa_addr->sa_family ) ? IpAddrFamily::IPv6 : IpAddrFamily::IPv4;
 
       InterfaceAddress *if_addr = nullptr;
 
-      if( addr_family == IpAddrFamily::IPv6 )
+      if( e_addr_family == IpAddrFamily::IPv6 )
       {
         struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) ifa->ifa_addr;
         inet_ntop( AF_INET6, (void *) ( &in6->sin6_addr ), &ascii_addr_buf[0], sizeof( ascii_addr_buf ) );
-        if_addr = new InterfaceAddress{ (uint32_t) ifindex, ifa->ifa_flags, addr_family, (const char *) &in6->sin6_addr };
+        if_addr = new InterfaceAddress{ (uint32_t) ifindex, ifa->ifa_flags, e_addr_family, (const char *) &in6->sin6_addr };
       }
-      else if( addr_family == IpAddrFamily::IPv4 )
+      else if( e_addr_family == IpAddrFamily::IPv4 )
       {
         struct sockaddr_in *in = (struct sockaddr_in *) ifa->ifa_addr;
         inet_ntop( AF_INET, (void *) ( &in->sin_addr ), &ascii_addr_buf[0], sizeof( ascii_addr_buf ) );
-        if_addr = new InterfaceAddress{ (uint32_t) ifindex, ifa->ifa_flags, addr_family, (const char *) &in->sin_addr };
+        if_addr = new InterfaceAddress{ (uint32_t) ifindex, ifa->ifa_flags, e_addr_family, (const char *) &in->sin_addr };
       }
 
-      DBG_INFO2( "Found interface index[%d], flag[%d], family[%d], addr[%s]", ifindex, ifa->ifa_flags, (int) addr_family, &ascii_addr_buf[0] );
-      if_ptr_array.push_back( if_addr );
+      DBG_INFO2( "Found interface index[%d], flag[%d], family[%d], addr[%s]", ifindex, ifa->ifa_flags, (int) e_addr_family, &ascii_addr_buf[0] );
+      pcz_interface_ptr_vector.push_back( if_addr );
 
       {
         ScopedMutex lock{ _access_mutex };
@@ -143,7 +143,7 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
         {
           auto if_addr = _interface_addr_list[i];
 
-          if( ( if_addr->get_index() == (uint32_t) ifindex ) && ( if_addr->get_family() == addr_family ) )
+          if( ( if_addr->get_index() == (uint32_t) ifindex ) && ( if_addr->get_family() == e_addr_family ) )
           {
             is_found = true;
             break;
@@ -168,11 +168,11 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
 
     DBG_INFO2( "Iterating interfaces END" );
 
-    freeifaddrs( ifp );
+    freeifaddrs( pst_interface_addr_list );
   }
 
   DBG_INFO2( "EXIT" );
-  return ( if_ptr_array );
+  return ( pcz_interface_ptr_vector );
 }
 
 std::vector<InterfaceAddress *> IpAdapterImplLinux::get_newly_found_interface_address()
@@ -292,15 +292,8 @@ void IpAdapterImplLinux::do_init_fast_shutdown_mechanism()
     }
   }
 
-  if( shutdown_fds[0] > max_fd )
-  {
-    max_fd = shutdown_fds[0];
-  }
-
-  if( shutdown_fds[1] > max_fd )
-  {
-    max_fd = shutdown_fds[1];
-  }
+  update_max_fd(shutdown_fds[0]);
+  update_max_fd(shutdown_fds[1]);
 }
 
 void IpAdapterImplLinux::do_init_address_change_notify_mechanism()
@@ -321,10 +314,7 @@ void IpAdapterImplLinux::do_init_address_change_notify_mechanism()
     }
     else
     {
-      if( netlink_fd > max_fd )
-      {
-        max_fd = netlink_fd;
-      }
+    	  update_max_fd(netlink_fd);
     }
   }
 }
@@ -362,7 +352,7 @@ void IpAdapterImplLinux::do_handle_receive()
 
     for( auto &socket : _sockets )
     {
-      add_socket_to_fd_array( (UdpSocketImplLinux *) socket, &readFds, &max_fd );
+    	intl_add_socket_to_fd_array( (UdpSocketImplLinux *) socket, &readFds, &max_fd );
     }
 
     if( shutdown_fds[0] != -1 )
@@ -641,15 +631,15 @@ void IpAdapterImplLinux::handle_received_socket_data( int &selected_fd, uint16_t
   }
 }
 
-void add_socket_to_fd_array( UdpSocketImplLinux *udp_socket, fd_set *readFds, int *max_fd )
+void intl_add_socket_to_fd_array( UdpSocketImplLinux *pcz_udp_socket, fd_set *readFds, int *max_fd )
 {
-  if( ( udp_socket != nullptr ) && ( udp_socket->get_socket() != -1 ) )
+  if( ( pcz_udp_socket != nullptr ) && ( pcz_udp_socket->get_socket() != -1 ) )
   {
-    FD_SET( udp_socket->get_socket(), readFds );
+    FD_SET( pcz_udp_socket->get_socket(), readFds );
 
-    if( udp_socket->get_socket() > *max_fd )
+    if( pcz_udp_socket->get_socket() > *max_fd )
     {
-      *max_fd = udp_socket->get_socket();
+      *max_fd = pcz_udp_socket->get_socket();
     }
   }
 }
@@ -664,18 +654,18 @@ ErrCode IpAdapterImplLinux::do_pre_stop_server()
   return ( ErrCode::OK );
 }
 
-void IpAdapterImplLinux::send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint &endpoint, const uint8_t *data, const uint16_t data_length ) const
+void IpAdapterImplLinux::send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint &rcz_endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length ) const
 {
   if( pcz_udp_socket == nullptr )
   {
     return;
   }
 
-  const auto send_status = pcz_udp_socket->SendData( endpoint.get_addr(), endpoint.get_port(), const_cast<uint8_t *>( data ), data_length );
+  const auto send_status = pcz_udp_socket->SendData( rcz_endpoint.get_addr(), rcz_endpoint.get_port(), const_cast<uint8_t *>( pu8_data ), u16_data_length );
 
   if( send_status != SocketError::OK )
   {
-    AdapterEvent cz_adapter_event{ ADAPTER_EVENT_TYPE_ERROR, &endpoint, (uint8_t *) data, data_length, k_adapter_type_ip };
+    AdapterEvent cz_adapter_event{ ADAPTER_EVENT_TYPE_ERROR, &rcz_endpoint, (uint8_t *) pu8_data, u16_data_length, k_adapter_type_ip };
     cz_adapter_event.set_error_code( ErrCode::SEND_DATA_FAILED );
 
     if( _adapter_event_callback != nullptr )
@@ -683,6 +673,14 @@ void IpAdapterImplLinux::send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint
       _adapter_event_callback( &cz_adapter_event, _adapter_event_cb_data );
     }
   }
+}
+
+void IpAdapterImplLinux::update_max_fd(int new_fd)
+{
+	if(new_fd > max_fd)
+	{
+		max_fd = new_fd;
+	}
 }
 }
 }

@@ -173,15 +173,16 @@ exit_label:
   return ( ErrCode::OK );
 }
 
-ErrCode CoapMsgCodec::encode_empty_coap_msg( uint8_t msg_type, uint16_t msg_id, uint8_t *pu8_coap_pdu, uint16_t &ru16_coap_pdu_len )
+ErrCode CoapMsgCodec::encode_empty_coap_msg( uint8_t u8_msg_type, uint16_t u16_msg_id, uint8_t *pu8_coap_pdu, uint16_t &ru16_coap_pdu_len )
 {
   pu8_coap_pdu[0]  = 0x40;
-  pu8_coap_pdu[0] |= ( msg_type & 0x03 ) << 4;
+  pu8_coap_pdu[0] |= ( u8_msg_type & 0x03 ) << 4;
 
   pu8_coap_pdu[1] = COAP_MSG_CODE_EMPTY;
-  pu8_coap_pdu[2] = msg_id >> 8 & 0xFF;
-  pu8_coap_pdu[3] = msg_id & 0xFF;
+  pu8_coap_pdu[2] = u16_msg_id >> 8 & 0xFF;
+  pu8_coap_pdu[3] = u16_msg_id & 0xFF;
 
+  /* return the total length of bytes encoded */
   ru16_coap_pdu_len = 4;
 
   return ( ErrCode::OK );
@@ -189,13 +190,13 @@ ErrCode CoapMsgCodec::encode_empty_coap_msg( uint8_t msg_type, uint16_t msg_id, 
 
 ErrCode CoapMsgCodec::encode_coap_msg( _in_ CoapMsg &rcz_coap_msg, uint8_t *pu8_coap_pdu, uint16_t &ru16_coap_pdu_len )
 {
-  auto &token = rcz_coap_msg.get_token();
+  auto &rcz_token = rcz_coap_msg.get_token();
 
   ru16_coap_pdu_len = 0;
 
   pu8_coap_pdu[0]  = 0x40;
   pu8_coap_pdu[0] |= ( rcz_coap_msg.get_type() & 0x03 ) << 4;
-  pu8_coap_pdu[0] |= token.get_length() & 0x0F;
+  pu8_coap_pdu[0] |= rcz_token.get_length() & 0x0F;
 
   pu8_coap_pdu[1] = rcz_coap_msg.get_code();
   pu8_coap_pdu[2] = rcz_coap_msg.get_id() >> 8 & 0xFF;
@@ -203,16 +204,18 @@ ErrCode CoapMsgCodec::encode_coap_msg( _in_ CoapMsg &rcz_coap_msg, uint8_t *pu8_
 
   uint16_t u16_current_byte_idx = 4;
 
-  if( token.get_length() > 0 )
+  if( rcz_token.get_length() > 0 )
   {
-    memcpy( &pu8_coap_pdu[u16_current_byte_idx], token.get_token(), token.get_length() );
+	  /* copy the token to new buffer */
+	  memcpy( &pu8_coap_pdu[u16_current_byte_idx], rcz_token.get_token(), rcz_token.get_length() );
   }
 
-  u16_current_byte_idx += token.get_length();
+  u16_current_byte_idx += rcz_token.get_length();
 
   uint16_t u16_last_option_no = 0;
   auto     cz_options_list    = rcz_coap_msg.get_option_set().get_sorted_options_list();
 
+  /* loop through all the options */
   for( auto &cz_option : cz_options_list )
   {
     uint16_t u16_cur_delta = cz_option.get_no() - u16_last_option_no;
@@ -278,6 +281,7 @@ ErrCode CoapMsgCodec::encode_coap_msg( _in_ CoapMsg &rcz_coap_msg, uint8_t *pu8_
     u16_current_byte_idx += rcz_coap_msg.get_payload_len();
   }
 
+  /* update the encoded no of bytes */
   ru16_coap_pdu_len = u16_current_byte_idx;
 
   return ( ErrCode::OK );
@@ -390,8 +394,8 @@ success:
 
 ErrCode parse_coap_options( _in_ const uint8_t *pu8_options_data_start, _in_ const uint16_t u16_options_data_len, _out_ uint8_t **pp_payload_start, _out_ uint8_t &ru8_options_count )
 {
-  uint16_t cur_buf_idx    = 0;
-  uint16_t last_option_no = 0;
+  uint16_t u16_cur_buf_idx    = 0;
+  uint16_t u16_last_option_no = 0;
 
   ru8_options_count = 0;
   *pp_payload_start = nullptr;
@@ -401,59 +405,59 @@ ErrCode parse_coap_options( _in_ const uint8_t *pu8_options_data_start, _in_ con
     return ( ErrCode::MSG_FORMAT_ERROR );
   }
 
-  while( cur_buf_idx < u16_options_data_len )
+  while( u16_cur_buf_idx < u16_options_data_len )
   {
     // check for payload marker, if it is there then mark the start of payload and return
-    if( pu8_options_data_start[cur_buf_idx] == 0xFF )
+    if( pu8_options_data_start[u16_cur_buf_idx] == 0xFF )
     {
       // at least one byte payload must follow to the payload marker
-      if( u16_options_data_len - cur_buf_idx < 2 )
+      if( u16_options_data_len - u16_cur_buf_idx < 2 )
       {
         return ( ErrCode::MSG_FORMAT_ERROR );
       }
 
-      cur_buf_idx++;     // skip payload marker
-      *pp_payload_start = const_cast<uint8_t *>( &pu8_options_data_start[cur_buf_idx] );
+      u16_cur_buf_idx++;     // skip payload marker
+      *pp_payload_start = const_cast<uint8_t *>( &pu8_options_data_start[u16_cur_buf_idx] );
       return ( ErrCode::OK );
     }
 
-    uint16_t option_delta  = pu8_options_data_start[cur_buf_idx] >> 4;    // initial delta in upper 4 bits
-    uint16_t option_length = pu8_options_data_start[cur_buf_idx] & 0x0F;     // initial length in lower 4 bits
-    cur_buf_idx++;     // skip the initial delta & length byte
+    uint16_t u16_option_delta  = pu8_options_data_start[u16_cur_buf_idx] >> 4;    // initial delta in upper 4 bits
+    uint16_t u16_option_length = pu8_options_data_start[u16_cur_buf_idx] & 0x0F;     // initial length in lower 4 bits
+    u16_cur_buf_idx++;     // skip the initial delta & length byte
 
-    if( option_delta == 13 )
+    if( u16_option_delta == 13 )
     {
       // An 8-bit unsigned integer follows the initial byte and indicates the Option Delta minus 13.
-      option_delta = pu8_options_data_start[cur_buf_idx] + 13;
-      cur_buf_idx++;     // skip 1 byte big delta
+      u16_option_delta = pu8_options_data_start[u16_cur_buf_idx] + 13;
+      u16_cur_buf_idx++;     // skip 1 byte big delta
     }
-    else if( option_delta == 14 )
+    else if( u16_option_delta == 14 )
     {
       // A 16-bit unsigned integer in network byte order follows the initial byte and indicates the Option Delta minus 269.
-      option_delta = ( uint16_t( pu8_options_data_start[cur_buf_idx] ) << 8 | uint16_t(
-          pu8_options_data_start[cur_buf_idx] ) ) + 269;
-      cur_buf_idx += 2;
+      u16_option_delta = ( uint16_t( pu8_options_data_start[u16_cur_buf_idx] ) << 8 | uint16_t(
+          pu8_options_data_start[u16_cur_buf_idx] ) ) + 269;
+      u16_cur_buf_idx += 2;
     }
-    else if( option_delta == 15 )
+    else if( u16_option_delta == 15 )
     {
       // Reserved for the Payload Marker.
       return ( ErrCode::MSG_FORMAT_ERROR );
     }
 
-    if( option_length == 13 )
+    if( u16_option_length == 13 )
     {
       // An 8-bit unsigned integer precedes the Option Value and indicates the Option Length minus 13.
-      option_length = pu8_options_data_start[cur_buf_idx] + 13;
-      cur_buf_idx++;     // skip 1 byte big delta
+      u16_option_length = pu8_options_data_start[u16_cur_buf_idx] + 13;
+      u16_cur_buf_idx++;     // skip 1 byte big delta
     }
-    else if( option_length == 14 )
+    else if( u16_option_length == 14 )
     {
       // A 16-bit unsigned integer in network byte order precedes the Option Value and indicates the Option Length minus 269.
-      option_length = ( uint16_t( pu8_options_data_start[cur_buf_idx] ) << 8 | uint16_t(
-          pu8_options_data_start[cur_buf_idx] ) ) + 269;
-      cur_buf_idx += 2;
+      u16_option_length = ( uint16_t( pu8_options_data_start[u16_cur_buf_idx] ) << 8 | uint16_t(
+          pu8_options_data_start[u16_cur_buf_idx] ) ) + 269;
+      u16_cur_buf_idx += 2;
     }
-    else if( option_length == 15 )
+    else if( u16_option_length == 15 )
     {
       // Reserved for future use.
       return ( ErrCode::MSG_FORMAT_ERROR );
@@ -461,14 +465,14 @@ ErrCode parse_coap_options( _in_ const uint8_t *pu8_options_data_start, _in_ con
 
     // if current option length is greater than max option size or
     // current option length is greater than remaining payload
-    if( ( option_length > JA_COAP_CONFIG_MAX_OPTION_SIZE )
-      || ( u16_options_data_len - cur_buf_idx < option_length ) )
+    if( ( u16_option_length > JA_COAP_CONFIG_MAX_OPTION_SIZE )
+      || ( u16_options_data_len - u16_cur_buf_idx < u16_option_length ) )
     {
       return ( ErrCode::MSG_FORMAT_ERROR );
     }
 
-    last_option_no += option_delta;     // encode option delta
-    cur_buf_idx    += option_length;
+    u16_last_option_no += u16_option_delta;     // encode option delta
+    u16_cur_buf_idx    += u16_option_length;
     ru8_options_count++;
   }
 

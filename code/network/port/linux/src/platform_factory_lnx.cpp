@@ -49,8 +49,8 @@ void ja_iot::network::LinuxPlatformFactory::free_socket( IUdpSocket *socket )
 {
   if( socket != nullptr )
   {
-    const auto win_socket = static_cast<UdpSocketImplLinux *>( socket );
-    delete win_socket;
+    const auto pcz_linux_socket = static_cast<UdpSocketImplLinux *>( socket );
+    delete pcz_linux_socket;
   }
 }
 }  // namespace network

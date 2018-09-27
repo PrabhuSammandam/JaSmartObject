@@ -8,19 +8,19 @@ namespace ja_iot {
 namespace network {
 using namespace memory;
 using namespace std;
-Option::Option( const uint16_t no, const uint16_t len, uint8_t *val ) : _is_mem_allocated{ false }, _u16_len{ 0 }
+Option::Option( const uint16_t u16_no, const uint16_t u16_len, uint8_t *pu8_val ) : _is_mem_allocated{ false }, _u16_len{ 0 }
 {
-  _u16_no = no;
-  this->set_val( len, val );
+  _u16_no = u16_no;
+  this->set_val( u16_len, pu8_val );
 }
-Option::Option( const uint16_t no ) : _is_mem_allocated{ false }, _u16_len{ 0 }, _u16_no{ no }, u{ 0 }
+Option::Option( const uint16_t u16_no ) : _is_mem_allocated{ false }, _u16_len{ 0 }, _u16_no{ u16_no }, u{ 0 }
 {
 }
-Option::Option( const uint16_t no, const string &rcz_string_value ) : _u16_no{ no }
+Option::Option( const uint16_t u16_no, const string &rcz_string_value ) : _u16_no{ u16_no }
 {
   set_string_value( rcz_string_value );
 }
-Option::Option( const uint16_t no, const uint32_t u32_value ) : _u16_no{ no }
+Option::Option( const uint16_t u16_no, const uint32_t u32_value ) : _u16_no{ u16_no }
 {
   set_integer_value( u32_value );
 }

@@ -17,7 +17,7 @@ namespace ja_iot {
 namespace network {
 using namespace std;
 
-void tokenize( string str, const char delimter, vector<string> &token_v );
+void tokenize( string in_str, const char delimter, vector<string> &rcz_token_list );
 CoapOptionsSet::CoapOptionsSet ()
 {
 }
@@ -616,23 +616,23 @@ const char * CoapOptionsSet::get_option_no_string( uint16_t option_no )
   return ( "" );
 }
 
-void CoapOptionsSet::get_option_value_as_string(Option& option, char *buffer, uint16_t buff_len )
+void CoapOptionsSet::get_option_value_as_string(Option& rcz_option, char *pc_buffer, uint16_t u16_buf_len )
 {
-  switch( option.get_no() )
+  switch( rcz_option.get_no() )
   {
     case COAP_OPTION_URI_PATH:
     {
-      sprintf( buffer, "%s", option.get_string_value().c_str() );
+      sprintf( pc_buffer, "%s", rcz_option.get_string_value().c_str() );
     }
     break;
     case COAP_OPTION_BLOCK_1:
     {
-      sprintf( buffer, "[%d,%d,%d]", _cz_block_1.get_num(), _cz_block_1.has_more(), _cz_block_1.get_size() );
+      sprintf( pc_buffer, "[%d,%d,%d]", _cz_block_1.get_num(), _cz_block_1.has_more(), _cz_block_1.get_size() );
     }
     break;
     case COAP_OPTION_BLOCK_2:
     {
-      sprintf( buffer, "[%d,%d,%d]", _cz_block_2.get_num(), _cz_block_2.has_more(), _cz_block_2.get_size() );
+      sprintf( pc_buffer, "[%d,%d,%d]", _cz_block_2.get_num(), _cz_block_2.has_more(), _cz_block_2.get_size() );
     }
     break;
 		case COAP_OPTION_SIZE1:
@@ -640,29 +640,31 @@ void CoapOptionsSet::get_option_value_as_string(Option& option, char *buffer, ui
 		case COAP_OPTION_CONTENT_FORMAT:
 		case COAP_OPTION_ACCEPT:
 		{
-			sprintf(buffer, "%d", option.get_integer_value());
+			sprintf(pc_buffer, "%d", rcz_option.get_integer_value());
 		}
 		break;
 		default:
     {
-      sprintf( buffer, "NA" );
+      sprintf( pc_buffer, "NA" );
     }
     break;
   }
 }
 
-void tokenize( string str, const char delimter, vector<string> &token_v )
+void tokenize( string in_str, const char delimter, vector<string> &rcz_token_list )
 {
-  auto start = str.find_first_not_of( delimter ), end = start;
+  auto start = in_str.find_first_not_of( delimter ), end = start;
 
   while( start != string::npos )
   {
-    // Find next occurence of delimiter
-    end = str.find( delimter, start );
+    // Find next occurrence of delimiter
+    end = in_str.find( delimter, start );
+
     // Push back the token found into vector
-    token_v.push_back( str.substr( start, end - start ) );
-    // Skip all occurences of the delimiter to find new start
-    start = str.find_first_not_of( delimter, end );
+    rcz_token_list.push_back( in_str.substr( start, end - start ) );
+
+    // Skip all occurrences of the delimiter to find new start
+    start = in_str.find_first_not_of( delimter, end );
   }
 }
 }

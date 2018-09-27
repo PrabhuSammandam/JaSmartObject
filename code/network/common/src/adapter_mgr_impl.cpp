@@ -24,17 +24,19 @@ void adapter_event_cb( AdapterEvent *pcz_adapter_event, void *pv_user_data );
 
 /**
  * adaptor manager
- * The adaptor manager is a singleton instance which can manage all the  adaptors that are configured in the system.
- * During system initialization it is required to  set all the adaptors that are available
+ * The adaptor manager is a singleton instance which can manage all the adaptors that are configured in the system.
+ * During system initialization it is required to set all the adaptors that are available
  * in the system to the adaptor manager.
  *
  * Adaptor manager is the primary interface for all the adaptor related operations for example
  * to start the adaptor, to stop the adaptor, to start the server, to stop the server,
  * to send the unicast messages and multicast messages.
  *
- * It is required to set the call back  to get the notification when a packet is arrived
+ * It is required to set the call back to get the notification when a packet is arrived
  * or any error happened in the system.
  */
+
+/* singleton instance of AdapterManager */
 AdapterManager *AdapterManager::_pcz_instance{};
 
 AdapterManager & AdapterManager::Inst()
@@ -55,36 +57,36 @@ AdapterManager::~AdapterManager ()
 {
 }
 
-ErrCode AdapterManager::initialize_adapters( const uint16_t adapter_types_bitmask )
+ErrCode AdapterManager::initialize_adapters( const uint16_t u16_adapter_types_bitmask )
 {
   ErrCode ret_status = ErrCode::OK;
 
-  DBG_INFO( "AdapterManager::InitializeAdapters:%d# ENTER adapter_types[%x]", __LINE__, adapter_types_bitmask );
+  DBG_INFO( "AdapterManager::initialize_adapters:%d# ENTER adapter_types[%x]", __LINE__, u16_adapter_types_bitmask );
 
   if( INetworkPlatformFactory::GetCurrFactory() == nullptr )
   {
-    DBG_ERROR( "AdapterManager::InitializeAdapters:%d# NetworkPlatformFactory is NULL", __LINE__ );
+    DBG_ERROR( "AdapterManager::initialize_adapters:%d# NetworkPlatformFactory is NULL", __LINE__ );
     ret_status = ErrCode::ERR;
     goto exit_label_;
   }
 
-  ret_status = init_adapter( adapter_types_bitmask, k_adapter_type_ip );
+  ret_status = init_adapter( u16_adapter_types_bitmask, k_adapter_type_ip );
 
   if( ret_status != ErrCode::OK )
   {
-    DBG_ERROR( "AdapterManager::InitializeAdapters:%d# init_adapter FAILED for type[%x]", __LINE__, k_adapter_type_ip );
+    DBG_ERROR( "AdapterManager::initialize_adapters:%d# init_adapter FAILED for type[%x]", __LINE__, k_adapter_type_ip );
     goto exit_label_;
   }
 
-  ret_status = init_adapter( adapter_types_bitmask, k_adapter_type_tcp );
+  ret_status = init_adapter( u16_adapter_types_bitmask, k_adapter_type_tcp );
 
   if( ret_status != ErrCode::OK )
   {
-    DBG_ERROR( "AdapterManager::InitializeAdapters:%d# init_adapter FAILED for type[%x]", __LINE__, k_adapter_type_tcp );
+    DBG_ERROR( "AdapterManager::initialize_adapters:%d# init_adapter FAILED for type[%x]", __LINE__, k_adapter_type_tcp );
   }
 
 exit_label_:
-  DBG_INFO( "AdapterManager::InitializeAdapters:%d# EXIT", __LINE__ );
+  DBG_INFO( "AdapterManager::initialize_adapters:%d# EXIT", __LINE__ );
 
   return ( ret_status );
 }
@@ -149,12 +151,12 @@ ErrCode AdapterManager::start_adapter( const uint16_t adapter_type )
 
 ErrCode AdapterManager::stop_adapter( const uint16_t adapter_type )
 {
-  DBG_INFO( "AdapterManager::StopAdapter:%d# ENTER adapter_type[%x]", __LINE__, int(adapter_type) );
+  DBG_INFO( "AdapterManager::stop_adapter:%d# ENTER adapter_type[%x]", __LINE__, int(adapter_type) );
 
   // be very specific to stop the adapter type
   if( ( adapter_type == k_adapter_type_default ) || ( adapter_type == k_adapter_type_all ) )
   {
-    DBG_ERROR( "AdapterManager::StopAdapter:%d# Not called for specific adapter", __LINE__ );
+    DBG_ERROR( "AdapterManager::stop_adapter:%d# Not called for specific adapter", __LINE__ );
     return ( ErrCode::OK );
   }
 
@@ -171,26 +173,26 @@ ErrCode AdapterManager::stop_adapter( const uint16_t adapter_type )
 
     if( ret_status != ErrCode::OK )
     {
-      DBG_ERROR( "AdapterManager::StopAdapter:%d# StopAdapter FAILED", __LINE__ );
+      DBG_ERROR( "AdapterManager::stop_adapter:%d# stop_adapter FAILED", __LINE__ );
     }
   }
   else
   {
-    DBG_ERROR( "AdapterManager::StopAdapter:%d# get_adapter_for_type FAILED", __LINE__ );
+    DBG_ERROR( "AdapterManager::stop_adapter:%d# get_adapter_for_type FAILED", __LINE__ );
   }
 
-  DBG_INFO( "AdapterManager::StopAdapter:%d# EXIT", __LINE__ );
+  DBG_INFO( "AdapterManager::stop_adapter:%d# EXIT", __LINE__ );
 
   return ( ret_status );
 }
 
 ErrCode AdapterManager::start_servers() const
 {
-  DBG_INFO( "AdapterManager::StartServers:%d# ENTER", __LINE__ );
+  DBG_INFO( "AdapterManager::start_servers:%d# ENTER", __LINE__ );
 
   if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
   {
-    DBG_ERROR( "AdapterManager::StartServers:%d# Not called for specific adapter", __LINE__ );
+    DBG_ERROR( "AdapterManager::start_servers:%d# Not called for specific adapter", __LINE__ );
     return ( ErrCode::OK );
   }
 
@@ -206,23 +208,24 @@ ErrCode AdapterManager::start_servers() const
 
       if( ret_status != ErrCode::OK )
       {
-        DBG_ERROR( "AdapterManager::StartServers:%d# StartServer FAILED for adapter_type[%x]", __LINE__, int(1 << i) );
+        DBG_ERROR( "AdapterManager::start_servers:%d# FAILED for adapter_type[%x]", __LINE__, int(1 << i) );
       }
     }
   }
 
-  DBG_INFO( "AdapterManager::StartServers:%d# EXIT", __LINE__ );
+  DBG_INFO( "AdapterManager::start_servers:%d# EXIT", __LINE__ );
 
   return ( ret_status );
 }
 
+/* Stop all the servers */
 ErrCode AdapterManager::stop_servers() const
 {
-  DBG_INFO( "AdapterManager::StopServers:%d# ENTER", __LINE__ );
+  DBG_INFO( "AdapterManager::stop_servers:%d# ENTER", __LINE__ );
 
   if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
   {
-    DBG_ERROR( "AdapterManager::StopServers:%d# Not called for specific adapter", __LINE__ );
+    DBG_ERROR( "AdapterManager::stop_servers:%d# Not called for specific adapter", __LINE__ );
     return ( ErrCode::OK );
   }
 
@@ -238,12 +241,12 @@ ErrCode AdapterManager::stop_servers() const
 
       if( ret_status != ErrCode::OK )
       {
-        DBG_ERROR( "AdapterManager::StopServers:%d# StopServer FAILED for adapter_type[%x]", __LINE__, int(1 << i) );
+        DBG_ERROR( "AdapterManager::stop_servers:%d# StopServer FAILED for adapter_type[%x]", __LINE__, int(1 << i) );
       }
     }
   }
 
-  DBG_INFO( "AdapterManager::StopServers:%d# EXIT", __LINE__ );
+  DBG_INFO( "AdapterManager::stop_servers:%d# EXIT", __LINE__ );
 
   return ( ret_status );
 }
@@ -255,7 +258,7 @@ ErrCode AdapterManager::read_data() const
 
   if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
   {
-    DBG_ERROR( "AdapterManager::StopServers:%d# Not called for specific adapter", __LINE__ );
+    DBG_ERROR( "AdapterManager::read_data:%d# Not called for specific adapter", __LINE__ );
     return ( ErrCode::OK );
   }
 
@@ -313,7 +316,7 @@ ErrCode AdapterManager::send_unicast_data( Endpoint &endpoint, const uint8_t *da
   return ( ErrCode::OK );
 }
 
-ErrCode AdapterManager::send_multicast_data( Endpoint &endpoint, const uint8_t *data, const uint16_t data_length ) const
+ErrCode AdapterManager::send_multicast_data( Endpoint &endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length ) const
 {
   if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
   {
@@ -329,13 +332,13 @@ ErrCode AdapterManager::send_multicast_data( Endpoint &endpoint, const uint8_t *
       continue;
     }
 
-    auto adapter = get_adapter_for_type( 1 << i );
+    auto pcz_adapter = get_adapter_for_type( 1 << i );
 
-    if( adapter != nullptr )
+    if( pcz_adapter != nullptr )
     {
-      const auto sent_data_length = adapter->send_multicast_data( endpoint, data, data_length );
+      const auto sent_data_length = pcz_adapter->send_multicast_data( endpoint, pu8_data, u16_data_length );
 
-      if( ( 0 > sent_data_length ) || ( uint16_t( sent_data_length ) != data_length ) )
+      if( ( 0 > sent_data_length ) || ( uint16_t( sent_data_length ) != u16_data_length ) )
       {
         return ( ErrCode::SEND_DATA_FAILED );
       }
@@ -408,9 +411,9 @@ std::deque<Endpoint *> AdapterManager::get_endpoints_list()
 {
   std::deque<Endpoint *> cz_endpoint_list{};
 
-  for(auto & adapter : _adapters_list)
+  for(auto & pcz_adapter : _adapters_list)
   {
-    adapter->get_endpoints_list(cz_endpoint_list);
+    pcz_adapter->get_endpoints_list(cz_endpoint_list);
   }
 
   return cz_endpoint_list;
@@ -425,13 +428,13 @@ void AdapterManager::remove_adapter_network_handler( IAdapterMgrNetworkHandler *
   }
 }
 
-IAdapter * AdapterManager::get_adapter_for_type( const uint16_t adapter_type ) const
+IAdapter * AdapterManager::get_adapter_for_type( const uint16_t u16_adapter_type ) const
 {
-  for( auto &adapter : this->_adapters_list )
+  for( auto &pcz_adapter : this->_adapters_list )
   {
-    if( adapter->get_type() == adapter_type )
+    if( pcz_adapter->get_type() == u16_adapter_type )
     {
-      return ( adapter );
+      return ( pcz_adapter );
     }
   }
 
@@ -457,18 +460,18 @@ ErrCode AdapterManager::init_adapter( const uint16_t req_adapter_type, const uin
     || is_bit_set( req_adapter_type, k_adapter_type_all )
     || is_bit_set( req_adapter_type, to_init_adapter_type ) )
   {
-    auto ip_adapter = platform_factory->get_adapter( to_init_adapter_type );
+    auto pcz_ip_adapter = platform_factory->get_adapter( to_init_adapter_type );
 
-    if( ip_adapter == nullptr )
+    if( pcz_ip_adapter == nullptr )
     {
       DBG_ERROR( "AdapterManager::init_adapter:%d# No Adapter defined for adapter_type[%x]", __LINE__, int(to_init_adapter_type) );
       ret_status = ErrCode::INVALID_PARAMS;
       goto exit_label_;
     }
 
-    ip_adapter->set_adapter_event_cb( adapter_event_cb, this );
+    pcz_ip_adapter->set_adapter_event_cb( adapter_event_cb, this /* user data */ );
 
-    ret_status = ip_adapter->initialize();
+    ret_status = pcz_ip_adapter->initialize();
 
     if( ret_status != ErrCode::OK )
     {
@@ -476,7 +479,7 @@ ErrCode AdapterManager::init_adapter( const uint16_t req_adapter_type, const uin
       goto exit_label_;
     }
 
-    _adapters_list.push_back( ip_adapter );
+    _adapters_list.push_back( pcz_ip_adapter );
   }
 
 exit_label_:

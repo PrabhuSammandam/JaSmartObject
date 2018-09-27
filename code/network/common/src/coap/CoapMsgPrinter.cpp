@@ -106,12 +106,12 @@ void CoapMsgPrinter::print_coap_msg( ja_iot::network::CoapMsg &coap_msg, uint8_t
 
   printf( "[%s]", &ascii_addr[0] );
 
-  auto type_str = get_msg_type_string( coap_msg.get_type() );
-  auto code_str = get_msg_code_string( coap_msg.get_code() );
+  auto pc_type_str = get_msg_type_string( coap_msg.get_type() );
+  auto pc_code_str = get_msg_code_string( coap_msg.get_code() );
 
-  if( ( type_str != nullptr ) && ( code_str != nullptr ) )
+  if( ( pc_type_str != nullptr ) && ( pc_code_str != nullptr ) )
   {
-    printf( "t:%s c:%s i:0x%04X t:", type_str, code_str, coap_msg.get_id() );
+    printf( "t:%s c:%s i:0x%04X t:", pc_type_str, pc_code_str, coap_msg.get_id() );
 
     auto &token = coap_msg.get_token();
 
