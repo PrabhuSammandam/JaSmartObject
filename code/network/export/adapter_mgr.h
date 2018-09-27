@@ -4,9 +4,7 @@
  *  Created on: Jun 29, 2017
  *      Author: psammand
  */
-
-#ifndef NETWORK_EXPORT_ADAPTER_MGR_H_
-#define NETWORK_EXPORT_ADAPTER_MGR_H_
+#pragma once
 
 #include <functional>
 #include <end_point.h>
@@ -42,8 +40,8 @@ class IAdapterMgrNetworkHandler
 
 typedef std::vector<IAdapter *> AdapterList;
 
-typedef void ( *pfn_adapter_mgr_pkt_recvd_cb ) ( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, uint16_t data_len );
-typedef void ( *pfn_adapter_mgr_error_cb ) ( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, uint16_t data_len, base::ErrCode error );
+typedef void ( *pfn_adapter_mgr_pkt_recvd_cb ) ( void *pv_user_data, Endpoint const &rcz_end_point, const uint8_t *pu8_data, uint16_t u16_data_len );
+typedef void ( *pfn_adapter_mgr_error_cb ) ( void *pv_user_data, Endpoint const &rcz_end_point, const uint8_t *pu8_data, uint16_t u16_data_len, base::ErrCode error );
 
 class AdapterManager
 {
@@ -96,5 +94,3 @@ class AdapterManager
 };
 }
 }
-
-#endif /* NETWORK_EXPORT_ADAPTER_MGR_H_ */
