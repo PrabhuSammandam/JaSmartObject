@@ -597,48 +597,48 @@ void IpAdapterBase::init_address_change_notify_mechanism()
   do_init_address_change_notify_mechanism();
 }
 
-ErrCode IpAdapterBase::open_socket( const IpAddrFamily ip_addr_family, const bool is_multicast, IUdpSocket *udp_socket, const uint16_t port )
+ErrCode IpAdapterBase::open_socket( const IpAddrFamily ip_addr_family, const bool is_multicast, IUdpSocket *pcz_udp_socket, const uint16_t port )
 {
   ErrCode ret_status = ErrCode::OK;
   IpAddress ip_addr{ ip_addr_family };
 
-  DBG_INFO2( "ENTER family[%d], is_mcast[%d], udp_socket[%p] port[%d]", (int) ip_addr_family, is_multicast, udp_socket, port );
+  DBG_INFO2( "ENTER family[%d], is_mcast[%d], pcz_udp_socket[%p] port[%d]", (int) ip_addr_family, is_multicast, pcz_udp_socket, port );
 
-  if( udp_socket == nullptr )
+  if( pcz_udp_socket == nullptr )
   {
     DBG_ERROR2( "NULL socket" );
     ret_status = ErrCode::INVALID_PARAMS;
     goto exit_label_;
   }
 
-  if( udp_socket->OpenSocket( ip_addr_family ) != SocketError::OK )
+  if( pcz_udp_socket->OpenSocket( ip_addr_family ) != SocketError::OK )
   {
     DBG_ERROR2( "Failed to open with family[%d]", (int) ip_addr_family );
     ret_status = ErrCode::INVALID_PARAMS;
     goto exit_label_;
   }
 
-  if( udp_socket->EnablePacketInfo( true ) != SocketError::OK )
+  if( pcz_udp_socket->EnablePacketInfo( true ) != SocketError::OK )
   {
     DBG_ERROR2( "EnablePacketInfo() FAILED" );
   }
 
   if( ip_addr_family == IpAddrFamily::IPv6 )
   {
-    udp_socket->EnableIpv6Only( true );
+    pcz_udp_socket->EnableIpv6Only( true );
     DBG_INFO2( "enable_ipv6_only()" );
   }
 
   if( is_multicast && ( port != 0 ) )
   {
-    udp_socket->EnableReuseAddr( true );
+    pcz_udp_socket->EnableReuseAddr( true );
     DBG_INFO2( "enable_reuse_addr()" );
   }
 
-  if( udp_socket->BindSocket( ip_addr, port ) != SocketError::OK )
+  if( pcz_udp_socket->BindSocket( ip_addr, port ) != SocketError::OK )
   {
     DBG_ERROR2( " BindSocket FAILED with port[%d]", port );
-    udp_socket->CloseSocket();
+    pcz_udp_socket->CloseSocket();
     ret_status = ErrCode::INVALID_PARAMS;
   }
 
@@ -649,27 +649,27 @@ exit_label_:
   return ( ret_status );
 }
 
-ErrCode IpAdapterBase::open_socket2( const IpAddrFamily ip_addr_family, const bool is_multicast, IUdpSocket *udp_socket, uint16_t &port ) const
+ErrCode IpAdapterBase::open_socket2( const IpAddrFamily ip_addr_family, const bool is_multicast, IUdpSocket *pcz_udp_socket, uint16_t &ru16_port ) const
 {
-  DBG_INFO2( "ENTER family[%d], is_mcast[%d], udp_socket[%p] port[%d]", (int) ip_addr_family, is_multicast, udp_socket, port );
-  auto ret_status = open_socket( ip_addr_family, is_multicast, udp_socket, port );
+  DBG_INFO2( "ENTER family[%d], is_mcast[%d], pcz_udp_socket[%p] port[%d]", (int) ip_addr_family, is_multicast, pcz_udp_socket, ru16_port );
+  auto ret_status = open_socket( ip_addr_family, is_multicast, pcz_udp_socket, ru16_port );
 
   if( ret_status != ErrCode::OK )
   {
-    DBG_ERROR2( "Failed to open socket with port[%d], family[%d], mcast[%d]", port, int(ip_addr_family), is_multicast );
+    DBG_ERROR2( "Failed to open socket with port[%d], family[%d], mcast[%d]", ru16_port, int(ip_addr_family), is_multicast );
     DBG_ERROR2( "Retrying with port 0" );
-    ret_status = open_socket( ip_addr_family, is_multicast, udp_socket, 0 );
+    ret_status = open_socket( ip_addr_family, is_multicast, pcz_udp_socket, 0 );
 
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR2(
-        "Failed to open socket after retrying with port[%d], family[%d], mcast[%d]", port, int(ip_addr_family), is_multicast );
+        "Failed to open socket after retrying with port[%d], family[%d], mcast[%d]", ru16_port, int(ip_addr_family), is_multicast );
       goto exit_label_;
     }
   }
 
-  port = udp_socket->GetLocalPort();
-  DBG_INFO2( "Opened socket with ****************** port[%d] ****************, family[%d], mcast[%d]", port, (int) ip_addr_family, is_multicast );
+  ru16_port = pcz_udp_socket->GetLocalPort();
+  DBG_INFO2( "Opened socket with ****************** port[%d] ****************, family[%d], mcast[%d]", ru16_port, (int) ip_addr_family, is_multicast );
 
 exit_label_:
 
@@ -775,6 +775,10 @@ ErrCode IpAdapterBase::add_socket( uint16_t socket_type, uint16_t port )
     return ( ret_status );
   }
 
+  /*
+    below block updates the port just opened above. This case will come when the user didn't set the default ports for the 
+unicast.
+*/
   if( !is_bit_set( socket_type, k_network_flag_multicast ) )
   {
     auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
@@ -1027,25 +1031,25 @@ void IpAdapterBase::delete_msg( void *pv_adapter_q_msg )
   DBG_INFO2( " EXIT" );
 }
 
-void join_mcast_group( IUdpSocket *udp_socket, IpAddress &ip_multicast_addr, const uint32_t if_index )
+void join_mcast_group( IUdpSocket *pcz_udp_socket, IpAddress &rcz_ip_multicast_addr, const uint32_t u32_if_index )
 {
-  DBG_INFO2( "ENTER udp_socket[%p], if_index[%d]", udp_socket, if_index );
+  DBG_INFO2( "ENTER pcz_udp_socket[%p], if_index[%d]", pcz_udp_socket, u32_if_index );
 
-  if( udp_socket != nullptr )
+  if( pcz_udp_socket != nullptr )
   {
 #ifdef _NETWORK_DEBUG_
     uint8_t ascii_addr[46] = { 0 };
 
-    ip_multicast_addr.to_string( &ascii_addr[0], 46 );
+    rcz_ip_multicast_addr.to_string( &ascii_addr[0], 46 );
 
-    DBG_INFO2( "Joining multicast group for addr %s at if_index[%d]", &ascii_addr[0], if_index );
+    DBG_INFO2( "Joining multicast group for addr %s at if_index[%d]", &ascii_addr[0], u32_if_index );
 #endif /* _NETWORK_DEBUG_ */
 
-    if( udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index ) != SocketError::OK )
+    if( pcz_udp_socket->JoinMulticastGroup( rcz_ip_multicast_addr, u32_if_index ) != SocketError::OK )
     {
-      udp_socket->LeaveMulticastGroup( ip_multicast_addr, if_index );
+      pcz_udp_socket->LeaveMulticastGroup( rcz_ip_multicast_addr, u32_if_index );
 
-      udp_socket->JoinMulticastGroup( ip_multicast_addr, if_index );
+      pcz_udp_socket->JoinMulticastGroup( rcz_ip_multicast_addr, u32_if_index );
     }
   }
   else

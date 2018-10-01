@@ -168,7 +168,7 @@ SocketError UdpSocketImplLinux::LeaveMulticastGroup( IpAddress &group_address, u
   return ( SocketError::OK );
 }
 
-SocketError UdpSocketImplLinux::SelectMulticastInterface( IpAddress &group_address, uint32_t if_index )
+SocketError UdpSocketImplLinux::SelectMulticastInterface( IpAddress &rcz_group_address, uint32_t if_index )
 {
   if( socket_fd_ < 0 )
   {
@@ -179,7 +179,7 @@ SocketError UdpSocketImplLinux::SelectMulticastInterface( IpAddress &group_addre
   {
 	struct ip_mreqn mreq {};
 
-	mreq.imr_multiaddr.s_addr = htonl( group_address.as_u32() );
+	mreq.imr_multiaddr.s_addr = htonl( rcz_group_address.as_u32() );
 	mreq.imr_address.s_addr = INADDR_ANY;
 	mreq.imr_ifindex = if_index;
 

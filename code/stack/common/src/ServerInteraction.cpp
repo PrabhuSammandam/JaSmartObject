@@ -318,11 +318,11 @@ CoapMsg * ServerInteraction::get_first_response_block( CoapMsg *pcz_response )
   return ( pcz_first_response );
 }
 
-ServerResponse* create_server_response_with_code( ServerRequest *pcz_server_request, uint8_t code )
+ServerResponse* create_server_response_with_code( ServerRequest *pcz_server_request, uint8_t u8_msg_code )
 {
   auto server_response = new ServerResponse{};
 
-  server_response->set_code( code );
+  server_response->set_code( u8_msg_code );
   server_response->set_token( pcz_server_request->get_token() );
   server_response->set_endpoint( pcz_server_request->get_endpoint() );
   /* type and id will be set in the send_response api */

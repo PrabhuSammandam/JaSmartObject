@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 project(libnetwork)
 
 add_definitions(-D_LITTLE_ENDIAN_ -D_WIN32_WINNT=0x0600)
-#add_definitions(-D_DEBUG_ -D_NETWORK_DEBUG_)
+add_definitions(-D_DEBUG_ -D_NETWORK_DEBUG_)
 
 if(ADAPTER STREQUAL IP)
 	message("IP Adapter selected")

@@ -26,23 +26,29 @@ namespace ja_iot
 
     class INetworkPlatformFactory
     {
-    public:
+      public:
 
-      virtual ~INetworkPlatformFactory()
-      {
-      }
+        virtual ~INetworkPlatformFactory () {
+        }
 
-      static INetworkPlatformFactory* create_factory(NetworkPlatform platform);
-      static INetworkPlatformFactory* GetCurrFactory() { return curr_factory_; }
-      static void set_curr_factory(INetworkPlatformFactory* curr_factory) { curr_factory_ = curr_factory; }
+        static INetworkPlatformFactory* create_set_factory( NetworkPlatform platform );
+        static INetworkPlatformFactory* create_factory( NetworkPlatform platform );
+        static INetworkPlatformFactory* GetCurrFactory()
+        {
+          return ( curr_factory_ );
+        }
+        static void set_curr_factory( INetworkPlatformFactory *curr_factory )
+        {
+          curr_factory_ = curr_factory;
+        }
 
-      virtual IInterfaceMonitor* get_interface_monitor() = 0;
-      virtual IAdapter* get_adapter(uint16_t adapter_type) = 0;
-      virtual IUdpSocket* AllocSocket() = 0;
-      virtual void free_socket(IUdpSocket* socket) = 0;
+        virtual IInterfaceMonitor* get_interface_monitor() = 0;
+        virtual IAdapter*          get_adapter( uint16_t adapter_type ) = 0;
+        virtual IUdpSocket*        AllocSocket() = 0;
+        virtual void               free_socket( IUdpSocket *socket ) = 0;
 
-    private:
-      static INetworkPlatformFactory* curr_factory_;
+      private:
+        static INetworkPlatformFactory *curr_factory_;
     };
   }
 }

@@ -31,25 +31,17 @@ void adapter_mgr_pkt_recvd_cb( void *pv_user_data, Endpoint const &end_point, co
 }
 void init_adapter_mgr()
 {
-  const auto mem_allocator = MemAllocatorFactory::create_mem_allocator( MemAlloctorType::kLinux );
-
-  if( mem_allocator == nullptr )
+  if( MemAllocatorFactory::create_set_mem_allocator( MemAlloctorType::kLinux ) == nullptr )
   {
     DBG_ERROR( "main:%d# Failed to allocate the mem allocator", __LINE__ );
   }
 
-  MemAllocatorFactory::set( mem_allocator );
-
   OsalMgr::Inst()->Init();
 
-  const auto platform_factory = INetworkPlatformFactory::create_factory( NetworkPlatform::kLinux );
-
-  if( platform_factory == nullptr )
+  if( INetworkPlatformFactory::create_set_factory( NetworkPlatform::kLinux ) == nullptr )
   {
     DBG_ERROR( "main:%d# INetworkPlatformFactory NULL for WINDOWS platform", __LINE__ );
   }
-
-  INetworkPlatformFactory::set_curr_factory( platform_factory );
 
   auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
 
@@ -68,9 +60,9 @@ void init_adapter_mgr()
 
 void init_resources()
 {
-	auto switch_res = new BinarySwitchResource{};
+  auto switch_res = new BinarySwitchResource {};
 
-	ResourceMgr::inst().add_resource(switch_res);
+  ResourceMgr::inst().add_resource( switch_res );
 }
 
 int main( int argc, char *argv[] )

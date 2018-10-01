@@ -64,6 +64,8 @@ namespace ja_iot
       ~MemAllocatorFactory();
 
       static IMemAllocator* create_mem_allocator(MemAlloctorType mem_allocator_type);
+            static IMemAllocator* create_set_mem_allocator(MemAlloctorType mem_allocator_type);
+
       static IMemAllocator& get() { return *cur_mem_allocator_factory_; }
       static void set(IMemAllocator* p_mem_allocator_factory) { cur_mem_allocator_factory_ = p_mem_allocator_factory; }
 

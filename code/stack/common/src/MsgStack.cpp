@@ -87,11 +87,11 @@ MsgStack & MsgStack::inst()
   return ( *_pcz_instance );
 }
 
-void MsgStack::initialize( const uint16_t adapter_type )
+void MsgStack::initialize( const uint16_t adapter_types )
 {
   AdapterManager::Inst().set_packet_received_cb( packet_received_callback, this );
 
-  auto ret_status = AdapterManager::Inst().initialize_adapters( adapter_type );
+  auto ret_status = AdapterManager::Inst().initialize_adapters( adapter_types );
 
   if( ret_status != ErrCode::OK )
   {
@@ -100,7 +100,7 @@ void MsgStack::initialize( const uint16_t adapter_type )
 
   DBG_INFO2( "Initialized" );
 
-  ret_status = AdapterManager::Inst().start_adapter( adapter_type );
+  ret_status = AdapterManager::Inst().start_adapter( adapter_types );
 
   if( ret_status != ErrCode::OK )
   {
@@ -507,11 +507,11 @@ void client_receive_response_msg( CoapMsg *client_response_msg )
 /**************************************************************************************************************/
 /**************************************** PRIVATE CALLBACK FUNCTIONS ******************************************/
 /**************************************************************************************************************/
-void packet_received_callback( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, const uint16_t data_len )
+void packet_received_callback( void *pv_user_data, Endpoint const &rcz_end_point, const uint8_t *pu8_data, const uint16_t u16_data_len )
 {
   if( pv_user_data )
   {
-    const auto new_raw_data_msg = new EndpointDataStackEvent{ end_point, const_cast<uint8_t *>( data ), data_len };
+    const auto new_raw_data_msg = new EndpointDataStackEvent{ rcz_end_point, const_cast<uint8_t *>( pu8_data ), u16_data_len };
     // cout << "received packet of length " << data_len << endl;
     static_cast<MsgStack *>( pv_user_data )->send_stack_event( new_raw_data_msg );
   }
