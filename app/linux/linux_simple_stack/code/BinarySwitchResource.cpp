@@ -39,14 +39,14 @@ uint8_t BinarySwitchResource::get_discovery_representation( ResRepresentation &r
 
 uint8_t BinarySwitchResource::handle_get( Interaction *interaction )
 {
-  auto request             = interaction->get_server_request();
+  auto pcz_server_request  = interaction->get_server_request();
   auto interface_requested = ResInterfaceType::Actuator;
 
-  if( request->get_option_set().get_uri_querys_count() > 0 )
+  if( pcz_server_request->get_option_set().get_uri_querys_count() > 0 )
   {
-    QueryContainer query_container{};
+    QueryContainer query_container {};
 
-    query_container.parse( request->get_option_set().get_uri_querys_list() );
+    query_container.parse( pcz_server_request->get_option_set().get_uri_querys_list() );
 
     if( check_type_query( query_container ) != STACK_STATUS_OK )
     {
@@ -66,23 +66,23 @@ uint8_t BinarySwitchResource::handle_get( Interaction *interaction )
 
   ResRepresentation rep;
 
-	if (interface_requested == ResInterfaceType::BaseLine)
-	{
-		rep.add("if", get_interfaces());
-		rep.add("rt", get_types());
-	}
+  if( interface_requested == ResInterfaceType::BaseLine )
+  {
+    rep.add( "if", get_interfaces() );
+    rep.add( "rt", get_types() );
+  }
 
-  rep.add<bool>( "value", _value );
+  rep.add < bool > ( "value", _value );
 
-  ResRepresentation representation{};
+  ResRepresentation representation {};
   representation.add( "", std::move( rep ) );
 
-  uint8_t *buffer;
-  uint16_t buffer_length;
+  uint8_t *         buffer;
+  uint16_t          buffer_length;
 
   if( CborCodec::encode( representation, buffer, buffer_length ) == ErrCode::OK )
   {
-    auto response = new ServerResponse{};
+    auto response = new ServerResponse {};
     response->set_code( COAP_MSG_CODE_CONTENT_205 );
     response->get_option_set().set_content_format( COAP_CONTENT_FORMAT_CBOR );
     response->set_payload( buffer, buffer_length );

@@ -4,6 +4,9 @@
 
 namespace ja_iot {
 namespace stack {
+
+#define REPRESENTATION_PRETTY_PRINT
+  
 ResRepresentation::~ResRepresentation ()
 {
   for( auto it = _props.cbegin(); it != _props.cend(); ++it )
