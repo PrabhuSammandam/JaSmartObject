@@ -1,8 +1,0 @@
-<testsuites>
-	<testsuite name="libosal_mutex_suite" tests="1">
-		<testcase classname="libosal_mutex_suite" name="mutex_test_1"/>
-	</testsuite>
-	<testsuite name="libosal_semaphore_suite" tests="1">
-		<testcase classname="libosal_semaphore_suite" name="semaphore_test_1"/>
-	</testsuite>
-</testsuites>

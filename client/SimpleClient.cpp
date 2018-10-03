@@ -9,6 +9,7 @@
 #define DBG_WARN( format, ... ) printf( format "\n", ## __VA_ARGS__ )
 #define DBG_ERROR( format, ... ) printf( format "\n", ## __VA_ARGS__ )
 #define DBG_FATAL( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+
 #include "IMemAllocator.h"
 #include "OsalMgr.h"
 #include "i_nwk_platform_factory.h"
@@ -49,7 +50,7 @@ class CommandLineArgs
 
 void init_adapter_mgr()
 {
-  const auto mem_allocator = MemAllocatorFactory::create_set_mem_allocator(MemAlloctorType::kLinux);
+  const auto mem_allocator = MemAllocatorFactory::create_set_mem_allocator( MemAlloctorType::kLinux );
 
   if( mem_allocator == nullptr )
   {
@@ -59,7 +60,7 @@ void init_adapter_mgr()
 
   OsalMgr::Inst()->Init();
 
-  const auto platform_factory = INetworkPlatformFactory::create_set_factory(NetworkPlatform::kLinux );
+  const auto platform_factory = INetworkPlatformFactory::create_set_factory( NetworkPlatform::kLinux );
 
   if( platform_factory == nullptr )
   {
@@ -219,13 +220,15 @@ bool parse_endpoint( std::string &endpoint_string, CommandLineArgs &commands )
 
 bool parse( std::string &endpoint_string, CommandLineArgs &commands )
 {
-  std::string regex_string( "(.*)://(.*):(\\d+)(/.*)" );
+  std::string regex_pattern( "(.*)://(.*):(\\d+)(/.*)" );
   std::cmatch m;
-  std::regex  scheme_ipv4( regex_string );
+  std::regex  scheme_ipv4( regex_pattern );
 
+  /* check whether passed string is in valid URI format ie coap://XXX.XXX.XXX.XXX:<port>/<resource path> for IPV4 */
   if( std::regex_match( endpoint_string.c_str(), m, scheme_ipv4 ) )
   {
-    auto scheme = m.str( 1 );
+	  /* check for the first group in the reg exp string */
+    auto scheme = m.str( 1 );// get the scheme
 
     if( !scheme.empty() )
     {
@@ -240,24 +243,27 @@ bool parse( std::string &endpoint_string, CommandLineArgs &commands )
       }
       else
       {
+    	  /* invalid scheme passed ie it is not "coap" or "coaps" */
         return ( false );
       }
     }
 
-    auto ip = m.str( 2 );
+    auto ip = m.str( 2 );// get the IP address
 
     if( !ip.empty() )
     {
       std::cmatch m1;
-      std::regex  ip6_regex( "\\[(.*)\\]" );
+      std::regex  ip6_regex_pattern( "\\[(.*)\\]" );
 
-      if( std::regex_match( ip.c_str(), m1, ip6_regex ) )
+      /* check for IPV6 address. */
+      if( std::regex_match( ip.c_str(), m1, ip6_regex_pattern ) )
       {
-        auto ipv6_addr = m1.str( 1 );
+        auto ipv6_addr = m1.str( 1 );// get the IPV6 address
         commands.network_flag |= ( k_network_flag_ipv6 );
         commands.ip_addr.set_addr_family( IpAddrFamily::IPv6 );
         auto success = IpAddress::from_string( ipv6_addr.c_str(), IpAddrFamily::IPv6, commands.ip_addr );
 
+        /* check if it is multicast address */
         if( success )
         {
           if( commands.ip_addr.is_multicast() )
@@ -290,33 +296,33 @@ bool parse( std::string &endpoint_string, CommandLineArgs &commands )
       }
     }
 
-    auto port = m.str( 3 );
+    auto port = m.str( 3 );// get the port
 
     if( !port.empty() )
     {
       commands.port = std::stoi( port );
     }
 
-		auto path_string = m.str(4);
+    auto path_string = m.str( 4 );// get the resource pathl
 
-		std::replace(path_string.begin(), path_string.end(), ';', '&');
+    std::replace( path_string.begin(), path_string.end(), ';', '&' );
 
-		cout << "Path string " << path_string << endl;
+    cout << "Path string " << path_string << endl;
 
-		if (!path_string.empty())
-		{
-			const auto start_eq = path_string.find_first_of('?');
+    if( !path_string.empty() )
+    {
+      const auto start_eq = path_string.find_first_of( '?' );
 
-			if ((start_eq == std::string::npos) || (start_eq == 0) || (start_eq == (path_string.length() - 1)))
-			{
-				commands.path = std::move(path_string);
-			}
-			else
-			{
-				commands.path = path_string.substr(0, start_eq);
-				commands.query = path_string.substr(start_eq + 1);
-			}
-		}
+      if( ( start_eq == std::string::npos ) || ( start_eq == 0 ) || ( start_eq == ( path_string.length() - 1 ) ) )
+      {
+        commands.path = std::move( path_string );
+      }
+      else
+      {
+        commands.path  = path_string.substr( 0, start_eq );
+        commands.query = path_string.substr( start_eq + 1 );
+      }
+    }
 
     return ( true );
   }
@@ -344,10 +350,10 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
 {
   try
   {
-    CmdLine cmd_line{ "Simple Client", ' ', "0.0" };
+    CmdLine                  cmd_line{ "Simple Client", ' ', "0.0" };
 
-    SwitchArg non_msg{ "", "non", "Use NON message type", cmd_line };
-    SwitchArg obs{ "", "obs", "Observe the resource", cmd_line };
+    SwitchArg                non_msg{ "", "non", "Use NON message type", cmd_line };
+    SwitchArg                obs{ "", "obs", "Observe the resource", cmd_line };
 
     std::vector<std::string> method_values{};
     method_values.push_back( "GET" );
@@ -357,13 +363,13 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
     ValuesConstraint<string> method_allowed_values( method_values );
 
 
-    ValueArg<std::string> method{ "m",
-                                  "method",
-                                  "Method to send",
-                                  true,
-                                  "GET",
-                                  &method_allowed_values,
-                                  cmd_line };
+    ValueArg<std::string>    method{ "m",
+                                     "method",
+                                     "Method to send",
+                                     true,
+                                     "GET",
+                                     &method_allowed_values,
+                                     cmd_line };
 
     ValueArg<std::string> token{ "t",
                                  "token",
@@ -381,16 +387,16 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
                                    "string",
                                    cmd_line };
 
-    std::vector<uint16_t> block2_values{ 32, 64, 128, 256, 512, 1024 };
+    std::vector<uint16_t>      block2_values{ 32, 64, 128, 256, 512, 1024 };
     ValuesConstraint<uint16_t> block2_allowed_values( block2_values );
 
-    ValueArg<uint16_t> block2_size{ "",
-                                    "b2",
-                                    "Response block size",
-                                    false,
-                                    0,
-                                    &block2_allowed_values,
-                                    cmd_line };
+    ValueArg<uint16_t>         block2_size{ "",
+                                            "b2",
+                                            "Response block size",
+                                            false,
+                                            0,
+                                            &block2_allowed_values,
+                                            cmd_line };
 
     std::vector<std::string> accept_format_values{};
     accept_format_values.push_back( "plain" );
@@ -400,13 +406,13 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
     accept_format_values.push_back( "cbor" );
     ValuesConstraint<std::string> accept_format_allowed_values( accept_format_values );
 
-    ValueArg<std::string> accept_format{ "",
-                                         "accept",
-                                         "Accept format for content",
-                                         false,
-                                         "none",
-                                         &accept_format_allowed_values,
-                                         cmd_line };
+    ValueArg<std::string>         accept_format{ "",
+                                                 "accept",
+                                                 "Accept format for content",
+                                                 false,
+                                                 "none",
+                                                 &accept_format_allowed_values,
+                                                 cmd_line };
 
     UnlabeledValueArg<std::string> endpoint{ "endpoint", "Endpoint to send message", true, "coap://", "endpoint", cmd_line };
 
@@ -442,36 +448,34 @@ ja_iot::osal::Semaphore *cb_sem = nullptr;
 
 void client_response_callback( ClientResponse *client_response, uint8_t status )
 {
-
   if( status == CLIENT_RESPONSE_STATUS_OK )
   {
-  cout << "got response" << endl;
+    cout << "got response" << endl;
 
     if( ( client_response != nullptr )
       && ( client_response->get_payload() != nullptr )
       && client_response->get_payload_len() )
     {
-			auto& option_set = client_response->get_option_set();
+      auto &option_set = client_response->get_option_set();
 
-			if (option_set.get_content_format() == COAP_CONTENT_FORMAT_CBOR)
-			{
-				ResRepresentation representation{};
+      if( option_set.get_content_format() == COAP_CONTENT_FORMAT_CBOR )
+      {
+        ResRepresentation representation{};
 
-				if (CborCodec::decode(client_response->get_payload(), client_response->get_payload_len(), representation) == ErrCode::OK)
-				{
-				  cout << "respresentation print" << endl;
+        if( CborCodec::decode( client_response->get_payload(), client_response->get_payload_len(), representation ) == ErrCode::OK )
+        {
+          cout << "respresentation print" << endl;
 
-					representation.print();
-				}
-
-			}
-			else
-			{
-				std::string response{ (char *)client_response->get_payload(), client_response->get_payload_len() };
-				printf("Got Response :\n");
-				printf("--------------\n");
-				printf("%s\n", response.c_str());
-			}
+          representation.print();
+        }
+      }
+      else
+      {
+        std::string response{ (char *) client_response->get_payload(), client_response->get_payload_len() };
+        printf( "Got Response :\n" );
+        printf( "--------------\n" );
+        printf( "%s\n", response.c_str() );
+      }
     }
   }
   else if( status == CLIENT_RESPONSE_STATUS_REJECTED )
@@ -496,7 +500,7 @@ int main( int argc, char *argv[] )
   MsgStack::inst().initialize( k_adapter_type_ip );
 
   Endpoint endpoint{ k_adapter_type_ip, commands.network_flag, commands.port, 0, commands.ip_addr };
-  Client client{};
+  Client   client{};
 
   if( commands.method == COAP_MSG_CODE_GET )
   {
@@ -505,10 +509,10 @@ int main( int argc, char *argv[] )
     get_request_info._block2_size   = commands.block2_size;
     get_request_info._accept_format = commands.accept_format;
 
-		if (!commands.query.empty())
-		{
-			get_request_info._uri_query = commands.query;
-		}
+    if( !commands.query.empty() )
+    {
+      get_request_info._uri_query = commands.query;
+    }
 
     client.get( get_request_info );
   }
@@ -520,46 +524,46 @@ int main( int argc, char *argv[] )
     put_request_info._accept_format  = commands.accept_format;
     put_request_info._content_format = COAP_CONTENT_FORMAT_PLAIN;
 
-		if (!commands.query.empty())
-		{
-			put_request_info._uri_query = commands.query;
-		}
+    if( !commands.query.empty() )
+    {
+      put_request_info._uri_query = commands.query;
+    }
 
     // std::string payload = "CoAP makes use of two message types, requests and responses, using a simple, binary, base header format. The base header may be followed by options in an optimized Type-Length-Value format. CoAP is by default bound to UDP and optionally to DTLS, providing a high level of communications security.";
     put_request_info.set_payload( commands.payload );
 
     client.put( put_request_info );
   }
-	else if (commands.method == COAP_MSG_CODE_POST)
-	{
-		PostRequestInfo put_request_info{ endpoint, commands.path, client_response_callback };
-		put_request_info._msg_type = commands.is_non ? COAP_MSG_TYPE_NON : COAP_MSG_TYPE_CON;
-		put_request_info._block2_size = commands.block2_size;
-		put_request_info._accept_format = commands.accept_format;
-		put_request_info._content_format = COAP_CONTENT_FORMAT_CBOR;
+  else if( commands.method == COAP_MSG_CODE_POST )
+  {
+    PostRequestInfo put_request_info{ endpoint, commands.path, client_response_callback };
+    put_request_info._msg_type       = commands.is_non ? COAP_MSG_TYPE_NON : COAP_MSG_TYPE_CON;
+    put_request_info._block2_size    = commands.block2_size;
+    put_request_info._accept_format  = commands.accept_format;
+    put_request_info._content_format = COAP_CONTENT_FORMAT_CBOR;
 
-		if (!commands.query.empty())
-		{
-			put_request_info._uri_query = commands.query;
-		}
+    if( !commands.query.empty() )
+    {
+      put_request_info._uri_query = commands.query;
+    }
 
-		uint8_t *buffer;
-		uint16_t buffer_length;
+    uint8_t *         buffer;
+    uint16_t          buffer_length;
 
-		ResRepresentation rep{};
-		rep.add("value", true);
+    ResRepresentation rep{};
+    rep.add( "value", true );
 
-		ResRepresentation representation{};
-		representation.add("", std::move(rep));
+    ResRepresentation representation{};
+    representation.add( "", std::move( rep ) );
 
-		CborCodec::encode(representation, buffer, buffer_length);
+    CborCodec::encode( representation, buffer, buffer_length );
 
-		// std::string payload = "CoAP makes use of two message types, requests and responses, using a simple, binary, base header format. The base header may be followed by options in an optimized Type-Length-Value format. CoAP is by default bound to UDP and optionally to DTLS, providing a high level of communications security.";
-		put_request_info._payload_buf = (int8_t*)buffer;
-		put_request_info._payload_buf_len = buffer_length;
+    // std::string payload = "CoAP makes use of two message types, requests and responses, using a simple, binary, base header format. The base header may be followed by options in an optimized Type-Length-Value format. CoAP is by default bound to UDP and optionally to DTLS, providing a high level of communications security.";
+    put_request_info._payload_buf     = (int8_t *) buffer;
+    put_request_info._payload_buf_len = buffer_length;
 
-		client.post(put_request_info);
-	}
+    client.post( put_request_info );
+  }
 
   cb_sem = OsalMgr::Inst()->alloc_semaphore();
 
