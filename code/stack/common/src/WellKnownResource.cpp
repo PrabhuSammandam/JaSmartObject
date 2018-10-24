@@ -7,7 +7,7 @@
 #include "StackConsts.h"
 #include "OsalTimer.h"
 #include "StackEvents.h"
-#include "cbor/CborCodec.h"
+#include "CborCodec.h"
 #include "ErrCode.h"
 
 using namespace ja_iot::osal;

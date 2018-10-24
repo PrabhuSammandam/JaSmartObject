@@ -2,7 +2,7 @@
 #include "ObserverMgr.h"
 #include "base_utils.h"
 #include "StackConsts.h"
-#include "cbor/CborCodec.h"
+#include "CborCodec.h"
 #include        "ErrCode.h"
 
 namespace ja_iot {

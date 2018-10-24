@@ -10,7 +10,7 @@ enum class SimpleStackMsgType : uint8_t
 {
   NONE,
   ENDPOINT_DATA,
-  SEND_SERVER_RESPONSE,
+  SERVER_SEND_RESPONSE,
   CLIENT_SEND_REQUEST,
   HEART_BEAT_TIMER
 };
@@ -50,7 +50,7 @@ class SendServerResponseStackEvent : public StackEvent
 {
   public:
     SendServerResponseStackEvent( ServerResponse *server_res ) :
-      StackEvent{ SimpleStackMsgType::SEND_SERVER_RESPONSE }, _server_response{ server_res }
+      StackEvent{ SimpleStackMsgType::SERVER_SEND_RESPONSE }, _server_response{ server_res }
     {
     }
 

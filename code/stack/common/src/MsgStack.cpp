@@ -47,20 +47,21 @@ using namespace ja_iot::stack;
 extern "C" uint32_t system_get_free_heap_size();
 #endif
 
-void packet_received_callback( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, uint16_t data_len );
-void stack_task_handle_msg_cb( void *pv_task_arg, void *pv_user_data );
-void stack_task_delete_msg_cb( void *pv_task_arg, void *pv_user_data );
-void heart_beat_timer_cb( void *user_param1, void *user_param2 );
+static void packet_received_callback( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, uint16_t data_len );
+static void STACK_TASK_handle_msg_cb( void *pv_task_arg, void *pv_user_data );
+static void STACK_TASK_delete_msg_cb( void *pv_task_arg, void *pv_user_data );
+static void heart_beat_timer_cb( void *user_param1, void *user_param2 );
 
-void receive_msg( ja_iot::network::CoapMsg *in_msg );
+void receive_msg( CoapMsg *in_msg );
 void server_receive_request_msg( CoapMsg *server_request_msg );
 void receive_empty_msg( CoapMsg *empty_msg );
 void client_receive_response_msg( CoapMsg *client_response_msg );
-void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg );
-void handle_stack_event_send_server_response( ServerResponse *server_response );
-void handle_stack_event_heart_beat();
-void handle_stack_event_endpoint_data( EndpointDataStackEvent *pv_stack_msg );
-void handle_stack_event_send_client_request( ClientRequest *client_request, client_response_cb response_cb );
+void receive_stack_event( StackEvent *pv_stack_msg );
+
+void HANDLE_STACK_EVENT_send_server_response( ServerResponse *server_response );
+void HANDLE_STACK_EVENT_heart_beat();
+void HANDLE_STACK_EVENT_receive_endpoint_data( EndpointDataStackEvent *pv_stack_msg );
+void HANDLE_STACK_EVENT_send_client_request( ClientRequest *client_request, client_response_cb response_cb );
 
 namespace ja_iot {
 namespace stack {
@@ -122,8 +123,8 @@ void MsgStack::initialize( const uint16_t adapter_types )
 
   _task->Init( { SIMPLE_STACK_TASK_NAME, SIMPLE_STACK_TASK_PRIORITY,
                  SIMPLE_STACK_TASK_STACK_SIZE, &_task_msg_q,
-                 stack_task_handle_msg_cb, this,
-                 stack_task_delete_msg_cb, this } );
+                 STACK_TASK_handle_msg_cb, this,
+                 STACK_TASK_delete_msg_cb, this } );
 
   _task->Start();
 
@@ -133,7 +134,7 @@ void MsgStack::initialize( const uint16_t adapter_types )
   _heart_beat_timer->start();
 }
 
-void MsgStack::send_stack_event( StackEvent *pcz_stack_msg ) 
+void MsgStack::send_stack_event( StackEvent *pcz_stack_msg )
 {
   if( pcz_stack_msg != nullptr )
   {
@@ -143,12 +144,17 @@ void MsgStack::send_stack_event( StackEvent *pcz_stack_msg )
 }
 }
 
-void handle_stack_event_heart_beat()
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ STACK MESSAGE HANDLING FUNCTIONS {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+
+void HANDLE_STACK_EVENT_heart_beat()
 {
   auto &i_store = InteractionStore::inst();
 
   i_store.check_remove_expired_server_exchanges();
   i_store.remove_expired_server_interaction();
+
   // i_store.print_server_exchanges();
   // i_store.print_server_interactions();
   //
@@ -157,23 +163,21 @@ void handle_stack_event_heart_beat()
 }
 
 /*
-This API is used by the client to send the request.
-The request may be unicast or multicast request. Then handling of the request will be different  based on the 
-request type.
-
-1. UNICAST request
-2. MULTICAST request
-
-*/
-void handle_stack_event_send_client_request( ClientRequest *client_request, client_response_cb response_cb )
+ * This API is used by the client to send the request.
+ * The request may be unicast or multicast request. Then handling of the request will be different based on the
+ * request type.
+ *
+ * 1. UNICAST request
+ * 2. MULTICAST request
+ *
+ */
+void HANDLE_STACK_EVENT_send_client_request( ClientRequest *client_request, client_response_cb response_cb )
 {
   if( client_request->get_endpoint().is_multicast() )
   {
-    auto mcast_client_interaction = new ja_iot::stack::MulticastClientInteraction{ client_request };
+    auto mcast_client_interaction = InteractionStore::inst().create_multicast_client_interaction( client_request );
+
     mcast_client_interaction->set_response_cb( response_cb );
-
-    InteractionStore::inst().get_mcast_interaction_list().push_back( mcast_client_interaction );
-
     mcast_client_interaction->send_request();
   }
   else
@@ -186,7 +190,14 @@ void handle_stack_event_send_client_request( ClientRequest *client_request, clie
   }
 }
 
-void handle_stack_event_endpoint_data( EndpointDataStackEvent *pv_stack_msg )
+/**
+ * Handles the received data from the lower layer.
+ *
+ * This api performs all basic coap related validation of messages.
+ *
+ * @param pv_stack_msg
+ */
+void HANDLE_STACK_EVENT_receive_endpoint_data( EndpointDataStackEvent *pv_stack_msg )
 {
   if( ( pv_stack_msg == nullptr ) || ( pv_stack_msg->data == nullptr ) || ( pv_stack_msg->data_len == 0 ) )
   {
@@ -198,10 +209,12 @@ void handle_stack_event_endpoint_data( EndpointDataStackEvent *pv_stack_msg )
   auto is_multicast_msg = pv_stack_msg->endpoint.is_multicast();
   CoapMsgHdr coap_msg_hdr{};
 
+  /* parse the coap message headers and get the basic information about the message */
   auto ret_status = CoapMsgCodec::parse_coap_header( pv_stack_msg->data, pv_stack_msg->data_len, coap_msg_hdr );
 
   if( ret_status == ErrCode::MSG_FORMAT_ERROR )
   {
+    /* received message is not valid and there may be some failure. */
     if( !is_multicast_msg && coap_msg_hdr.is_confirmable() && coap_msg_hdr.has_mid() )
     {
       /* reject erroneous reliably transmitted message as mandated by CoAP spec */
@@ -222,7 +235,7 @@ void handle_stack_event_endpoint_data( EndpointDataStackEvent *pv_stack_msg )
     return;
   }
 
-  /* if token is zero length do not process */
+  /* if the message is not EMPTY message and if token is zero length do not process */
   if( !coap_msg_hdr.is_empty_msg() && ( coap_msg_hdr._token_len == 0 ) )
   {
     if( !is_multicast_msg )
@@ -269,13 +282,33 @@ void handle_stack_event_endpoint_data( EndpointDataStackEvent *pv_stack_msg )
 
   // CoapMsgPrinter::print_coap_msg( *coap_msg, 0 );
 
-  receive_msg( coap_msg );
+  receive_msg( coap_msg );// api common for both client and server
   delete[] pv_stack_msg->data;
 }
 
-/**********************************************************************************************************************/
-/************************************* COMMON FUNCTIONS START *********************************************************/
-/**********************************************************************************************************************/
+void HANDLE_STACK_EVENT_send_server_response( ServerResponse *server_response )
+{
+  if( server_response != nullptr )
+  {
+    /* find the server interaction based on the token value */
+    auto server_interaction = InteractionStore::inst().find_server_interaction( server_response );
+
+    if( server_interaction == nullptr )
+    {
+      delete server_response;
+      return;
+    }
+
+    server_interaction->send_separate_response( server_response );
+  }
+}
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}} STACK MESSAGE HANDLING FUNCTIONS }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
+
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ COMMON FUNCTIONS {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
 
 void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg )
 {
@@ -284,7 +317,7 @@ void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg )
     case SimpleStackMsgType::HEART_BEAT_TIMER:
     {
       // printf( "Got heart beat msg, timestamp[%I64d]\n", OsalTimer::get_system_time() );
-      handle_stack_event_heart_beat();
+      HANDLE_STACK_EVENT_heart_beat();
 #ifdef _OS_FREERTOS_
       printf( "free mem %d\n", system_get_free_heap_size() );
 #endif
@@ -292,19 +325,19 @@ void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg )
     break;
     case SimpleStackMsgType::ENDPOINT_DATA:
     {
-      handle_stack_event_endpoint_data( static_cast<EndpointDataStackEvent *>( pv_stack_msg ) );
+      HANDLE_STACK_EVENT_receive_endpoint_data( static_cast<EndpointDataStackEvent *>( pv_stack_msg ) );
     }
     break;
-    case SimpleStackMsgType::SEND_SERVER_RESPONSE:
+    case SimpleStackMsgType::SERVER_SEND_RESPONSE:
     {
       auto send_response_stack_msg = static_cast<SendServerResponseStackEvent *>( pv_stack_msg );
-      handle_stack_event_send_server_response( send_response_stack_msg->_server_response );
+      HANDLE_STACK_EVENT_send_server_response( send_response_stack_msg->_server_response );
     }
     break;
     case SimpleStackMsgType::CLIENT_SEND_REQUEST:
     {
       auto client_send_request_stack_msg = static_cast<ClientSendRequestStackEvent *>( pv_stack_msg );
-      handle_stack_event_send_client_request( client_send_request_stack_msg->_client_request, client_send_request_stack_msg->_client_response_cb );
+      HANDLE_STACK_EVENT_send_client_request( client_send_request_stack_msg->_client_request, client_send_request_stack_msg->_client_response_cb );
     }
     break;
 
@@ -317,14 +350,17 @@ void receive_msg( ja_iot::network::CoapMsg *in_msg )
 {
   if( in_msg->is_request() )
   {
+    /* server will always receive the message in the form of request */
     server_receive_request_msg( in_msg );
   }
   else if( in_msg->is_empty_msg() )
   {
+    /* this is the generic handling of empty message both for client and server */
     receive_empty_msg( in_msg );
   }
   else
   {
+    /* client will always receive the message in the form of response */
     client_receive_response_msg( in_msg );
   }
 }
@@ -344,15 +380,18 @@ void receive_empty_msg( CoapMsg *empty_msg )
 
   if( empty_msg->is_ack() )
   {
-    auto exchange = InteractionStore::inst().find_server_exchange( *empty_msg );
+    /* check is there any server exchange for this empty message.
+     * Since the message is replied only for the other message received, so we need to find
+     * the exchange of previoulsy send message */
+    auto server_exchange = InteractionStore::inst().find_server_exchange( *empty_msg );
 
-    if( exchange != nullptr )
+    if( server_exchange != nullptr )
     {
       // printf( "got the ACK for CON with MID [%x]\n", empty_msg->get_id() );
 
-      if( exchange->get_interaction() != nullptr )
+      if( server_exchange->get_interaction() != nullptr )
       {
-        exchange->get_interaction()->delete_exchange( exchange );
+        server_exchange->get_interaction()->delete_exchange( server_exchange );
       }
     }
     else
@@ -393,26 +432,11 @@ void receive_empty_msg( CoapMsg *empty_msg )
   delete empty_msg;
 }
 
-void handle_stack_event_send_server_response( ServerResponse *server_response )
-{
-  if( server_response != nullptr )
-  {
-    auto server_interaction = InteractionStore::inst().find_server_interaction( server_response );
-
-    if( server_interaction == nullptr )
-    {
-      delete server_response;
-      return;
-    }
-
-    server_interaction->send_separate_response( server_response );
-  }
-}
-
 void server_receive_request_msg( CoapMsg *server_request_msg )
 {
-  /* check for deduplication. If the received message is CON then check for whether this message is already received.
-   * If it is already received then send the same response previously send
+  /* check for deduplication. If the received message is CON then check for whether
+   * this request message is already received.
+   * If it is already received then send the same response previously send for the request
    */
   if( server_request_msg->is_confirmable() )
   {
@@ -420,7 +444,7 @@ void server_receive_request_msg( CoapMsg *server_request_msg )
 
     if( exchange != nullptr )
     {
-      /* duplicate message received, send the already created reply message */
+      /* duplicate request message received, send the already created reply message */
       exchange->resend_reply();
       delete server_request_msg;
       return;
@@ -432,27 +456,37 @@ void server_receive_request_msg( CoapMsg *server_request_msg )
   server_interaction->receive_request( server_request_msg, true );
 }
 
+/**
+ * Response handling for client.
+ * There are two types of response client can receive.
+ * 1. Unicast response.
+ * 2. Multicast response.
+ *
+ * For unicast response it is straight forward, find the interaction and handle it.
+ *
+ * For multicast response it is little bit more work because the response can come from any number of servers.
+ * So it is required to create a new interaction for each response from different servers. Then onwards the
+ * created interaction will be used for further message handling.
+ *
+ * @param client_response_msg
+ */
 void client_receive_response_msg( CoapMsg *client_response_msg )
 {
-  auto                              &i_store = InteractionStore::inst();
+  auto               &i_store           = InteractionStore::inst();
+  ClientInteraction *client_interaction = nullptr;
 
-  ja_iot::stack::ClientInteraction *client_interaction    = nullptr;
-  bool                              is_multicast_response = false;
+  auto               mcast_interaction_list = i_store.get_mcast_interaction_list();
 
-  auto                              mcast_interaction_list = i_store.get_mcast_interaction_list();
-
-  for( ja_iot::stack::MulticastClientInteraction * &mcast_interaction : mcast_interaction_list )
+  for( MulticastClientInteraction * &mcast_interaction : mcast_interaction_list )
   {
     if( mcast_interaction->get_client_request()->get_token() == client_response_msg->get_token() )
     {
-      is_multicast_response = true;
-
       for( auto &base_interaction : i_store.get_client_interaction_list() )
       {
-        if( static_cast<ja_iot::stack::ClientInteraction *>( base_interaction )->get_endpoint() == client_response_msg->get_endpoint() )
+        if( static_cast<ClientInteraction *>( base_interaction )->get_endpoint() == client_response_msg->get_endpoint() )
         {
           /* found the previous client interaction for the multicast request */
-          client_interaction = static_cast<ja_iot::stack::ClientInteraction *>( base_interaction );
+          client_interaction = static_cast<ClientInteraction *>( base_interaction );
           break;
         }
       }
@@ -460,7 +494,7 @@ void client_receive_response_msg( CoapMsg *client_response_msg )
       if( client_interaction == nullptr )
       {
         /* not found the previous interaction so it is new response came from the server */
-        client_interaction = new ja_iot::stack::ClientInteraction{ mcast_interaction->get_client_request(), mcast_interaction->get_response_cb() };
+        client_interaction = new ClientInteraction{ mcast_interaction->get_client_request(), mcast_interaction->get_response_cb() };
         client_interaction->set_token( mcast_interaction->get_client_request()->get_token() );
         client_interaction->set_endpoint( client_response_msg->get_endpoint() );
         client_interaction->set_multicast( true );
@@ -503,11 +537,22 @@ void client_receive_response_msg( CoapMsg *client_response_msg )
     client_interaction->receive_response( client_response_msg );
   }
 }
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}} COMMON FUNCTIONS }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
+/*}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}*/
 
-/**************************************************************************************************************/
-/**************************************** PRIVATE CALLBACK FUNCTIONS ******************************************/
-/**************************************************************************************************************/
-void packet_received_callback( void *pv_user_data, Endpoint const &rcz_end_point, const uint8_t *pu8_data, const uint16_t u16_data_len )
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ PRIVATE CALLBACK FUNCTIONS {{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+/*{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{*/
+
+/**
+ * This is the main callback function for the input data from lower stack.
+ * @param pv_user_data
+ * @param rcz_end_point - endpoint from where the data comes from
+ * @param pu8_data      - received data
+ * @param u16_data_len  - received data length
+ */
+static void packet_received_callback( void *pv_user_data, Endpoint const &rcz_end_point, const uint8_t *pu8_data, const uint16_t u16_data_len )
 {
   if( pv_user_data )
   {
@@ -516,16 +561,18 @@ void packet_received_callback( void *pv_user_data, Endpoint const &rcz_end_point
     static_cast<MsgStack *>( pv_user_data )->send_stack_event( new_raw_data_msg );
   }
 }
-void stack_task_handle_msg_cb( void *pv_task_arg, void *pv_user_data )
+
+static void STACK_TASK_handle_msg_cb( void *pv_task_arg, void *pv_user_data )
 {
   if( pv_user_data != nullptr )
   {
-    receive_stack_event( static_cast<ja_iot::stack::StackEvent *>( pv_task_arg ) );
+    receive_stack_event( static_cast<StackEvent *>( pv_task_arg ) );
   }
 }
-void stack_task_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
+
+static void STACK_TASK_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
 {
-  const auto stack_msg = static_cast<ja_iot::stack::StackEvent *>( pv_task_arg );
+  const auto stack_msg = static_cast<StackEvent *>( pv_task_arg );
 
   switch( stack_msg->get_msg_type() )
   {
@@ -535,7 +582,7 @@ void stack_task_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
     case SimpleStackMsgType::HEART_BEAT_TIMER:
       delete static_cast<HeartBeatTimerStackEvent *>( pv_task_arg );
       break;
-    case SimpleStackMsgType::SEND_SERVER_RESPONSE:
+    case SimpleStackMsgType::SERVER_SEND_RESPONSE:
       delete static_cast<SendServerResponseStackEvent *>( pv_task_arg );
       break;
     case SimpleStackMsgType::CLIENT_SEND_REQUEST:
@@ -546,7 +593,7 @@ void stack_task_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
   }
 }
 
-void heart_beat_timer_cb( void *user_param1, void *user_param2 )
+static void heart_beat_timer_cb( void *user_param1, void *user_param2 )
 {
   if( user_param1 )
   {

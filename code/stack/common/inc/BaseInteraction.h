@@ -16,6 +16,21 @@ namespace stack {
 class Exchange;
 class BlockTransferStatus;
 
+/**
+ * Base class for interaction which contains base data structures and common api's for both client and server interaction.
+ *
+ * Interaction is basic communication between client and server. There are two types of interation client interaction
+ * and server interaction.
+ * Each interaction is uniquely identified by token.
+ *
+ * Creation of interaction.
+ * ------------------------
+ * In client whenever there is new request send ClientInteraction will be created.
+ * In server whenever there is new request received ServerInteraction will be created.
+ *
+ * Each interaction will contain two exchanges, one for received and one for send. This is common for both client and
+ * server.
+ */
 class BaseInteraction : public Interaction
 {
   public:

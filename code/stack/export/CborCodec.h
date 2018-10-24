@@ -16,10 +16,8 @@ namespace stack {
 class CborCodec
 {
   public:
-    static ja_iot::base::ErrCode encode( ja_iot::stack::ResRepresentation &res_representation, uint8_t *&dst_buffer, uint16_t &dst_buffer_len );
+    static ja_iot::base::ErrCode encode( ja_iot::stack::ResRepresentation &res_representation, uint8_t * &dst_buffer, uint16_t &dst_buffer_len );
     static ja_iot::base::ErrCode decode( uint8_t *src_buffer, uint16_t src_buffer_len, ja_iot::stack::ResRepresentation &res_representation );
-
-		
 };
 }
 }

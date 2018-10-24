@@ -7,7 +7,6 @@
 
 namespace ja_iot {
 namespace stack {
-
 enum class ResPropValType : unsigned char
 {
   none          = 0,
@@ -26,47 +25,62 @@ enum class ResPropValType : unsigned char
 class ResPropValue;
 typedef std::map<std::string, ResPropValue *> ResPropMap;
 
+/**
+ * Class used to store the key,value.
+ * This is customized dictionary class for storing key, value pairs.
+ *
+ * The key is always std::string
+ * The value is instance of ResPropValue
+ */
 class ResRepresentation
 {
   public:
     ResRepresentation () = default;
     ~ResRepresentation ();
-    ResRepresentation( const ResRepresentation &other );
-    ResRepresentation( ResRepresentation &&other ) noexcept;
-    ResRepresentation & operator = ( const ResRepresentation &other );
-    ResRepresentation & operator = ( ResRepresentation &&other ) noexcept;
+    ResRepresentation( const ResRepresentation &other );// copy constructor
+    ResRepresentation( ResRepresentation &&other ) noexcept;// move constructor
+    ResRepresentation & operator = ( const ResRepresentation &other );// assignment operator
+    ResRepresentation & operator = ( ResRepresentation &&other ) noexcept;// move operator
 
     ResPropMap& get_props()
     {
       return ( _props );
     }
 
+    /***********************************************************************************/
     template<typename T,
     typename std::enable_if<std::is_class<T>::value, int>::type = 0>
-    void add( const std::string &name, T &val );
+    void add( const std::string &property_name, T &val );
 
     template<typename T,
     typename std::enable_if<std::is_fundamental<T>::value, int>::type = 0>
-    void add( const std::string &name, T val );
+    void add( const std::string &property_name, T val );
 
+    /**
+     * Add the value by move semantics
+     * @param property_name
+     * @param val
+     */
     template<typename T,
     typename std::enable_if<std::is_class<T>::value, int>::type = 0>
-    void add( const std::string &name, T &&val );
+    void add( const std::string &property_name, T &&val );
 
+    /***********************************************************************************/
     template<typename T,
     typename std::enable_if<std::is_fundamental<T>::value, int>::type = 0>
-    T get_prop( const std::string &name, T def_value = 0 );
+    T get_prop( const std::string &property_name, T def_value = 0 );
 
     template<typename T,
     typename std::enable_if<std::is_class<T>::value, int>::type = 0>
-    bool get_prop( const std::string &name, T &prop_value );
+    bool get_prop( const std::string &property_name, T &prop_value );
+    /***********************************************************************************/
 
     void     print();
-    bool     has_prop( const std::string &name );
+    bool     has_prop( const std::string &property_name );
     uint16_t no_of_props() const;
-    void     remove_prop( const std::string &str );
-    void     clear_prop( const std::string &str );
-    bool     is_prop_none( const std::string &str );
+    void     remove_prop( const std::string &property_name );// removes the property from map.
+    void     clear_prop( const std::string &property_name );// only clears the value of property, the property still in the map.
+    bool     is_prop_none( const std::string &property_name );
 
   private:
     ResPropMap   _props;
@@ -84,7 +98,7 @@ union PropUnion
   std::string                    str;
   ResRepresentation              obj;
   std::vector<bool>              b_arr;
-  std::vector<long>               l_arr;
+  std::vector<long>              l_arr;
   std::vector<double>            d_arr;
   std::vector<std::string>       s_arr;
   std::vector<ResRepresentation> o_arr;
@@ -230,31 +244,59 @@ struct PropTraits<std::vector<std::string> > : res_prop_type_trait<std::vector<s
   static void      move_value( PropUnion &value, PROP_VALUE &new_value ) { value.s_arr = std::move( new_value ); }
 };
 
+/***
+ * Class that represents the value of the property.
+ *
+ * Following are the values supported by this class.
+ * 1. bool
+ * 2. long
+ * 3. double
+ * 4. std::string
+ * 5. ResRepresentation (ie object)
+ * 6. std::vector<bool>
+ * 7. std::vector<long>
+ * 8. std::vector<double>
+ * 9. std::vector<std::string>
+ * 10. std::vector<ResRepresentation>
+ *
+ * The special purpose of this class is that value is stored in the union. So because of union small memory is used
+ * for the value and also supports the different data types with single unified interface.
+ *
+ * Following are the main operations supported by this class.
+ * 1. set
+ * 2. get
+ * 3. move
+ */
 class ResPropValue
 {
   public:
-    ResPropValue( ResPropValType val_type = ResPropValType::none );
-    ResPropValue( const ResPropValue &other );
-    ResPropValue( ResPropValue &&other ) noexcept;
+    ResPropValue( ResPropValType val_type = ResPropValType::none );// default constructor
+    ResPropValue( const ResPropValue &other );// copy constructor
+    ResPropValue( ResPropValue &&other ) noexcept;// move constructor
 
+    /* Parameterized constructor. Valid types are bool, long, double, std::string, ResRepresentation and array of all the previous */
     template<typename T>
     explicit ResPropValue( const T &value )
     {
       typedef PropTraits<T> PropTraitsValue;
       val_type = PropTraitsValue::PROP_VAL_TYPE;
-      PropTraitsValue::initialize( val );
-      PropTraitsValue::set_value( val, value );
+      PropTraitsValue::initialize( val );// based on the type initialize the union value.
+      PropTraitsValue::set_value( val, value );// and finally set the passed value
     }
 
-    ResPropValue & operator = ( const ResPropValue &other );
+    ResPropValue & operator = ( const ResPropValue &other );// assignment operator, definition in cpp file.
 
-    ResPropValue & operator = ( ResPropValue &&other ) noexcept;
-		~ResPropValue();
+    ResPropValue & operator = ( ResPropValue &&other ) noexcept;// move operator, definition in cpp file.
+    ~ResPropValue ();           // definition in cpp file.
 
     void init( const ResPropValType value_type );
 
     void destroy();
 
+    /***
+     * Templated get function for fundamental data types ie bool, long, double
+     * @return
+     */
     template<typename T,
     typename std::enable_if<std::is_fundamental<T>::value, int>::type = 0>
     T get()
@@ -263,6 +305,11 @@ class ResPropValue
       return ( PropTraitsValue::get_value( val ) );
     }
 
+    /***
+     * Templated get function for class based data types ie std::string, ResRepresentation, and array of all the data types.
+     * This is different from the templated get function of fundatmental types by returing the reference of the class.
+     * @return
+     */
     template<typename T,
     typename std::enable_if<std::is_class<T>::value, int>::type = 0>
     T& get()
@@ -327,7 +374,7 @@ class ResPropValue
       return ( &PropTraitsValue::get_value( val ) );
     }
 
-		ResPropValType get_type() { return val_type; }
+    ResPropValType get_type() { return ( val_type ); }
 
   public:
     PropUnion        val;
@@ -358,35 +405,43 @@ struct PropTraits<std::vector<ResRepresentation> > : res_prop_type_trait<std::ve
   static void move_value( PropUnion &value, PROP_VALUE &new_value ) { value.o_arr = std::move( new_value ); }
 };
 
+/******************************************************************************************************************/
+/************************************* ResRepresentation Implementations ******************************************/
+/******************************************************************************************************************/
 template<typename T,
 typename std::enable_if<std::is_class<T>::value, int>::type>
-void ResRepresentation::add( const std::string &name, T &val )
+void ResRepresentation::add( const std::string &property_name, T &val )
 {
-  _props[name] = new ResPropValue{ val };
+  _props[property_name] = new ResPropValue{ val };
 }
 
 template<typename T,
 typename std::enable_if<std::is_fundamental<T>::value, int>::type>
-void ResRepresentation::add( const std::string &name, T val )
+void ResRepresentation::add( const std::string &property_name, T val )
 {
-  _props[name] = new ResPropValue{ val };
+  _props[property_name] = new ResPropValue{ val };
 }
 
+/**
+ * This api will add the value by move semantics.
+ * @param property_name
+ * @param val
+ */
 template<typename T,
 typename std::enable_if<std::is_class<T>::value, int>::type>
-void ResRepresentation::add( const std::string &name, T &&val )
+void ResRepresentation::add( const std::string &property_name, T &&val )
 {
   auto rv = new ResPropValue{};
 
   rv->move( val );
-  _props[name] = rv;
+  _props[property_name] = rv;
 }
 
 template<typename T,
 typename std::enable_if<std::is_fundamental<T>::value, int>::type>
-T ResRepresentation::get_prop( const std::string &name, T def_value )
+T ResRepresentation::get_prop( const std::string &property_name, T def_value )
 {
-  const auto find_result = _props.find( name );
+  const auto find_result = _props.find( property_name );
 
   if( find_result != _props.end() )
   {
@@ -399,9 +454,9 @@ T ResRepresentation::get_prop( const std::string &name, T def_value )
 
 template<typename T,
 typename std::enable_if<std::is_class<T>::value, int>::type>
-bool ResRepresentation::get_prop( const std::string &name, T &prop_value )
+bool ResRepresentation::get_prop( const std::string &property_name, T &prop_value )
 {
-  const auto find_result = _props.find( name );
+  const auto find_result = _props.find( property_name );
 
   if( find_result != _props.end() )
   {
@@ -410,6 +465,7 @@ bool ResRepresentation::get_prop( const std::string &name, T &prop_value )
     return ( true );
   }
 
+  /* if there is no such property, then initialize to default value */
   prop_value = T();
   return ( false );
 }

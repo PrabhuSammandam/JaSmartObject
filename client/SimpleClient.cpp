@@ -227,7 +227,7 @@ bool parse( std::string &endpoint_string, CommandLineArgs &commands )
   /* check whether passed string is in valid URI format ie coap://XXX.XXX.XXX.XXX:<port>/<resource path> for IPV4 */
   if( std::regex_match( endpoint_string.c_str(), m, scheme_ipv4 ) )
   {
-	  /* check for the first group in the reg exp string */
+    /* check for the first group in the reg exp string */
     auto scheme = m.str( 1 );// get the scheme
 
     if( !scheme.empty() )
@@ -243,7 +243,7 @@ bool parse( std::string &endpoint_string, CommandLineArgs &commands )
       }
       else
       {
-    	  /* invalid scheme passed ie it is not "coap" or "coaps" */
+        /* invalid scheme passed ie it is not "coap" or "coaps" */
         return ( false );
       }
     }
@@ -350,10 +350,10 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
 {
   try
   {
-    CmdLine                  cmd_line{ "Simple Client", ' ', "0.0" };
+    CmdLine cmd_line{ "Simple Client", ' ', "0.0" };
 
-    SwitchArg                non_msg{ "", "non", "Use NON message type", cmd_line };
-    SwitchArg                obs{ "", "obs", "Observe the resource", cmd_line };
+    SwitchArg non_msg{ "", "non", "Use NON message type", cmd_line };
+    SwitchArg obs{ "", "obs", "Observe the resource", cmd_line };
 
     std::vector<std::string> method_values{};
     method_values.push_back( "GET" );
@@ -363,13 +363,13 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
     ValuesConstraint<string> method_allowed_values( method_values );
 
 
-    ValueArg<std::string>    method{ "m",
-                                     "method",
-                                     "Method to send",
-                                     true,
-                                     "GET",
-                                     &method_allowed_values,
-                                     cmd_line };
+    ValueArg<std::string> method{ "m",
+                                  "method",
+                                  "Method to send",
+                                  true,
+                                  "GET",
+                                  &method_allowed_values,
+                                  cmd_line };
 
     ValueArg<std::string> token{ "t",
                                  "token",
@@ -387,16 +387,16 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
                                    "string",
                                    cmd_line };
 
-    std::vector<uint16_t>      block2_values{ 32, 64, 128, 256, 512, 1024 };
+    std::vector<uint16_t> block2_values{ 32, 64, 128, 256, 512, 1024 };
     ValuesConstraint<uint16_t> block2_allowed_values( block2_values );
 
-    ValueArg<uint16_t>         block2_size{ "",
-                                            "b2",
-                                            "Response block size",
-                                            false,
-                                            0,
-                                            &block2_allowed_values,
-                                            cmd_line };
+    ValueArg<uint16_t> block2_size{ "",
+                                    "b2",
+                                    "Response block size",
+                                    false,
+                                    0,
+                                    &block2_allowed_values,
+                                    cmd_line };
 
     std::vector<std::string> accept_format_values{};
     accept_format_values.push_back( "plain" );
@@ -406,13 +406,13 @@ bool get_commands( int argc, char *argv[], CommandLineArgs &commands )
     accept_format_values.push_back( "cbor" );
     ValuesConstraint<std::string> accept_format_allowed_values( accept_format_values );
 
-    ValueArg<std::string>         accept_format{ "",
-                                                 "accept",
-                                                 "Accept format for content",
-                                                 false,
-                                                 "none",
-                                                 &accept_format_allowed_values,
-                                                 cmd_line };
+    ValueArg<std::string> accept_format{ "",
+                                         "accept",
+                                         "Accept format for content",
+                                         false,
+                                         "none",
+                                         &accept_format_allowed_values,
+                                         cmd_line };
 
     UnlabeledValueArg<std::string> endpoint{ "endpoint", "Endpoint to send message", true, "coap://", "endpoint", cmd_line };
 
@@ -492,7 +492,7 @@ int main( int argc, char *argv[] )
 
   if( !get_commands( argc, argv, commands ) )
   {
-    printf( "Error in arg parsing\n" );
+    cout << "Error in argument parsing" << endl;
     return ( 1 );
   }
 
@@ -500,7 +500,7 @@ int main( int argc, char *argv[] )
   MsgStack::inst().initialize( k_adapter_type_ip );
 
   Endpoint endpoint{ k_adapter_type_ip, commands.network_flag, commands.port, 0, commands.ip_addr };
-  Client   client{};
+  Client client{};
 
   if( commands.method == COAP_MSG_CODE_GET )
   {
@@ -547,8 +547,8 @@ int main( int argc, char *argv[] )
       put_request_info._uri_query = commands.query;
     }
 
-    uint8_t *         buffer;
-    uint16_t          buffer_length;
+    uint8_t *buffer;
+    uint16_t buffer_length;
 
     ResRepresentation rep{};
     rep.add( "value", true );

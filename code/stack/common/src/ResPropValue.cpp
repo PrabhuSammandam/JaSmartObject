@@ -4,9 +4,7 @@
 
 namespace ja_iot {
 namespace stack {
-
 #define REPRESENTATION_PRETTY_PRINT
-  
 ResRepresentation::~ResRepresentation ()
 {
   for( auto it = _props.cbegin(); it != _props.cend(); ++it )
@@ -50,6 +48,11 @@ ResRepresentation & ResRepresentation::operator = ( const ResRepresentation &oth
   return ( *this );
 }
 
+/**
+ * Move operator implementation
+ * @param other
+ * @return
+ */
 ResRepresentation & ResRepresentation::operator = ( ResRepresentation &&other ) noexcept
 {
   if( this == &other )
@@ -57,11 +60,11 @@ ResRepresentation & ResRepresentation::operator = ( ResRepresentation &&other ) 
     return ( *this );
   }
 
-	/* delete all the old values */
-	for (auto it = _props.cbegin(); it != _props.cend(); ++it)
-	{
-		delete (*it).second;
-	}
+  /* delete all the old values */
+  for( auto it = _props.cbegin(); it != _props.cend(); ++it )
+  {
+    delete ( *it ).second;// calling delete for nullptr is ok
+  }
 
   _props = std::move( other._props );
   return ( *this );
@@ -72,40 +75,40 @@ uint16_t ResRepresentation::no_of_props() const
   return ( uint16_t( _props.size() ) );
 }
 
-void ResRepresentation::remove_prop( const std::string &str )
+void ResRepresentation::remove_prop( const std::string &property_name )
 {
-  if( has_prop( str ) )
+  if( has_prop( property_name ) )
   {
-    delete _props[str];
-    _props.erase( str );
+    delete _props[property_name];
+    _props.erase( property_name );
   }
 }
 
-void ResRepresentation::clear_prop( const std::string &str )
+void ResRepresentation::clear_prop( const std::string &property_name )
 {
-  auto find_result = _props.find( str );
+  auto find_result = _props.find( property_name );
 
   if( find_result != _props.end() )
   {
-		delete _props[str];
-		_props[str] = nullptr;
+    delete _props[property_name];
+    _props[property_name] = nullptr;
   }
 }
 
-bool ResRepresentation::has_prop( const std::string &name )
+bool ResRepresentation::has_prop( const std::string &property_name )
 {
-  const auto find_result = _props.find( name );
+  const auto find_result = _props.find( property_name );
 
   return ( find_result != _props.end() ? true : false );
 }
 
-bool ResRepresentation::is_prop_none( const std::string &str )
+bool ResRepresentation::is_prop_none( const std::string &property_name )
 {
-  const auto find_result = _props.find( str );
+  const auto find_result = _props.find( property_name );
 
-  if( find_result != _props.end() )
+  if( find_result != _props.end() && (find_result->second != nullptr))
   {
-    return ( find_result->second->val_type == ResPropValType::none );
+	  return ( find_result->second->val_type == ResPropValType::none );
   }
 
   return ( true );
@@ -113,7 +116,7 @@ bool ResRepresentation::is_prop_none( const std::string &str )
 
 #ifdef REPRESENTATION_PRETTY_PRINT
 
-void print_object( ResRepresentation &object, uint8_t indent );
+void print_object( ResRepresentation &object, uint8_t u8_indent );
 
 template<typename T>
 void print_array( std::vector<T> &array, uint8_t indent )
@@ -166,10 +169,10 @@ void print_array( std::vector<ResRepresentation> &array, uint8_t indent )
 }
 
 
-void print_object( ResRepresentation &object, uint8_t indent )
+void print_object( ResRepresentation &object, uint8_t u8_indent )
 {
-  printf( "\n%*s{\n", indent, "" );
-  indent += 4;
+  printf( "\n%*s{\n", u8_indent, "" );
+  u8_indent += 4;
 
   for( auto &prop : object.get_props() )
   {
@@ -179,68 +182,68 @@ void print_object( ResRepresentation &object, uint8_t indent )
     {
       case ResPropValType::boolean:
       {
-        printf( "%*s\"%s\" : %s\n", indent, "", prop.first.c_str(), prop_val->get<bool>() == true ? "true" : "false" );
+        printf( "%*s\"%s\" : %s\n", u8_indent, "", prop.first.c_str(), prop_val->get<bool>() == true ? "true" : "false" );
       }
       break;
       case ResPropValType::integer:
       {
-        printf( "%*s\"%s\" : %d\n", indent, "", prop.first.c_str(), prop_val->get<long>() );
+        printf( "%*s\"%s\" : %d\n", u8_indent, "", prop.first.c_str(), prop_val->get<long>() );
       }
       break;
       case ResPropValType::number:
       {
-        printf( "%*s\"%s\" : %f\n", indent, "", prop.first.c_str(), prop_val->get<double>() );
+        printf( "%*s\"%s\" : %f\n", u8_indent, "", prop.first.c_str(), prop_val->get<double>() );
       }
       break;
       case ResPropValType::string:
       {
-        printf( "%*s\"%s\" : %s\n", indent, "", prop.first.c_str(), prop_val->get<std::string>().c_str() );
+        printf( "%*s\"%s\" : %s\n", u8_indent, "", prop.first.c_str(), prop_val->get<std::string>().c_str() );
       }
       break;
       case ResPropValType::object:
       {
-        printf( "%*s\"%s\" :", indent, "", prop.first.c_str() );
-        print_object( prop_val->get<ResRepresentation>(), indent );
+        printf( "%*s\"%s\" :", u8_indent, "", prop.first.c_str() );
+        print_object( prop_val->get<ResRepresentation>(), u8_indent );
       }
       break;
       case ResPropValType::boolean_array:
       {
-        printf( "%*s\"%s\" : [\n", indent, "", prop.first.c_str() );
+        printf( "%*s\"%s\" : [\n", u8_indent, "", prop.first.c_str() );
         auto b_array = prop_val->get_array<std::vector<bool> >();
-        print_array( *b_array, indent + 4 );
-        printf( "%*s]\n", indent, "" );
+        print_array( *b_array, u8_indent + 4 );
+        printf( "%*s]\n", u8_indent, "" );
       }
       break;
       case ResPropValType::integer_array:
       {
-        printf( "%*s\"%s\" : [\n", indent, "", prop.first.c_str() );
+        printf( "%*s\"%s\" : [\n", u8_indent, "", prop.first.c_str() );
         auto b_array = prop_val->get_array<std::vector<long> >();
-        print_array( *b_array, indent + 4 );
-        printf( "%*s]\n", indent, "" );
+        print_array( *b_array, u8_indent + 4 );
+        printf( "%*s]\n", u8_indent, "" );
       }
       break;
       case ResPropValType::number_array:
       {
-        printf( "%*s\"%s\" : [\n", indent, "", prop.first.c_str() );
+        printf( "%*s\"%s\" : [\n", u8_indent, "", prop.first.c_str() );
         auto b_array = prop_val->get_array<std::vector<double> >();
-        print_array( *b_array, indent + 4 );
-        printf( "%*s]\n", indent, "" );
+        print_array( *b_array, u8_indent + 4 );
+        printf( "%*s]\n", u8_indent, "" );
       }
       break;
       case ResPropValType::string_array:
       {
-        printf( "%*s\"%s\" : [\n", indent, "", prop.first.c_str() );
+        printf( "%*s\"%s\" : [\n", u8_indent, "", prop.first.c_str() );
         auto b_array = prop_val->get_array<std::vector<std::string> >();
-        print_array( *b_array, indent + 4 );
-        printf( "%*s]\n", indent, "" );
+        print_array( *b_array, u8_indent + 4 );
+        printf( "%*s]\n", u8_indent, "" );
       }
       break;
       case ResPropValType::obj_array:
       {
-        printf( "%*s\"%s\" : [\n", indent, "", prop.first.c_str() );
+        printf( "%*s\"%s\" : [\n", u8_indent, "", prop.first.c_str() );
         auto b_array = prop_val->get_array<std::vector<ResRepresentation> >();
-        print_array( *b_array, indent + 4 );
-        printf( "%*s]\n", indent, "" );
+        print_array( *b_array, u8_indent + 4 );
+        printf( "%*s]\n", u8_indent, "" );
       }
       break;
       default:
@@ -250,7 +253,7 @@ void print_object( ResRepresentation &object, uint8_t indent )
     }
   }
 
-  printf( "%*s}\n", indent - 4, "" );
+  printf( "%*s}\n", u8_indent - 4, "" );
 }
 #endif
 
@@ -291,11 +294,11 @@ ResPropValue & ResPropValue::operator = ( const ResPropValue &other )
 
     if( other.val_type == ResPropValType::number )
     {
-    	this->val.d = other.val.d;
+      this->val.d = other.val.d;
     }
     else if( other.val_type == ResPropValType::string )
     {
-    	this->val.str = other.val.str;
+      this->val.str = other.val.str;
     }
     else if( other.val_type == ResPropValType::object )
     {
@@ -341,11 +344,11 @@ ResPropValue & ResPropValue::operator = ( ResPropValue &&other ) noexcept
 
     if( other.val_type == ResPropValType::number )
     {
-    	this->val.d = other.val.d;
+      this->val.d = other.val.d;
     }
     else if( other.val_type == ResPropValType::string )
     {
-    	this->val.str = std::move( other.val.str );
+      this->val.str = std::move( other.val.str );
     }
     else if( other.val_type == ResPropValType::object )
     {
@@ -382,10 +385,9 @@ ResPropValue & ResPropValue::operator = ( ResPropValue &&other ) noexcept
 
   return ( *this );
 }
-
-inline ResPropValue::~ResPropValue()
+inline ResPropValue::~ResPropValue ()
 {
-	destroy();
+  destroy();
 }
 
 void ResPropValue::init( const ResPropValType value_type )
@@ -400,23 +402,23 @@ void ResPropValue::init( const ResPropValType value_type )
   }
   else if( value_type == ResPropValType::boolean_array )
   {
-    new(&this->val.b_arr) std::vector<bool>{};
+    new(&this->val.b_arr) std::vector<bool> {};
   }
   else if( value_type == ResPropValType::integer_array )
   {
-    new(&this->val.l_arr) std::vector<long>{};
+    new(&this->val.l_arr) std::vector<long> {};
   }
   else if( value_type == ResPropValType::number_array )
   {
-    new(&this->val.d_arr) std::vector<double>{};
+    new(&this->val.d_arr) std::vector<double> {};
   }
   else if( value_type == ResPropValType::string_array )
   {
-    new(&this->val.s_arr) std::vector<std::string>{};
+    new(&this->val.s_arr) std::vector<std::string> {};
   }
   else if( value_type == ResPropValType::obj_array )
   {
-    new(&val.o_arr) std::vector<ResRepresentation>{};
+    new(&val.o_arr) std::vector<ResRepresentation> {};
   }
   else
   {
@@ -428,31 +430,31 @@ void ResPropValue::destroy()
 {
   if( val_type == ResPropValType::string )
   {
-		this->val.str.~basic_string ();
+    this->val.str.~basic_string ();
   }
   else if( val_type == ResPropValType::object )
   {
-		this->val.obj.~ResRepresentation ();
+    this->val.obj.~ResRepresentation ();
   }
   else if( val_type == ResPropValType::boolean_array )
   {
-    this->val.b_arr.~vector();
+    this->val.b_arr.~vector ();
   }
   else if( val_type == ResPropValType::integer_array )
   {
-    this->val.l_arr.~vector();
+    this->val.l_arr.~vector ();
   }
   else if( val_type == ResPropValType::number_array )
   {
-    this->val.d_arr.~vector();
+    this->val.d_arr.~vector ();
   }
   else if( val_type == ResPropValType::string_array )
   {
-	  this->val.s_arr.~vector();
+    this->val.s_arr.~vector ();
   }
   else if( val_type == ResPropValType::obj_array )
   {
-    this->val.o_arr.~vector();
+    this->val.o_arr.~vector ();
   }
 
   val_type = ResPropValType::none;

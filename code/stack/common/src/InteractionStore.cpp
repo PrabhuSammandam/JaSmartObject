@@ -4,6 +4,7 @@
 #include "base_utils.h"
 #include "common/inc/ServerInteraction.h"
 #include "common/inc/ClientInteraction.h"
+#include "common/inc/MulticastClientInteraction.h"
 #include "logging_stack.h"
 
 #define __FILE_NAME__ "i_store"
@@ -38,6 +39,13 @@ InteractionStore & InteractionStore::inst()
   return ( *_pcz_instance );
 }
 
+/**
+ * Finds the server exchange for the coap message.
+ * The match criteria is the coap message should be from same endpoint and same message id.
+ *
+ * @param rcz_coap_msg - received coap message.
+ * @return
+ */
 Exchange * InteractionStore::find_server_exchange( CoapMsg &rcz_coap_msg )
 {
   for( auto &pcz_loop_exchange : _server_exchanges )
@@ -51,6 +59,12 @@ Exchange * InteractionStore::find_server_exchange( CoapMsg &rcz_coap_msg )
   return ( nullptr );
 }
 
+/**
+ * Adds new server exchange to store.
+ *
+ * @param pcz_server_exchange
+ * @return
+ */
 bool InteractionStore::add_server_exchange( Exchange *pcz_server_exchange )
 {
   _server_exchanges.push_back( pcz_server_exchange );
@@ -59,9 +73,15 @@ bool InteractionStore::add_server_exchange( Exchange *pcz_server_exchange )
 
 bool InteractionStore::delete_server_exchange( Exchange *pcz_server_exchange )
 {
+  if( pcz_server_exchange == nullptr )
+  {
+    return ( false );
+  }
+
   for( size_t i = 0; i < _server_exchanges.size(); ++i )
   {
-    if( pcz_server_exchange == _server_exchanges[i] )
+    if( ( _server_exchanges[i] != nullptr ) &&
+      ( pcz_server_exchange == _server_exchanges[i] ) )
     {
       _server_exchanges.erase( _server_exchanges.cbegin() + i );
       delete_and_clear<Exchange>( pcz_server_exchange );
@@ -71,7 +91,14 @@ bool InteractionStore::delete_server_exchange( Exchange *pcz_server_exchange )
 
   return ( false );
 }
-
+/**
+ * Finds the server interaction for this message. The search criteria is the message should be from same
+ * endpoint and also with same token.
+ *
+ * @param pcz_coap_msg   - received message
+ * @param create_if_null - if true then new interaction will be created if there is no match.
+ * @return
+ */
 ServerInteraction * InteractionStore::find_server_interaction( CoapMsg *pcz_coap_msg, bool create_if_null )
 {
   ServerInteraction *pcz_temp_server_interaction = nullptr;
@@ -87,6 +114,9 @@ ServerInteraction * InteractionStore::find_server_interaction( CoapMsg *pcz_coap
 
   if( ( pcz_temp_server_interaction == nullptr ) && create_if_null )
   {
+    /* there is no server interaction for this message and user also request to create new server interaction
+     * if there is no such
+     */
     pcz_temp_server_interaction = create_server_interaction( pcz_coap_msg );
   }
 
@@ -97,7 +127,10 @@ ServerInteraction * InteractionStore::create_server_interaction( CoapMsg *pcz_co
 {
   auto pcz_server_interaction = new ServerInteraction{ pcz_coap_msg->get_token(), pcz_coap_msg->get_endpoint() };
 
-  _server_interactions.push_back( pcz_server_interaction );
+  if( pcz_server_interaction != nullptr )
+  {
+    _server_interactions.push_back( pcz_server_interaction );
+  }
 
   return ( pcz_server_interaction );
 }
@@ -106,9 +139,15 @@ bool InteractionStore::delete_server_interaction( ServerInteraction *pcz_server_
 {
   DBG_INFO2( "Deleting Interaction \n" );
 
+  if( pcz_server_interaction == nullptr )
+  {
+    return ( false );
+  }
+
   for( size_t i = 0; i < _server_interactions.size(); i++ )
   {
-    if( _server_interactions[i] == pcz_server_interaction )
+    if( ( _server_interactions[i] != nullptr ) &&
+      ( _server_interactions[i] == pcz_server_interaction ) )
     {
       _server_interactions.erase( _server_interactions.cbegin() + i );
       delete_and_clear<ServerInteraction>( pcz_server_interaction );
@@ -226,6 +265,19 @@ ClientInteraction * InteractionStore::find_client_interaction( CoapMsg *pcz_coap
   return ( nullptr );
 }
 
+MulticastClientInteraction * InteractionStore::create_multicast_client_interaction( ja_iot::network::CoapMsg *coap_msg )
+{
+  auto mcast_client_interaction = new MulticastClientInteraction{ (ClientRequest *) coap_msg };
+
+  _mcast_client_interactions.push_back( mcast_client_interaction );
+
+  return ( mcast_client_interaction );
+}
+
+MulticastClientInteraction * InteractionStore::find_multicast_client_interaction( ja_iot::network::CoapMsg *coap_msg )
+{
+}
+
 void InteractionStore::print_server_exchanges()
 {
   if( _server_exchanges.size() == 0 )
@@ -309,7 +361,7 @@ void InteractionStore::print_client_interactions()
   for( auto it = _client_interactions.cbegin(); it != _client_interactions.cend(); ++it )
   {
     auto pcz_loop_client_interaction = (ClientInteraction *) ( *it );
-    auto pcz_client_request     = pcz_loop_client_interaction->get_client_request();
+    auto pcz_client_request          = pcz_loop_client_interaction->get_client_request();
 
     if( pcz_client_request != nullptr )
     {

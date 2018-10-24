@@ -1,5 +1,5 @@
-#include "cbor/CborTypedefs.h"
-#include "cbor/CborEncoding.h"
+#include "common/inc/cbor/CborTypedefs.h"
+#include "common/inc/cbor/CborEncoding.h"
 
 size_t _cbor_encode_uint8(uint8_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
 {

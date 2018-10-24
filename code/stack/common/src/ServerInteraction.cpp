@@ -93,6 +93,12 @@ CoapMsg * ServerInteraction::get_next_res_block( CoapMsg *pcz_server_response, b
   return ( pcz_new_response_block );
 }
 
+/**
+ * Entry API for server interaction.
+ *
+ * @param pcz_new_request - newly received coap message
+ * @param is_ongoing      - is it ongoing interaction
+ */
 void ServerInteraction::receive_request( CoapMsg *pcz_new_request, bool is_ongoing )
 {
   /*
@@ -104,7 +110,8 @@ void ServerInteraction::receive_request( CoapMsg *pcz_new_request, bool is_ongoi
    * 4. Observe response notification.
    */
 
-  /* we got some new message for the previous interaction, so don't need of the previous send and received exchanges. */
+  /* we got some new message for the previous interaction,
+   * so don't need of the previous send and received exchanges. */
   delete_current_in_exchange();
   delete_current_out_exchange();
 
@@ -116,6 +123,7 @@ void ServerInteraction::receive_request( CoapMsg *pcz_new_request, bool is_ongoi
     /* blockwise request ongoing */
     handle_request_download();
   }
+  /* check whether the server response is already generated and also the response it sending by blockwise */
   else if( ( _server_response != nullptr ) && pcz_new_request->get_option_set().has_block2() )
   {
     /* blockwise response ongoing */
@@ -136,7 +144,7 @@ void ServerInteraction::receive_request( CoapMsg *pcz_new_request, bool is_ongoi
   }
   else
   {
-    /* check for early block2 negotiation */
+    /* check for early block2 negotiation (client requested blockwise response) */
     if( pcz_new_request->get_option_set().has_block2() )
     {
       auto &block2_option     = pcz_new_request->get_option_set().get_block2();
@@ -145,6 +153,7 @@ void ServerInteraction::receive_request( CoapMsg *pcz_new_request, bool is_ongoi
       pcz_res_blk_status->set_block_size( block2_option.get_size() );
     }
 
+    /* at this stage we got the full request message, pass it to the stack */
     _server_request = new ServerRequest{ pcz_new_request };
 
     handle_fully_downloaded_request();
@@ -272,7 +281,11 @@ void ServerInteraction::handle_request_download()
 /* this API checks if the response is greater than configure MESSAGE_SIZE and if it
  * exceeds then calculate the first block and return.
  *
- * If the response not exceeds the max size then the passed response is returned
+ * If the response not exceeds the max size then the passed response is returned.
+ *
+ * This API should be called only after response is fully generated.
+ *
+ * This API will not disturb the passed parameter and it creates the new response message.
  */
 
 CoapMsg * ServerInteraction::get_first_response_block( CoapMsg *pcz_response )
@@ -284,6 +297,7 @@ CoapMsg * ServerInteraction::get_first_response_block( CoapMsg *pcz_response )
   {
     if( pcz_res_blk_status == nullptr )
     {
+    	/* start the blockwise response transfer */
       pcz_res_blk_status = create_response_block_transfer_status( pcz_response, false );
     }
 
@@ -330,6 +344,9 @@ ServerResponse* create_server_response_with_code( ServerRequest *pcz_server_requ
   return ( server_response );
 }
 
+/**
+ * This API should be called only after the request is fully downloaded.
+ */
 void ServerInteraction::handle_fully_downloaded_request()
 {
   auto pcz_temp_server_request = _server_request;
@@ -400,7 +417,7 @@ void ServerInteraction::handle_fully_downloaded_request()
       }
 
       /* send the error response only for the unicast request */
-      if( !get_server_request()->is_multicast() )
+      if( get_server_request()->is_multicast() == false )
       {
         _server_response = create_server_response_with_code( _server_request, u8_error_code );
 
@@ -434,7 +451,9 @@ void ServerInteraction::send_response( CoapMsg *pcz_response_msg )
     pcz_response_msg->set_type( pcz_originator_msg->is_confirmable() ? COAP_MSG_TYPE_ACK : COAP_MSG_TYPE_NON );
   }
 
+  /* set the same token as request */
   pcz_response_msg->set_token( pcz_originator_msg->get_token() );
+  /* set the same endpoint as request */
   pcz_response_msg->set_endpoint( pcz_originator_msg->get_endpoint() );
 
   if( pcz_response_msg->is_ack() )
@@ -444,7 +463,7 @@ void ServerInteraction::send_response( CoapMsg *pcz_response_msg )
   }
   else
   {
-    /* this may be CON or NON. if it is CON send ACK */
+    /* this may be CON or NON. if it is CON send ACK for previous received CON request */
     _current_in_exchange->acknowledge();
 
     /* For CON or NON assign new message id */
@@ -457,9 +476,9 @@ void ServerInteraction::send_response( CoapMsg *pcz_response_msg )
 }
 
 /*
- * This API used to send the separate response for the previous request.
+ * This API used to send the separate response for the previous request (slow response).
  *
- * If the new response is more than the configured message size then blockwise transfer
+ * If the new response is more than the configured message size then blockwise transfer will be
  * started and the first block will be sent.
  */
 void ServerInteraction::send_separate_response( ServerResponse *pcz_separate_response_msg )

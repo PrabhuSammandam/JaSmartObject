@@ -14,6 +14,11 @@
 
 namespace ja_iot {
 namespace stack {
+/**
+ * Server Interaction implementation.
+ *
+ * Instance of this class will be created whenever new request comes from client.
+ */
 class ServerInteraction : public BaseInteraction
 {
   public:
@@ -43,8 +48,8 @@ class ServerInteraction : public BaseInteraction
   private:
     ja_iot::network::CoapMsgToken   _token;
     ja_iot::network::Endpoint       _endpoint;
-    ServerRequest *                 _server_request  = nullptr;
-    ServerResponse *                _server_response = nullptr;
+    ServerRequest *                 _server_request  = nullptr;// data received from client
+    ServerResponse *                _server_response = nullptr;// data to send to client
 };
 }
 }

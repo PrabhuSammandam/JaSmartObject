@@ -5,186 +5,344 @@
  *      Author: psammand
  */
 
-#include <cbor/CborCodec.h>
-#include <cbor/CborEncoder.h>
-#include <cbor/ICborDecoderListener.h>
-#include <cbor/CborDecoderBuffer.h>
+#include <CborCodec.h>
+#include <common/inc/cbor/CborEncoder.h>
+#include <common/inc/cbor/ICborDecoderListener.h>
+#include <common/inc/cbor/CborDecoderBuffer.h>
 #include <stack>
 #include "ResPropValue.h"
-#include "cbor/CborItem.h"
-#include "cbor/CborItemBuilder.h"
+#include "common/inc/cbor/CborItem.h"
+#include "common/inc/cbor/CborItemBuilder.h"
 
 using namespace ja_iot::base;
 using namespace ja_iot::stack;
 
-uint8_t encode_representation( ResRepresentation &res_rep, CborEncoder &encoder );
-uint8_t encode_object( ResRepresentation &res_rep, CborEncoder &encoder );
+static ErrCode encode_representation( ResRepresentation &rcz_res_rep, CborEncoder &rcz_encoder );
+static ErrCode encode_object( ResRepresentation &rcz_res_rep, CborEncoder &rcz_encoder );
 
+/********************************************************************************************/
+/**
+ * This is the template function to encode the array of value of specified type.
+ * Following are the types used by this function int, long, double, float.
+ *
+ * @param rcz_value_array - list of all values of type T.
+ * @param encoder         - main encoder object.
+ */
 template<typename T>
-void encode_value_array( std::vector<T> &value_array, CborEncoder &encoder )
+void encode_value_array( std::vector<T> &rcz_value_array, CborEncoder &rcz_encoder )
 {
-  for( auto &value : value_array )
+  for( auto &value : rcz_value_array )
   {
-    encoder.write( value );
+    rcz_encoder.write( value );
   }
 }
 
+/**
+ * This is the partial specialization function to encode 'ResRepresentation' values.
+ *
+ * @param rcz_value_array - list of 'ResRepresentation' values
+ * @param encoder         - encoder object to encode
+ */
 template<>
-void encode_value_array<ResRepresentation>( std::vector<ResRepresentation> &value_array, CborEncoder &encoder )
+void encode_value_array<ResRepresentation>( std::vector<ResRepresentation> &rcz_value_array, CborEncoder &rcz_encoder )
 {
-  for( auto &value : value_array )
+  for( auto &rcz_res_rep : rcz_value_array )
   {
-    encode_object( value, encoder );
+    encode_object( rcz_res_rep, rcz_encoder );
   }
 }
 
+/**
+ * This is the partial specialization function to encode 'bool' values.
+ * @param rcz_value_array
+ * @param rcz_encoder
+ */
 template<>
-void encode_value_array<bool>( std::vector<bool> &value_array, CborEncoder &encoder )
+void encode_value_array<bool>( std::vector<bool> &rcz_value_array, CborEncoder &rcz_encoder )
 {
-  for( auto value : value_array )
+  for( auto bool_value : rcz_value_array )
   {
-    encoder.write( value );
+    rcz_encoder.write( bool_value );
   }
 }
+/********************************************************************************************/
 
+/**
+ * This is the template function for encoding the CBOR array type.
+ * The array type are bool, int, long, object, array, string, byte string.
+ *
+ * @param rcz_value_array
+ * @param rcz_encoder
+ */
 template<typename T>
-void encode_array( std::vector<T> &value_array, CborEncoder &encoder )
+void encode_array( std::vector<T> &rcz_value_array, CborEncoder &rcz_encoder )
 {
-  if( value_array.empty() )
+  if( rcz_value_array.empty() )
   {
-    encoder.write_null();
+    /* array has no value then write NULL CBOR type */
+    rcz_encoder.write_null();
   }
   else
   {
-    encoder.write_array( static_cast<uint16_t>( value_array.size() ) );
-    encode_value_array<T>( value_array, encoder );
+    /* inform the encoder about the number of values */
+    rcz_encoder.write_array( static_cast<uint16_t>( rcz_value_array.size() ) );
+    /* encode the values*/
+    encode_value_array<T>( rcz_value_array, rcz_encoder );
   }
 }
 
-uint8_t encode_object( ResRepresentation &res_rep, CborEncoder &encoder )
+static ErrCode encode_object( ResRepresentation &rcz_res_rep, CborEncoder &rcz_encoder )
 {
-  encoder.write_map( res_rep.no_of_props() );
+  /* inform the encoder about the number of properties in the map */
+  rcz_encoder.write_map( rcz_res_rep.no_of_props() );
 
-  for( auto it = res_rep.get_props().cbegin(); it != res_rep.get_props().cend(); ++it )
+  for( auto it = rcz_res_rep.get_props().cbegin(); it != rcz_res_rep.get_props().cend(); ++it )
   {
     auto &key  = it->first;
     auto value = it->second;
 
-    encoder.write_string( (std::string &) key );
+    /* encode the name of the object */
+    rcz_encoder.write_string( (std::string &) key );
 
     switch( value->get_type() )
     {
       case ResPropValType::boolean:
       {
-        encoder.write( value->get<bool>() );
+        rcz_encoder.write( value->get<bool>() );
       }
       break;
       case ResPropValType::integer:
       {
-        encoder.write<long>( value->get<long>() );
+        rcz_encoder.write<long>( value->get<long>() );
       }
       break;
       case ResPropValType::number:
       {
-        encoder.write( value->get<double>() );
+        rcz_encoder.write( value->get<double>() );
       }
       break;
       case ResPropValType::string:
       {
-        encoder.write( value->get<std::string>() );
+        rcz_encoder.write( value->get<std::string>() );
       }
       break;
       case ResPropValType::object:
       {
-        encode_object( value->get<ResRepresentation>(), encoder );
+        /* Recursively call the encode_object api */
+        encode_object( value->get<ResRepresentation>(), rcz_encoder );
       }
       break;
       case ResPropValType::boolean_array:
       {
-        encode_array<bool>( value->get<std::vector<bool> >(), encoder );
+        encode_array<bool>( value->get<std::vector<bool> >(), rcz_encoder );
       }
       break;
       case ResPropValType::integer_array:
       {
-        encode_array<long>( value->get<std::vector<long> >(), encoder );
+        encode_array<long>( value->get<std::vector<long> >(), rcz_encoder );
       }
       break;
       case ResPropValType::number_array:
       {
-        encode_array<double>( value->get<std::vector<double> >(), encoder );
+        encode_array<double>( value->get<std::vector<double> >(), rcz_encoder );
       }
       break;
       case ResPropValType::string_array:
       {
-        encode_array<std::string>( value->get<std::vector<std::string> >(), encoder );
+        encode_array<std::string>( value->get<std::vector<std::string> >(), rcz_encoder );
       }
       break;
       case ResPropValType::obj_array:
       {
-        encode_array<ResRepresentation>( value->get<std::vector<ResRepresentation> >(), encoder );
+        encode_array<ResRepresentation>( value->get<std::vector<ResRepresentation> >(), rcz_encoder );
       }
       break;
       default:
       {
-        encoder.write_null();
+        rcz_encoder.write_null();
       }
       break;
     }
   }
 
-  return ( 0 );
+  return ( ErrCode::OK );
 }
 
-uint8_t encode_representation( ResRepresentation &res_rep, CborEncoder &encoder )
+/**
+ * In OCF the top most resource representation is either single object or array of objects.
+ *
+ * @param rcz_res_rep
+ * @param rcz_encoder
+ * @return
+ */
+static ErrCode encode_representation( ResRepresentation &rcz_res_rep, CborEncoder &rcz_encoder )
 {
-  if( ( res_rep.no_of_props() == 0 ) || ( res_rep.no_of_props() > 1 ) )
+  if( ( rcz_res_rep.no_of_props() == 0 ) || ( rcz_res_rep.no_of_props() > 1 ) )
   {
-    return ( 1 );
+    return ( ErrCode::ERR );
   }
 
-  auto it    = res_rep.get_props().cbegin();
+  auto it = rcz_res_rep.get_props().cbegin();
+
+  if( ( it == rcz_res_rep.get_props().cend() ) || ( ( ( *it ).second ) == nullptr ) )
+  {
+    return ( ErrCode::ERR );
+  }
+
   auto value = ( *it ).second;
 
   if( value->get_type() == ResPropValType::obj_array )
   {
-    encode_array( value->get<std::vector<ResRepresentation> >(), encoder );
+    encode_array( value->get<std::vector<ResRepresentation> >(), rcz_encoder );
   }
   else if( value->get_type() == ResPropValType::object )
   {
-    encode_object( value->get<ResRepresentation>(), encoder );
+    encode_object( value->get<ResRepresentation>(), rcz_encoder );
   }
   else
   {
-    return ( 1 );
+    return ( ErrCode::ERR );
   }
 
-  return ( 0 );
+  return ( ErrCode::OK );
 }
 
-ErrCode decode_object( CborMapItem *map_item, ResRepresentation &properties );
-ErrCode decode_object_array( CborArrayItem *map_item, ResRepresentation &properties );
+/*=============================================================================================================*/
 
-ErrCode decode_object( CborMapItem *map_item, ResRepresentation &properties )
+static ErrCode decode_object( CborMapItem *map_item, ResRepresentation &rcz_res_rep );
+static ErrCode decode_object_array( CborArrayItem *map_item, ResRepresentation &rcz_res_rep );
+
+static ErrCode decode_cbor_array( CborArrayItem *array_cbor_item, ResRepresentation &rcz_res_rep, std::string& str_key )
 {
-  for( auto &loop_item : map_item->get_data_list() )
+  auto first_array_item = array_cbor_item->get_item( 0 );
+
+  if( first_array_item == nullptr )
   {
-    if( ( loop_item.key == nullptr ) || ( loop_item.value == nullptr ) || ( loop_item.key->get_type() != CBOR_TYPE_STRING ) )
+    return ( ErrCode::ERR );
+  }
+
+  switch( first_array_item->get_type() )
+  {
+    case CBOR_TYPE_UINT:
+    case CBOR_TYPE_NEGINT:
     {
-      return ( ErrCode::INVALID_PARAMS );
+      std::vector<long> long_array{};
+      long_array.reserve( array_cbor_item->get_size() );
+
+      for( auto &l : array_cbor_item->get_item_list() )
+      {
+        long_array.push_back( (long) static_cast<CborIntItem *>( l )->get_int() );
+      }
+
+      rcz_res_rep.add( str_key, std::move( long_array ) );
+    }
+    break;
+    case CBOR_TYPE_STRING:
+    {
+      std::vector<std::string> string_array{};
+      string_array.reserve( array_cbor_item->get_size() );
+
+      for( auto &str : array_cbor_item->get_item_list() )
+      {
+        auto string_item = static_cast<CborTextStringItem *>( str );
+        std::string val_str{ (const char *) string_item->get_data(), string_item->get_length() };
+
+        string_array.push_back( std::move( val_str ) );
+      }
+
+      rcz_res_rep.add( str_key, std::move( string_array ) );
+    }
+    break;
+
+    case CBOR_TYPE_FLOAT_CTRL:
+    {
+      auto special_item = static_cast<CborSpecialItem *>( first_array_item );
+
+      if( special_item->is_ctrl() )
+      {
+        if( special_item->is_bool() )
+        {
+          std::vector<bool> b_array{};
+          b_array.reserve( array_cbor_item->get_size() );
+
+          for( auto &loop_item : array_cbor_item->get_item_list() )
+          {
+            b_array.push_back( static_cast<CborSpecialItem *>( loop_item )->get_bool() );
+          }
+
+          rcz_res_rep.add( str_key, std::move( b_array ) );
+        }
+      }
+      else
+      {
+        std::vector<double> d_array{};
+        d_array.reserve( array_cbor_item->get_size() );
+
+        for( auto &loop_item : array_cbor_item->get_item_list() )
+        {
+          d_array.push_back( static_cast<CborSpecialItem *>( loop_item )->get_float() );
+        }
+
+        rcz_res_rep.add( str_key, std::move( d_array ) );
+      }
+    }
+    break;
+    case CBOR_TYPE_MAP:
+    {
+      std::vector<ResRepresentation> obj_array{};
+      obj_array.reserve( array_cbor_item->get_size() );
+
+      for( auto &loop_item : array_cbor_item->get_item_list() )
+      {
+        ResRepresentation new_object{};
+
+        if( decode_object( static_cast<CborMapItem *>( loop_item ), new_object ) == ErrCode::OK )
+        {
+          obj_array.push_back( std::move( new_object ) );
+        }
+        else
+        {
+          return ( ErrCode::INVALID_PARAMS );
+        }
+      }
+
+      rcz_res_rep.add( str_key, std::move( obj_array ) );
+    }
+    break;
+    default:
+    {
+    }
+    break;
+  }
+
+  return ErrCode::OK;
+}
+
+static ErrCode decode_object( CborMapItem *map_item, ResRepresentation &rcz_res_rep )
+{
+  for( auto &loop_cbor_pair_item : map_item->get_data_list() )
+  {
+    if( ( loop_cbor_pair_item.key == nullptr ) ||
+      ( loop_cbor_pair_item.value == nullptr ) ||
+      ( loop_cbor_pair_item.key->get_type() != CBOR_TYPE_STRING ) )
+    {
+      /* skip this item */
+      continue;
     }
 
-    auto key_item = static_cast<CborTextStringItem *>( loop_item.key );
+    auto pcz_key_string_item = static_cast<CborTextStringItem *>( loop_cbor_pair_item.key );
 
-    if( ( key_item->get_length() == 0 ) || ( key_item->get_data() == nullptr ) )
+    if( ( pcz_key_string_item->get_length() == 0 ) || ( pcz_key_string_item->get_data() == nullptr ) )
     {
-      return ( ErrCode::INVALID_PARAMS );
+      /* skip this item */
+      continue;
     }
 
-    std::string key{ (char *) key_item->get_data(), key_item->get_length() };
+    std::string str_key{ (char *) pcz_key_string_item->get_data(), pcz_key_string_item->get_length() };
 
-    auto val_item = loop_item.value;
+    auto pcz_val_item = loop_cbor_pair_item.value;
 
-    switch( val_item->get_type() )
+    switch( pcz_val_item->get_type() )
     {
       case CBOR_TYPE_BYTESTRING:
       case CBOR_TYPE_TAG:
@@ -193,155 +351,54 @@ ErrCode decode_object( CborMapItem *map_item, ResRepresentation &properties )
       break;
       case CBOR_TYPE_UINT:
       {
-        properties.add( key, (long) static_cast<CborIntItem *>( val_item )->get_int() );
+        auto l = static_cast<CborIntItem *>( pcz_val_item )->get_int();
+        rcz_res_rep.add( str_key, (long) l );
       }
       break;
       case CBOR_TYPE_NEGINT:
       {
-        properties.add( key, (long) ( ( int32_t ) static_cast<CborIntItem *>( val_item )->get_int() ) );
+        int32_t l = static_cast<CborIntItem *>( pcz_val_item )->get_int();
+        rcz_res_rep.add( str_key, (long) l );
       }
       break;
       case CBOR_TYPE_STRING:
       {
-        auto string_item = static_cast<CborTextStringItem *>( val_item );
-        std::string str{ (const char *) string_item->get_data(), string_item->get_length() };
+        auto string_cbor_item = static_cast<CborTextStringItem *>( pcz_val_item );
+        std::string str_value{ (const char *) string_cbor_item->get_data(), string_cbor_item->get_length() };
 
-        properties.add( key, str );
+        rcz_res_rep.add( str_key, str_value );
       }
       break;
       case CBOR_TYPE_ARRAY:
       {
-        auto array_item = static_cast<CborArrayItem *>( val_item );
-        auto first_item = array_item->get_item( 0 );
-
-        if( first_item == nullptr )
-        {
-          break;
-        }
-
-        switch( first_item->get_type() )
-        {
-          case CBOR_TYPE_UINT:
-          case CBOR_TYPE_NEGINT:
-          {
-            std::vector<long> long_array{};
-            long_array.reserve( array_item->get_size() );
-
-            for( auto &l : array_item->get_item_list() )
-            {
-              long_array.push_back( (long) static_cast<CborIntItem *>( l )->get_int() );
-            }
-
-            properties.add( key, std::move( long_array ) );
-          }
-          break;
-          case CBOR_TYPE_STRING:
-          {
-            std::vector<std::string> string_array{};
-            string_array.reserve( array_item->get_size() );
-
-            for( auto &str : array_item->get_item_list() )
-            {
-              auto string_item = static_cast<CborTextStringItem *>( str );
-              std::string val_str{ (const char *) string_item->get_data(), string_item->get_length() };
-
-              string_array.push_back( std::move( val_str ) );
-            }
-
-            properties.add( key, std::move( string_array ) );
-          }
-          break;
-
-          case CBOR_TYPE_FLOAT_CTRL:
-          {
-            auto special_item = static_cast<CborSpecialItem *>( first_item );
-
-            if( special_item->is_ctrl() )
-            {
-              if( special_item->is_bool() )
-              {
-                std::vector<bool> b_array{};
-                b_array.reserve( array_item->get_size() );
-
-                for( auto &loop_item : array_item->get_item_list() )
-                {
-                  b_array.push_back( static_cast<CborSpecialItem *>( loop_item )->get_bool() );
-                }
-
-                properties.add( key, std::move( b_array ) );
-              }
-            }
-            else
-            {
-              std::vector<double> d_array{};
-              d_array.reserve( array_item->get_size() );
-
-              for( auto &loop_item : array_item->get_item_list() )
-              {
-                d_array.push_back( static_cast<CborSpecialItem *>( loop_item )->get_float() );
-              }
-
-              properties.add( key, std::move( d_array ) );
-            }
-          }
-          break;
-          case CBOR_TYPE_MAP:
-          {
-            std::vector<ResRepresentation> obj_array{};
-            obj_array.reserve( array_item->get_size() );
-
-            for( auto &loop_item : array_item->get_item_list() )
-            {
-              ResRepresentation new_object{};
-
-              if( decode_object( static_cast<CborMapItem *>( loop_item ), new_object ) == ErrCode::OK )
-              {
-                obj_array.push_back( std::move( new_object ) );
-              }
-              else
-              {
-                return ( ErrCode::INVALID_PARAMS );
-              }
-            }
-
-            properties.add( key, std::move( obj_array ) );
-          }
-          break;
-          default:
-          {
-          }
-          break;
-        }
+        auto array_cbor_item  = static_cast<CborArrayItem *>( pcz_val_item );
+        decode_cbor_array(array_cbor_item, rcz_res_rep, str_key);
       }
       break;
       case CBOR_TYPE_MAP:
       {
         ResRepresentation new_object{};
 
-        if( decode_object( static_cast<CborMapItem *>( val_item ), new_object ) == ErrCode::OK )
+        if( decode_object( static_cast<CborMapItem *>( pcz_val_item ), new_object ) == ErrCode::OK )
         {
-          properties.add( key, std::move( new_object ) );
-        }
-        else
-        {
-          return ( ErrCode::INVALID_PARAMS );
+          rcz_res_rep.add( str_key, std::move( new_object ) );
         }
       }
       break;
       case CBOR_TYPE_FLOAT_CTRL:
       {
-        auto special_item = static_cast<CborSpecialItem *>( val_item );
+        auto special_item = static_cast<CborSpecialItem *>( pcz_val_item );
 
         if( special_item->is_ctrl() )
         {
           if( special_item->is_bool() )
           {
-            properties.add( key, special_item->get_bool() );
+            rcz_res_rep.add( str_key, special_item->get_bool() );
           }
         }
         else
         {
-          properties.add( key, special_item->get_float() );
+          rcz_res_rep.add( str_key, special_item->get_float() );
         }
       }
       break;
@@ -355,16 +412,16 @@ ErrCode decode_object( CborMapItem *map_item, ResRepresentation &properties )
   return ( ErrCode::OK );
 }
 
-ErrCode decode_object_array( CborArrayItem *array_item, ResRepresentation &properties )
+static ErrCode decode_object_array( CborArrayItem *array_item, ResRepresentation &rcz_res_rep )
 {
   std::vector<ResRepresentation> obj_array{};
   obj_array.reserve( array_item->get_size() );
 
-  for( auto &loop_item : array_item->get_item_list() )
+  for( auto &loop_cbor_item : array_item->get_item_list() )
   {
     ResRepresentation new_object{};
 
-    if( decode_object( static_cast<CborMapItem *>( loop_item ), new_object ) == ErrCode::OK )
+    if( decode_object( static_cast<CborMapItem *>( loop_cbor_item ), new_object ) == ErrCode::OK )
     {
       obj_array.push_back( std::move( new_object ) );
     }
@@ -374,12 +431,12 @@ ErrCode decode_object_array( CborArrayItem *array_item, ResRepresentation &prope
     }
   }
 
-  properties.add( "", obj_array );
+  rcz_res_rep.add( "", obj_array );
 
   return ( ErrCode::OK );
 }
 
-ErrCode decode_representation( CborItem *root_map_item, ResRepresentation &properties )
+static ErrCode decode_representation( CborItem *root_map_item, ResRepresentation &properties )
 {
   if( root_map_item->get_type() == CBOR_TYPE_MAP )
   {
@@ -397,28 +454,59 @@ ErrCode decode_representation( CborItem *root_map_item, ResRepresentation &prope
   return ( ErrCode::OK );
 }
 
-uint8_t buffer[1024];
-
-ErrCode CborCodec::encode( ResRepresentation &res_representation, uint8_t * &dst_buffer, uint16_t &dst_buffer_len )
+/**
+ * This api should be called to encode the resource representation.
+ *
+ * @param rcz_res_rep          - object to encode
+ * @param rpu8_dst_buffer      - encoded buffer
+ * @param ru16_dst_buffer_len  - encoded buffer length
+ * @return
+ */
+ErrCode CborCodec::encode( ResRepresentation &rcz_res_rep, uint8_t * &rpu8_dst_buffer, uint16_t &ru16_dst_buffer_len )
 {
-  dst_buffer     = nullptr;
-  dst_buffer_len = 0;
+  /* initialize the buffers */
+  ru16_dst_buffer_len = 0;
 
-  CborEncoderBuffer encode_buffer{ &buffer[0], 1024 };
-  CborEncoder encoder{ &encode_buffer };
+#if defined ( _OS_FREERTOS_ )
+  static uint8_t buffer[1024];
+  rpu8_dst_buffer = &buffer[0];
+#else
+  rpu8_dst_buffer = new uint8_t[1024];
 
-  encode_representation( res_representation, encoder );
-
-  if( encode_buffer.size() > 0 )
+  if( rpu8_dst_buffer == nullptr )
   {
-    dst_buffer = new uint8_t[encode_buffer.size()];
-    memcpy( dst_buffer, encode_buffer.data(), encode_buffer.size() );
-    dst_buffer_len = encode_buffer.size();
+    return ( ErrCode::ERR );
+  }
+
+#endif
+
+  CborEncoderBuffer cz_encode_buffer{ rpu8_dst_buffer, 1024 };
+  CborEncoder cz_encoder{ &cz_encode_buffer };
+
+  encode_representation( rcz_res_rep, cz_encoder );
+
+  ru16_dst_buffer_len = cz_encode_buffer.size();
+
+  return ( ErrCode::OK );
+
+  #if 0
+
+  CborEncoderBuffer cz_encode_buffer{ &buffer[0], 1024 };
+  CborEncoder cz_encoder{ &cz_encode_buffer };
+
+  encode_representation( rcz_res_rep, cz_encoder );
+
+  if( cz_encode_buffer.size() > 0 )
+  {
+    rpu8_dst_buffer = new uint8_t[cz_encode_buffer.size()];
+    memcpy( rpu8_dst_buffer, cz_encode_buffer.data(), cz_encode_buffer.size() );
+    ru16_dst_buffer_len = cz_encode_buffer.size();
 
     return ( ErrCode::OK );
   }
 
   return ( ErrCode::ERR );
+#endif
 }
 
 ErrCode CborCodec::decode( uint8_t *src_buffer, uint16_t src_buffer_len, ResRepresentation &res_representation )
@@ -446,6 +534,7 @@ ErrCode CborCodec::decode( uint8_t *src_buffer, uint16_t src_buffer_len, ResRepr
   return ( ErrCode::OK );
 }
 
+#if 0
 uint8_t encode_object( CborItem *root_map, ResRepresentation &object )
 {
   auto &props_list = object.get_props();
@@ -561,8 +650,10 @@ uint8_t encode_object( CborItem *root_map, ResRepresentation &object )
         cbor_value = array_item;
       }
       break;
-			default:
-				break;
+      default:
+      {
+      }
+      break;
     }
 
     if( cbor_value != nullptr )
@@ -573,7 +664,7 @@ uint8_t encode_object( CborItem *root_map, ResRepresentation &object )
 
   return ( 0 );
 }
-
+#endif
 
 #if 0
 

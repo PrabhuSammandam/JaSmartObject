@@ -1,82 +1,82 @@
-#include "cbor/CborStreaming.h"
 #include <math.h>
-#include "cbor/CborListener.h"
+#include "common/inc/cbor/CborStreaming.h"
+#include "common/inc/cbor/CborListener.h"
 
-static uint8_t _cbor_load_uint8(cbor_data source)
+static uint8_t _cbor_load_uint8( cbor_data source )
 {
-	return ((uint8_t)*source);
+  return ( (uint8_t) *source );
 }
 
-static uint16_t _cbor_load_uint16(const unsigned char *source)
+static uint16_t _cbor_load_uint16( const unsigned char *source )
 {
-	return (((uint16_t) *(source + 0) << 8) +
-		(uint8_t) *(source + 1));
+  return ( ( (uint16_t) *( source + 0 ) << 8 ) +
+         (uint8_t) *( source + 1 ) );
 }
 
-static uint32_t _cbor_load_uint32(const unsigned char *source)
+static uint32_t _cbor_load_uint32( const unsigned char *source )
 {
-	return (((uint32_t) *(source + 0) << 0x18) +
-		((uint32_t) *(source + 1) << 0x10) +
-		((uint16_t) *(source + 2) << 0x08) +
-		(uint8_t) *(source + 3));
+  return ( ( (uint32_t) *( source + 0 ) << 0x18 ) +
+         ( (uint32_t) *( source + 1 ) << 0x10 ) +
+         ( (uint16_t) *( source + 2 ) << 0x08 ) +
+         (uint8_t) *( source + 3 ) );
 }
 
-static uint64_t _cbor_load_uint64(const unsigned char *source)
+static uint64_t _cbor_load_uint64( const unsigned char *source )
 {
-	return (((uint64_t) *(source + 0) << 0x38) +
-		((uint64_t) *(source + 1) << 0x30) +
-		((uint64_t) *(source + 2) << 0x28) +
-		((uint64_t) *(source + 3) << 0x20) +
-		((uint32_t) *(source + 4) << 0x18) +
-		((uint32_t) *(source + 5) << 0x10) +
-		((uint16_t) *(source + 6) << 0x08) +
-		(uint8_t) *(source + 7));
+  return ( ( (uint64_t) *( source + 0 ) << 0x38 ) +
+         ( (uint64_t) *( source + 1 ) << 0x30 ) +
+         ( (uint64_t) *( source + 2 ) << 0x28 ) +
+         ( (uint64_t) *( source + 3 ) << 0x20 ) +
+         ( (uint32_t) *( source + 4 ) << 0x18 ) +
+         ( (uint32_t) *( source + 5 ) << 0x10 ) +
+         ( (uint16_t) *( source + 6 ) << 0x08 ) +
+         (uint8_t) *( source + 7 ) );
 }
 
 /* As per http://tools.ietf.org/html/rfc7049#appendix-D */
-static float _cbor_decode_half(unsigned char *halfp)
+static float _cbor_decode_half( unsigned char *halfp )
 {
-	int    half = (halfp[0] << 8) + halfp[1];
-	int    exp = (half >> 10) & 0x1f;
-	int    mant = half & 0x3ff;
-	double val;
+  int    half = ( halfp[0] << 8 ) + halfp[1];
+  int    exp  = ( half >> 10 ) & 0x1f;
+  int    mant = half & 0x3ff;
+  double val;
 
-	if (exp == 0)
-	{
-		val = ldexp(mant, -24);
-	}
-	else if (exp != 31)
-	{
-		val = ldexp(mant + 1024, exp - 25);
-	}
-	else
-	{
-		val = mant == 0 ? INFINITY : NAN;
-	}
+  if( exp == 0 )
+  {
+    val = ldexp( mant, -24 );
+  }
+  else if( exp != 31 )
+  {
+    val = ldexp( mant + 1024, exp - 25 );
+  }
+  else
+  {
+    val = mant == 0 ? INFINITY : NAN;
+  }
 
-	return ((float)(half & 0x8000 ? -val : val));
+  return ( (float) ( half & 0x8000 ? -val : val ) );
 }
 
-static double _cbor_load_half(cbor_data source)
+static double _cbor_load_half( cbor_data source )
 {
-	/* Discard const */
-	return (_cbor_decode_half((unsigned char *)source));
+  /* Discard const */
+  return ( _cbor_decode_half( (unsigned char *) source ) );
 }
 
-static float _cbor_load_float(cbor_data source)
+static float _cbor_load_float( cbor_data source )
 {
-	union _cbor_float_helper helper;
+  union _cbor_float_helper helper;
 
-	helper.as_uint = _cbor_load_uint32(source);
-	return (helper.as_float);
+  helper.as_uint = _cbor_load_uint32( source );
+  return ( helper.as_float );
 }
 
-static double _cbor_load_double(cbor_data source)
+static double _cbor_load_double( cbor_data source )
 {
-	union _cbor_double_helper helper;
+  union _cbor_double_helper helper;
 
-	helper.as_uint = _cbor_load_uint64(source);
-	return (helper.as_double);
+  helper.as_uint = _cbor_load_uint64( source );
+  return ( helper.as_double );
 }
 
 bool static _cbor_claim_bytes( size_t required, size_t provided, struct cbor_decoder_result *result )
@@ -96,7 +96,7 @@ bool static _cbor_claim_bytes( size_t required, size_t provided, struct cbor_dec
 }
 
 
-cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, CborListener& listener)
+cbor_decoder_result cbor_stream_decode( uint8_t *source, size_t source_size, CborListener &listener )
 {
   struct cbor_decoder_result decode_result;
 
@@ -139,7 +139,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x17:
       /* Embedded one byte unsigned integer */
     {
-			listener.on_uint8(_cbor_load_uint8(source));
+      listener.on_uint8( _cbor_load_uint8( source ) );
       return ( result );
     }
     case 0x18:
@@ -147,7 +147,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 1, source_size, &result ) )
       {
-				listener.on_uint8(_cbor_load_uint8(source + 1));
+        listener.on_uint8( _cbor_load_uint8( source + 1 ) );
       }
 
       return ( result );
@@ -157,7 +157,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_uint16(_cbor_load_uint16(source+1));
+        listener.on_uint16( _cbor_load_uint16( source + 1 ) );
       }
 
       return ( result );
@@ -167,7 +167,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_uint32(_cbor_load_uint32(source + 1));
+        listener.on_uint32( _cbor_load_uint32( source + 1 ) );
       }
 
       return ( result );
@@ -177,7 +177,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_uint64(_cbor_load_uint64(source + 1));
+        listener.on_uint64( _cbor_load_uint64( source + 1 ) );
       }
 
       return ( result );
@@ -218,7 +218,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x37:
       /* Embedded one byte negative integer */
     {
-			listener.on_int8(_cbor_load_uint8(source ) - 0x20);
+      listener.on_int8( _cbor_load_uint8( source ) - 0x20 );
       return ( result );
     }
     case 0x38:
@@ -226,7 +226,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 1, source_size, &result ) )
       {
-				listener.on_int8(_cbor_load_uint8(source + 1));
+        listener.on_int8( _cbor_load_uint8( source + 1 ) );
       }
 
       return ( result );
@@ -236,7 +236,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_int16(_cbor_load_uint16(source + 1));
+        listener.on_int16( _cbor_load_uint16( source + 1 ) );
       }
 
       return ( result );
@@ -246,7 +246,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_int32(_cbor_load_uint32(source + 1));
+        listener.on_int32( _cbor_load_uint32( source + 1 ) );
       }
 
       return ( result );
@@ -256,7 +256,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_int64(_cbor_load_uint64(source + 1));
+        listener.on_int64( _cbor_load_uint64( source + 1 ) );
       }
 
       return ( result );
@@ -301,7 +301,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
       if( _cbor_claim_bytes( length, source_size, &result ) )
       {
-				listener.on_definite_byte_string(source + 1, length);
+        listener.on_definite_byte_string( source + 1, length );
       }
 
       return ( result );
@@ -316,7 +316,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_byte_string(source + 1 + 1, length);
+          listener.on_definite_byte_string( source + 1 + 1, length );
         }
       }
 
@@ -331,7 +331,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_byte_string(source + 1 + 2, length);
+          listener.on_definite_byte_string( source + 1 + 2, length );
         }
       }
 
@@ -346,7 +346,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_byte_string(source + 1 + 4, length);
+          listener.on_definite_byte_string( source + 1 + 4, length );
         }
       }
 
@@ -361,7 +361,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_byte_string(source + 1 + 8, length);
+          listener.on_definite_byte_string( source + 1 + 8, length );
         }
       }
 
@@ -379,7 +379,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x5F:
       /* Indefinite byte string */
     {
-			listener.on_indefinite_byte_string();
+      listener.on_indefinite_byte_string();
       return ( result );
     }
     case 0x60:     /* Fallthrough */
@@ -412,7 +412,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
       if( _cbor_claim_bytes( length, source_size, &result ) )
       {
-				listener.on_definite_text_string(source + 1, length);
+        listener.on_definite_text_string( source + 1, length );
       }
 
       return ( result );
@@ -426,7 +426,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_text_string(source + 1 + 1, length);
+          listener.on_definite_text_string( source + 1 + 1, length );
         }
       }
 
@@ -441,7 +441,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_text_string(source + 1 + 2, length);
+          listener.on_definite_text_string( source + 1 + 2, length );
         }
       }
 
@@ -456,7 +456,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_text_string(source + 1 + 4, length);
+          listener.on_definite_text_string( source + 1 + 4, length );
         }
       }
 
@@ -471,7 +471,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
 
         if( _cbor_claim_bytes( length, source_size, &result ) )
         {
-					listener.on_definite_text_string(source + 1 + 8, length);
+          listener.on_definite_text_string( source + 1 + 8, length );
         }
       }
 
@@ -489,7 +489,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x7F:
       /* Indefinite length string */
     {
-			listener.on_indefinite_text_string();
+      listener.on_indefinite_text_string();
       return ( result );
     }
     case 0x80:     /* Fallthrough */
@@ -518,7 +518,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x97:
       /* Embedded one byte length array */
     {
-			listener.on_definite_array((size_t)_cbor_load_uint8(source)-0x80);
+      listener.on_definite_array( (size_t) _cbor_load_uint8( source ) - 0x80 );
       return ( result );
     }
     case 0x98:
@@ -526,7 +526,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 1, source_size, &result ) )
       {
-				listener.on_definite_array((size_t)_cbor_load_uint8(source + 1));
+        listener.on_definite_array( (size_t) _cbor_load_uint8( source + 1 ) );
       }
 
       return ( result );
@@ -536,7 +536,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_definite_array((size_t)_cbor_load_uint16(source + 1));
+        listener.on_definite_array( (size_t) _cbor_load_uint16( source + 1 ) );
       }
 
       return ( result );
@@ -546,7 +546,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_definite_array((size_t)_cbor_load_uint32(source + 1));
+        listener.on_definite_array( (size_t) _cbor_load_uint32( source + 1 ) );
       }
 
       return ( result );
@@ -556,7 +556,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_definite_array((size_t)_cbor_load_uint64(source + 1));
+        listener.on_definite_array( (size_t) _cbor_load_uint64( source + 1 ) );
       }
 
       return ( result );
@@ -573,7 +573,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0x9F:
       /* Indefinite length array */
     {
-			listener.on_indefinite_array();
+      listener.on_indefinite_array();
       return ( result );
     }
     case 0xA0:     /* Fallthrough */
@@ -602,7 +602,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xB7:
       /* Embedded one byte length map */
     {
-			listener.on_definite_map((size_t)_cbor_load_uint8(source) - 0xA0);
+      listener.on_definite_map( (size_t) _cbor_load_uint8( source ) - 0xA0 );
       return ( result );
     }
     case 0xB8:
@@ -610,7 +610,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 1, source_size, &result ) )
       {
-				listener.on_definite_map((size_t)_cbor_load_uint8(source + 1));
+        listener.on_definite_map( (size_t) _cbor_load_uint8( source + 1 ) );
       }
 
       return ( result );
@@ -620,7 +620,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_definite_map((size_t)_cbor_load_uint16(source + 1));
+        listener.on_definite_map( (size_t) _cbor_load_uint16( source + 1 ) );
       }
 
       return ( result );
@@ -630,7 +630,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_definite_map((size_t)_cbor_load_uint32(source + 1));
+        listener.on_definite_map( (size_t) _cbor_load_uint32( source + 1 ) );
       }
 
       return ( result );
@@ -640,7 +640,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_definite_map((size_t)_cbor_load_uint64(source + 1));
+        listener.on_definite_map( (size_t) _cbor_load_uint64( source + 1 ) );
       }
 
       return ( result );
@@ -657,7 +657,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xBF:
       /* Indefinite length map */
     {
-			listener.on_indefinite_map();
+      listener.on_indefinite_map();
       return ( result );
     }
     case 0xC0:
@@ -673,7 +673,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xC5:
       /* Big float */
     {
-			listener.on_tag(_cbor_load_uint8(source) - 0xC0);
+      listener.on_tag( _cbor_load_uint8( source ) - 0xC0 );
       return ( result );
     }
     case 0xC6:     /* Fallthrough */
@@ -700,14 +700,14 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xD6:     /* Expected b64 conversion tag - fallthrough */
     case 0xD7:     /* Expected b16 conversion tag */
     {
-			listener.on_tag(_cbor_load_uint8(source) - 0xC0);
+      listener.on_tag( _cbor_load_uint8( source ) - 0xC0 );
       return ( result );
     }
     case 0xD8:     /* 1B tag */
     {
       if( _cbor_claim_bytes( 1, source_size, &result ) )
       {
-				listener.on_tag(_cbor_load_uint8(source + 1));
+        listener.on_tag( _cbor_load_uint8( source + 1 ) );
       }
 
       return ( result );
@@ -716,7 +716,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_tag(_cbor_load_uint16(source + 1));
+        listener.on_tag( _cbor_load_uint16( source + 1 ) );
       }
 
       return ( result );
@@ -725,7 +725,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_tag(_cbor_load_uint32(source + 1));
+        listener.on_tag( _cbor_load_uint32( source + 1 ) );
       }
 
       return ( result );
@@ -734,7 +734,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_tag(_cbor_load_uint64(source + 1));
+        listener.on_tag( _cbor_load_uint64( source + 1 ) );
       }
 
       return ( result );
@@ -776,25 +776,25 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xF4:
       /* False */
     {
-			listener.on_bool(false);
+      listener.on_bool( false );
       return ( result );
     }
     case 0xF5:
       /* True */
     {
-			listener.on_bool(true);
+      listener.on_bool( true );
       return ( result );
     }
     case 0xF6:
       /* Null */
     {
-			listener.on_null();
+      listener.on_null();
       return ( result );
     }
     case 0xF7:
       /* Undefined */
     {
-			listener.on_undefined();
+      listener.on_undefined();
       return ( result );
     }
     case 0xF8:
@@ -809,7 +809,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 2, source_size, &result ) )
       {
-				listener.on_float16((float)_cbor_load_half(source + 1));
+        listener.on_float16( (float) _cbor_load_half( source + 1 ) );
       }
 
       return ( result );
@@ -819,7 +819,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 4, source_size, &result ) )
       {
-				listener.on_float32(_cbor_load_float(source + 1));
+        listener.on_float32( _cbor_load_float( source + 1 ) );
       }
 
       return ( result );
@@ -829,7 +829,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     {
       if( _cbor_claim_bytes( 8, source_size, &result ) )
       {
-				listener.on_float64(_cbor_load_double(source + 1));
+        listener.on_float64( _cbor_load_double( source + 1 ) );
       }
 
       return ( result );
@@ -846,7 +846,7 @@ cbor_decoder_result cbor_stream_decode( uint8_t* source, size_t source_size, Cbo
     case 0xFF:
       /* Break */
     {
-			listener.on_indefinite_break();
+      listener.on_indefinite_break();
       return ( result );
     }
     default:     /* Never happens - this shuts up the compiler */

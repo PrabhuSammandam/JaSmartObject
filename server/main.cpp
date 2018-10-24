@@ -10,6 +10,7 @@
 #define DBG_WARN( format, ... ) printf( format "\n", ## __VA_ARGS__ )
 #define DBG_ERROR( format, ... ) printf( format "\n", ## __VA_ARGS__ )
 #define DBG_FATAL( format, ... ) printf( format "\n", ## __VA_ARGS__ )
+
 #include "IMemAllocator.h"
 #include "OsalMgr.h"
 #include "i_nwk_platform_factory.h"
@@ -25,10 +26,6 @@ using namespace ja_iot::memory;
 using namespace ja_iot::network;
 using namespace ja_iot::osal;
 
-void adapter_mgr_pkt_recvd_cb( void *pv_user_data, Endpoint const &end_point, const uint8_t *data, uint16_t data_len )
-{
-  cout << "received packet of length " << data_len << endl;
-}
 void init_adapter_mgr()
 {
   if( MemAllocatorFactory::create_set_mem_allocator( MemAlloctorType::kLinux ) == nullptr )
@@ -60,7 +57,7 @@ void init_adapter_mgr()
 
 void init_resources()
 {
-  auto switch_res = new BinarySwitchResource {};
+  auto switch_res = new BinarySwitchResource{};
 
   ResourceMgr::inst().add_resource( switch_res );
 }

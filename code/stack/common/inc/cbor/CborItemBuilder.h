@@ -24,15 +24,15 @@ class CborItemBuilder : public CborListener
 {
   public:
 
-    void append( CborItem *item );
-    void push( CborItem *item, size_t size = 0 ) { _stack.push( { item, size } ); }
-		static CborItem* Load(cbor_data source, size_t source_size, cbor_load_result *result);
+    void             append( CborItem *item );
+    void             push( CborItem *item, size_t size = 0 ) { _stack.push( { item, size } ); }
+    static CborItem* Load( cbor_data source, size_t source_size, cbor_load_result *result );
 
     auto get_root_item() { return ( _root_item ); }
     void set_root_item( CborItem *item ) { _root_item = item; }
     auto get_item_count() { return ( _stack.size() ); }
-		bool is_creation_failed() { return _creation_failed; }
-		bool is_syntax_error() { return _syntax_error; }
+    bool is_creation_failed() { return ( _creation_failed ); }
+    bool is_syntax_error() { return ( _syntax_error ); }
 
   public:
     void on_uint8( uint8_t u8_value ) override;
@@ -49,12 +49,12 @@ class CborItemBuilder : public CborListener
     void on_indefinite_byte_string() override;
     void on_definite_byte_string( uint8_t *data, size_t size ) override;
     void on_indefinite_text_string() override;
-    void on_definite_text_string(uint8_t *data, size_t size) override;
+    void on_definite_text_string( uint8_t *data, size_t size ) override;
     void on_indefinite_array() override;
-    void on_definite_array(uint32_t size ) override;
+    void on_definite_array( uint32_t size ) override;
     void on_indefinite_map() override;
-    void on_definite_map(uint32_t size ) override;
-    void on_tag(uint64_t tag ) override;
+    void on_definite_map( uint32_t size ) override;
+    void on_tag( uint64_t tag ) override;
     void on_bool( bool ) override;
     void on_null() override;
     void on_undefined() override;
@@ -64,6 +64,6 @@ class CborItemBuilder : public CborListener
   private:
     bool                             _creation_failed = false;
     bool                             _syntax_error    = false;
-    CborItem *                       _root_item      = nullptr;
+    CborItem *                       _root_item       = nullptr;
     std::stack<BuilderContextInfo>   _stack;
 };

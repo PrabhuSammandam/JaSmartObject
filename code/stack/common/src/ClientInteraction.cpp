@@ -39,17 +39,23 @@ void ClientInteraction::send_request()
     return;
   }
 
-  MessageIdProvider::assign_message_id( *_client_request );
-  TokenProvider::assign_next_token( *_client_request );
+  MessageIdProvider::assign_message_id( *_client_request );// assign message id for new message
+  TokenProvider::assign_next_token( *_client_request );// assign token id for new interaction
 
-  set_token( _client_request->get_token() );
-  set_endpoint( _client_request->get_endpoint() );
+  set_token( _client_request->get_token() );// update this interaction with request token
+  set_endpoint( _client_request->get_endpoint() );// update this interaction with the request endpoint
 
   CoapMsg *coap_request_msg = nullptr;
 
-  if( ( ( _client_request->get_code() == COAP_MSG_CODE_POST ) || ( _client_request->get_code() == COAP_MSG_CODE_PUT ) )
-    && ( _client_request->get_payload_len() > MAX_MESSAGE_SIZE ) )
+  auto     is_post_request       = _client_request->get_code() == COAP_MSG_CODE_POST;
+  auto     is_put_request        = _client_request->get_code() == COAP_MSG_CODE_PUT;
+  auto     is_blockwise_required = _client_request->get_payload_len() > MAX_MESSAGE_SIZE;
+
+  /* check whether the client request exceeds the max configured message size and it usually comes
+   * only for POST or PUT request */
+  if( ( is_post_request || is_put_request ) && is_blockwise_required )
   {
+    /* send the request in blockwise */
     auto req_transfer_status = create_request_block_transfer_status( _client_request, false );
     coap_request_msg = client_blockwise_get_next_request_block( _client_request, req_transfer_status );
   }
@@ -59,7 +65,7 @@ void ClientInteraction::send_request()
     coap_request_msg = new CoapMsg{ *( (CoapMsg *) _client_request ) };
   }
 
-  /* to send request following fields must be set
+  /* to send request, following fields must be set
    * 1. Type        - set from resource or calculated based on request
    * 2. Code        - set from resource
    * 3. ID          - set based on the request
@@ -185,7 +191,7 @@ void ClientInteraction::receive_response( CoapMsg *pcz_response )
 
   if( pcz_response->is_confirmable() || pcz_response->is_non_confirmable() )
   {
-    /* an incoming CON or NON exchange is meant to be that it is a reply for previous msg
+    /* an incoming CON or NON exchange is meant to be that it is a reply for previous message
      * and also whatever send previous also not valid */
     delete_current_in_exchange();
 
@@ -198,7 +204,7 @@ void ClientInteraction::receive_response( CoapMsg *pcz_response )
     }
   }
 
-  if( !pcz_response->has_block_option() )
+  if( pcz_response->has_block_option() == false )
   {
     /* received single complete message */
     auto client_response = new ClientResponse{ pcz_response };
@@ -254,6 +260,7 @@ void ClientInteraction::client_handle_block1_transfer( CoapMsg *pcz_response_msg
 
   if( pcz_req_block_status == nullptr )
   {
+	  /* blockwise request transfer not found */
     delete pcz_response_msg;
     return;
   }
@@ -268,9 +275,9 @@ void ClientInteraction::client_handle_block1_transfer( CoapMsg *pcz_response_msg
   if( pcz_response_msg->get_code() == COAP_MSG_CODE_CONTINUE_231 )
   {
     auto u16_current_size   = pcz_req_block_status->get_block_size();
-		auto u16_new_block_size = u16_current_size;
+    auto u16_new_block_size = u16_current_size;
 
-		/* check if the block size changed */
+    /* check if the block size changed */
     if( pcz_response_msg->get_option_set().get_block1().get_size() < u16_current_size )
     {
       u16_new_block_size = pcz_response_msg->get_option_set().get_block1().get_size();
@@ -319,7 +326,7 @@ void ClientInteraction::client_handle_block1_transfer( CoapMsg *pcz_response_msg
   }
   else if( !pcz_response_msg->get_option_set().has_block2() )
   {
-		/* there is no block2 transfer, it means this is the final response */
+    /* there is no block2 transfer, it means this is the final response */
     auto pcz_client_response = new ClientResponse{ pcz_response_msg };
     notify_response( pcz_client_response, CLIENT_RESPONSE_STATUS_OK );
   }
@@ -333,6 +340,7 @@ void ClientInteraction::client_handle_block2_transfer( CoapMsg *pcz_response_msg
 
   if( pcz_res_blk_status == nullptr )
   {
+	  /* blockwise response not started previously, so start it now*/
     pcz_res_blk_status = create_response_block_transfer_status( pcz_response_msg, true );
     pcz_res_blk_status->set_block_size( rcz_options_set.get_block2().get_size() );
   }
@@ -354,10 +362,13 @@ void ClientInteraction::client_handle_block2_transfer( CoapMsg *pcz_response_msg
     }
     else
     {
+    	/* no more response blocks, now it is time to assemble all the received block2 messages and pass
+    	 * it to the stack */
       auto client_response = new ClientResponse{};
       client_response->copy_with_options( pcz_response_msg );
       client_response->set_id( pcz_response_msg->get_id() );
       client_response->set_payload( (uint8_t *) pcz_res_blk_status->get_payload_buffer(), pcz_res_blk_status->get_payload_length() );
+      /* need to check where the payload_buffer memory is deleted */
       delete_response_block_transfer_status();
       notify_response( client_response, CLIENT_RESPONSE_STATUS_OK );
     }
@@ -391,11 +402,14 @@ CoapMsg * ClientInteraction::client_blockwise_get_next_request_block( CoapMsg *c
 
 void ClientInteraction::send_single_request_msg( CoapMsg *pcz_new_request )
 {
+  /* check whether the message type is set in the request. If it is not set
+   * then default it will be CON message */
   if( pcz_new_request->get_type() == COAP_MSG_TYPE_NONE )
   {
     pcz_new_request->set_type( COAP_MSG_TYPE_CON );
   }
 
+  /* assign new message id, if it is not not set */
   MessageIdProvider::assign_message_id( *pcz_new_request );
 
   pcz_new_request->set_token( get_token() );

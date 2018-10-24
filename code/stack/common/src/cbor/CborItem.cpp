@@ -1,5 +1,5 @@
-#include "cbor/CborItem.h"
-#include "cbor/CborEncoding.h"
+#include "common/inc/cbor/CborItem.h"
+#include "common/inc/cbor/CborEncoding.h"
 
 CborItem & CborItem::operator = ( CborItem &other )
 {
