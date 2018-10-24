@@ -20,7 +20,7 @@
 #include "base_utils.h"
 #include "ip_addr.h"
 #include "ResPropValue.h"
-#include "cbor/CborCodec.h"
+#include "CborCodec.h"
 
 using namespace std;
 using namespace ja_iot::base;

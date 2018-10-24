@@ -1,6 +1,6 @@
 #include "BinarySwitchResource.h"
 #include "StackConsts.h"
-#include "cbor/CborCodec.h"
+#include "CborCodec.h"
 BinarySwitchResource::BinarySwitchResource () : BaseResource{ "/switch/1" }
 {
   init();
