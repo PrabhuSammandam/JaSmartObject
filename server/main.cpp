@@ -28,14 +28,30 @@ using namespace ja_iot::osal;
 
 void init_adapter_mgr()
 {
-  if( MemAllocatorFactory::create_set_mem_allocator( MemAlloctorType::kLinux ) == nullptr )
+  MemAlloctorType mem_alloctor_type;
+  NetworkPlatform network_platform;
+
+#ifdef _OS_LINUX_
+  mem_alloctor_type = MemAlloctorType::kLinux;
+  network_platform  = NetworkPlatform::kLinux;
+#endif
+#ifdef _OS_WINDOWS_
+  mem_alloctor_type = MemAlloctorType::kWindows;
+  network_platform  = NetworkPlatform::kWindows;
+#endif
+#ifdef _OS_FREERTOS_
+  mem_alloctor_type = MemAlloctorType::kFreeRTOS;
+  network_platform  = NetworkPlatform::kFreeRTOS;
+#endif
+
+  if( MemAllocatorFactory::create_set_mem_allocator( mem_alloctor_type ) == nullptr )
   {
     DBG_ERROR( "main:%d# Failed to allocate the mem allocator", __LINE__ );
   }
 
   OsalMgr::Inst()->Init();
 
-  if( INetworkPlatformFactory::create_set_factory( NetworkPlatform::kLinux ) == nullptr )
+  if( INetworkPlatformFactory::create_set_factory( network_platform ) == nullptr )
   {
     DBG_ERROR( "main:%d# INetworkPlatformFactory NULL for WINDOWS platform", __LINE__ );
   }
