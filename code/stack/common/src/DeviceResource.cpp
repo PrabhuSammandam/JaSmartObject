@@ -7,8 +7,10 @@ namespace ja_iot {
 namespace stack {
 using namespace base;
 /*
- * Methods : GET[oic.if.r, oic.if.baseline]
- * Interfaces : oic.if.r, oic.if.baseline
+ * WellKnownURI		/oic/d
+ * Resource Type	oic.wk.d
+ * Methods			GET[oic.if.r, oic.if.baseline]
+ * Interfaces		oic.if.r, oic.if.baseline
  */
 DeviceResource::DeviceResource () : BaseResource{ "/oic/d" }
 {

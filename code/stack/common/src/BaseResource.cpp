@@ -220,6 +220,7 @@ uint8_t BaseResource::check_interface_query( QueryContainer &query_container )
 
   if( query_if_count > res_if_count )
   {
+	  /* query contains more no of interfaces than the resource supports */
     return ( STACK_STATUS_INVALID_INTERFACE_QUERY );
   }
   else
@@ -263,10 +264,12 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
     return ( STACK_STATUS_OK );
   }
 
+  /* get the number of resource type supported in this resource */
   auto res_type_count = get_types().size();
 
   if( query_type_count > res_type_count )
   {
+	  /* query contains more number of resource types the resource supported */
     return ( STACK_STATUS_INVALID_TYPE_QUERY );
   }
   else
@@ -275,11 +278,13 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
     for( auto &query_rt : query_container.get_query_map() )
     {
+    	/* check for only "rt" query */
       if( query_rt.first != rt_string )
       {
         continue;
       }
 
+      /* found the "rt" query, now check whether it is supported in the resource */
       auto is_matched = false;
 
       for( auto &res_rt_name : get_types() )
@@ -293,7 +298,7 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
       if( !is_matched )
       {
-        return ( STACK_STATUS_INVALID_INTERFACE_QUERY );
+        return ( STACK_STATUS_INVALID_TYPE_QUERY );
       }
     }
   }

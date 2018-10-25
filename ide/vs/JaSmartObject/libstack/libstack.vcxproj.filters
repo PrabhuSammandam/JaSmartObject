@@ -33,7 +33,7 @@
     <Filter Include="Source Files\common\src\cbor">
       <UniqueIdentifier>{19e901d8-992e-4486-a407-0779e3716676}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\export\cbor">
+    <Filter Include="Header Files\common\inc\cbor">
       <UniqueIdentifier>{0287511e-b4f3-4e8c-b8f5-4f448bc12e1e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -224,43 +224,43 @@
       <Filter>Header Files\export</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\ICborDecoderListener.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborCodec.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborDecoder.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborDecoderBuffer.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoder.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoderBuffer.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborEncoding.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborItem.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborItemBuilder.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborListener.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborPrettyPrinter.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborStreaming.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborTypedefs.h">
-      <Filter>Header Files\export\cbor</Filter>
+      <Filter>Header Files\common\inc\cbor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

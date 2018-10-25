@@ -21,7 +21,7 @@ enum class ResInterfaceType : uint8_t
   ReadWrite,
   Actuator,
   Sensor,
-	none
+  none
 };
 }
 }

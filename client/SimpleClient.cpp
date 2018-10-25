@@ -50,7 +50,23 @@ class CommandLineArgs
 
 void init_adapter_mgr()
 {
-  const auto mem_allocator = MemAllocatorFactory::create_set_mem_allocator( MemAlloctorType::kLinux );
+	MemAlloctorType mem_alloctor_type;
+	NetworkPlatform network_platform;
+
+#ifdef _OS_LINUX_
+	mem_alloctor_type = MemAlloctorType::kLinux;
+	network_platform = NetworkPlatform::kLinux;
+#endif 
+#ifdef _OS_WINDOWS_
+	mem_alloctor_type = MemAlloctorType::kWindows;
+	network_platform = NetworkPlatform::kWindows;
+#endif 
+#ifdef _OS_FREERTOS_
+	mem_alloctor_type = MemAlloctorType::kFreeRTOS;
+	network_platform = NetworkPlatform::kFreeRTOS;
+#endif 
+
+	const auto mem_allocator = MemAllocatorFactory::create_set_mem_allocator(mem_alloctor_type);
 
   if( mem_allocator == nullptr )
   {
@@ -60,7 +76,7 @@ void init_adapter_mgr()
 
   OsalMgr::Inst()->Init();
 
-  const auto platform_factory = INetworkPlatformFactory::create_set_factory( NetworkPlatform::kLinux );
+  const auto platform_factory = INetworkPlatformFactory::create_set_factory(network_platform);
 
   if( platform_factory == nullptr )
   {

@@ -314,7 +314,7 @@ void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg )
 {
   switch( pv_stack_msg->get_msg_type() )
   {
-    case SimpleStackMsgType::HEART_BEAT_TIMER:
+    case SoStackMsgType::HEART_BEAT_TIMER:
     {
       // printf( "Got heart beat msg, timestamp[%I64d]\n", OsalTimer::get_system_time() );
       HANDLE_STACK_EVENT_heart_beat();
@@ -323,25 +323,25 @@ void receive_stack_event( ja_iot::stack::StackEvent *pv_stack_msg )
 #endif
     }
     break;
-    case SimpleStackMsgType::ENDPOINT_DATA:
+    case SoStackMsgType::ENDPOINT_DATA:
     {
       HANDLE_STACK_EVENT_receive_endpoint_data( static_cast<EndpointDataStackEvent *>( pv_stack_msg ) );
     }
     break;
-    case SimpleStackMsgType::SERVER_SEND_RESPONSE:
+    case SoStackMsgType::SERVER_SEND_RESPONSE:
     {
       auto send_response_stack_msg = static_cast<SendServerResponseStackEvent *>( pv_stack_msg );
       HANDLE_STACK_EVENT_send_server_response( send_response_stack_msg->_server_response );
     }
     break;
-    case SimpleStackMsgType::CLIENT_SEND_REQUEST:
+    case SoStackMsgType::CLIENT_SEND_REQUEST:
     {
       auto client_send_request_stack_msg = static_cast<ClientSendRequestStackEvent *>( pv_stack_msg );
       HANDLE_STACK_EVENT_send_client_request( client_send_request_stack_msg->_client_request, client_send_request_stack_msg->_client_response_cb );
     }
     break;
 
-    case SimpleStackMsgType::NONE: break;
+    case SoStackMsgType::NONE: break;
     default:;
   }
 }
@@ -576,16 +576,16 @@ static void STACK_TASK_delete_msg_cb( void *pv_task_arg, void *pv_user_data )
 
   switch( stack_msg->get_msg_type() )
   {
-    case SimpleStackMsgType::ENDPOINT_DATA:
+    case SoStackMsgType::ENDPOINT_DATA:
       delete static_cast<EndpointDataStackEvent *>( pv_task_arg );
       break;
-    case SimpleStackMsgType::HEART_BEAT_TIMER:
+    case SoStackMsgType::HEART_BEAT_TIMER:
       delete static_cast<HeartBeatTimerStackEvent *>( pv_task_arg );
       break;
-    case SimpleStackMsgType::SERVER_SEND_RESPONSE:
+    case SoStackMsgType::SERVER_SEND_RESPONSE:
       delete static_cast<SendServerResponseStackEvent *>( pv_task_arg );
       break;
-    case SimpleStackMsgType::CLIENT_SEND_REQUEST:
+    case SoStackMsgType::CLIENT_SEND_REQUEST:
       delete static_cast<ClientSendRequestStackEvent *>( pv_task_arg );
       break;
     default:

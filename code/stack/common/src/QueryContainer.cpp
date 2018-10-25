@@ -34,6 +34,10 @@ uint8_t QueryContainer::get_interface_count()
   return ( interface_count );
 }
 
+/**
+ * Returns the no of resource type query count.
+ * @return
+ */
 uint8_t QueryContainer::get_type_count()
 {
   uint8_t res_type_count = 0;

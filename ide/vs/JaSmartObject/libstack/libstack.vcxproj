@@ -168,7 +168,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>REPRESENTATION_PRETTY_PRINT;_LITTLE_ENDIAN_;_IP_ADAPTER_;_OS_WINDOWS_;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\..\..\..\code\stack\common\inc;..\..\..\..\code\base\export;..\..\..\..\code\memory\export;..\..\..\..\code\osal\export;..\..\..\..\code\network\export;..\..\..\..\code\stack;..\..\..\..\code\stack\common\inc;..\..\..\..\code\stack\export</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\code\base\export;..\..\..\..\code\memory\export;..\..\..\..\code\osal\export;..\..\..\..\code\network\export;..\..\..\..\code\stack;..\..\..\..\code\stack\export</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -177,7 +177,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>

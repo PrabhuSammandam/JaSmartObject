@@ -276,6 +276,7 @@ MulticastClientInteraction * InteractionStore::create_multicast_client_interacti
 
 MulticastClientInteraction * InteractionStore::find_multicast_client_interaction( ja_iot::network::CoapMsg *coap_msg )
 {
+	return nullptr;
 }
 
 void InteractionStore::print_server_exchanges()
