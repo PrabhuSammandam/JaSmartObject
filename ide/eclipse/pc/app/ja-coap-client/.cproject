@@ -340,6 +340,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/ja-coap-client/client/tclap}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -376,6 +378,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/ja-coap-client/client/tclap}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -424,6 +428,12 @@
                                     <listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="base"/>
                                     									
                                     <listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+                                    									
+                                    <listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="ws2_32"/>
+                                    									
+                                    <listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="iphlpapi"/>
+                                    									
+                                    <listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="bcrypt"/>
                                     								
                                 </option>
                                 								
@@ -462,6 +472,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/osal/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/ja-coap-client/client/tclap}&quot;"/>
                                     								
                                 </option>
                                 								
