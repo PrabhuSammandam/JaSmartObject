@@ -59,9 +59,8 @@ class IpAdapterBase : public IAdapter
 
     void          set_adapter_event_cb( const pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) override { this->_adapter_event_callback = pfn_adapter_event_callback; this->_adapter_event_cb_data = pv_user_data; }
     base::ErrCode get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list ) override;
-    base::ErrCode handle_interface_event( InterfaceEvent *interface_event );
-    void          handle_msg( void *msg );
-    void          delete_msg( void *msg );
+    void          SEND_TASK_handle_msg( void *msg );
+    void          SEND_TASK_delete_msg( void *msg );
 
   protected:
     virtual base::ErrCode do_pre_intialize() { return ( base::ErrCode::OK ); }
@@ -82,15 +81,12 @@ class IpAdapterBase : public IAdapter
     virtual base::ErrCode do_pre_stop_server() { return ( base::ErrCode::OK ); }
     virtual base::ErrCode do_post_stop_server();
 
-    virtual base::ErrCode do_start_interface_monitor() { return ( base::ErrCode::OK ); }
-    virtual base::ErrCode do_stop_interface_monitor() { return ( base::ErrCode::OK ); }
-
     virtual void          do_handle_send_msg( IpAdapterQMsg *msg ) {}
     virtual void          do_delete_msg( IpAdapterQMsg *msg ) {}
     virtual void          do_handle_receive() {}
     virtual void          do_init_fast_shutdown_mechanism() {}
     virtual void          do_init_address_change_notify_mechanism() {}
-    virtual void          do_un_init_address_change_notify_mechanism();
+    virtual void          do_un_init_address_change_notify_mechanism() {}
     virtual base::ErrCode do_handle_interface_event( InterfaceEvent *interface_event ) { return ( base::ErrCode::OK ); }
 
     virtual std::vector<InterfaceAddress *> get_interface_address_for_index( uint8_t u8_index ) = 0;
@@ -99,20 +95,21 @@ class IpAdapterBase : public IAdapter
     base::ErrCode start_sending_thread();
     void          start_ipv4_mcast_at_interface( uint32_t if_index ) const;
     void          start_ipv6_mcast_at_interface( uint32_t if_index ) const;
-		IUdpSocket * get_socket_by_mask(uint16_t socket_type_mask);
+    IUdpSocket*   get_socket_by_mask( uint16_t socket_type_mask );
+    void                                  handle_address_change_event();
+    void                 update_interface_listening( std::vector<InterfaceAddress *> &cz_interface_addr_list );
+    void                 refresh_end_point_list( std::vector<InterfaceAddress *> &cz_interface_addr_list );
+    void                 refresh_end_point_list( );
+
   private:
 
     base::ErrCode        terminate_internal();
-    base::ErrCode        start_interface_monitor();
-    base::ErrCode        stop_interface_monitor();
     base::ErrCode        open_ipv6_sockets();
     base::ErrCode        open_ipv4_sockets();
     static base::ErrCode open_socket( base::IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t port = 0 );
-    base::ErrCode        open_socket2( base::IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port ) const;
-    base::ErrCode add_socket(uint16_t socket_type, uint16_t port );
+    base::ErrCode        open_socket_with_retry( base::IpAddrFamily ip_addr_family, bool is_multicast, IUdpSocket *udp_socket, uint16_t &port ) const;
+    base::ErrCode        add_socket( uint16_t socket_type, uint16_t port );
 
-    void           init_fast_shutdown_mechanism();
-    void           init_address_change_notify_mechanism();
     static void    receive_data_routine( void *arg ) { static_cast<IpAdapterBase *>( arg )->do_handle_receive(); }
     int32_t        post_data_to_send_task( Endpoint &end_point, const uint8_t *data, uint16_t data_length, bool is_mcast );
     IpAdapterQMsg* create_new_send_msg( Endpoint const &end_point, const uint8_t *data, uint16_t data_length, bool is_multicast = false );
@@ -134,6 +131,9 @@ class IpAdapterBase : public IAdapter
 
     base::SimpleList<IpAdapterQMsg, IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_list_{};
     base::PtrMsgQ<IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_{};
+
+    osal::Mutex * _access_mutex = nullptr;
+    std::deque<Endpoint *> _cz_end_points{};
 };
 }
 }

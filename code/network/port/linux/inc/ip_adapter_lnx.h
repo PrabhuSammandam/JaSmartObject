@@ -38,8 +38,6 @@ class IpAdapterImplLinux : public IpAdapterBase
     void          do_handle_send_msg( IpAdapterQMsg *ip_adapter_q_msg ) override;
     void          do_handle_receive() override;
     base::ErrCode do_pre_stop_server() override;
-    base::ErrCode do_start_interface_monitor() override;
-    base::ErrCode do_stop_interface_monitor() override;
 
     std::vector<InterfaceAddress *> get_interface_address_for_index( uint8_t u8_index ) override;
     void                            read_data() override {}

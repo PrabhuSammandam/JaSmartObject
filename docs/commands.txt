@@ -1,0 +1,4 @@
+1. netstat -ul ;; to list all UDP sockets
+2. ip link show  ;; It will display the index in front of the interface information.
+3. ip maddr ;; to list all the multicast registrations on interface.
+4. tcpdump -i eth0 port 5683 ;; filter all the packets for port

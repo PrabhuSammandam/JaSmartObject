@@ -1,0 +1,60 @@
+Socket
+------
+
+Socket is uniquely identified by two parameters
+1. port
+2. local_interface_address
+
+Socket can be denoted as S<socket_no>[port][local_interface_address]
+
+e.g
+    S100[5675][0] (0 means ANY_ADDRESS)
+    S200[5687][192.168.0.100]
+    
+If the socket is binded with ANY address, then it will receive all the data comes for the binded port from
+all the local interface addresses.
+
+IOT Socket details
+-------------------
+In our IOT project, we are using both IPV4 and IPV6 protocols. In IPV4 both unicast and multicast models are used.
+
+System Definition
+-----------------
+First we will define our system, our system consists of four network interface card as mentioned below
+
+IF1[192.168.0.1]
+IF2[192.168.1.1]
+IF3[192.168.2.1]
+IF4[192.168.3.1]
+
+IPV4 unicast
+-------------
+To support IPV4 unicast messaging in our IOT, we need to create the socket and bind it to ANY address. In standard it is not
+mentioned which port to use for the unicast. So let the system define the unused port. So the socket created as below
+
+    S1[56775][0]
+    
+This socket will receive the data sent for port 56775 from any network interface ie IF1, IF2, If3, IF4.
+
+IPV4 multicast
+--------------
+To support IPV4 multicast in our IOT, we need create the socket and bind with port 5683 and ANY address. So the socket created as follows
+    S2[5683][0]
+    
+This socket will receive the data sent for port 5683 from any network interface ie IF1, IF2, If3, IF4.
+
+Now we need to subscribe, to get data for the multicast address 224.0.1.187 in each network interface. To subscribe it is necessary to use 
+the same socket as created above. After subscribtion the system is as like below
+
+
+---------unicast data[5683]-----------> IF1[192.168.0.1]----/----------------\
+---------multicast data--------------->     [224.0.1.187]--/                  \
+                                                                               \
+---------unicast data[5683]-----------> IF2[192.168.1.1]----/-------------------\
+---------multicast data--------------->     [224.0.1.187]--/                     \
+                                                                                  \----- S2[5683][0]
+---------unicast data[5683]-----------> IF3[192.168.2.1]----/---------------------/
+---------multicast data--------------->     [224.0.1.187]--/                     /
+                                                                                /
+---------unicast data[5683]-----------> IF4[192.168.3.1]----/------------------/
+---------multicast data--------------->     [224.0.1.187]--/                  /

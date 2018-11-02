@@ -46,42 +46,6 @@ IpAdapterImplLinux::~IpAdapterImplLinux ()
 {
 }
 
-ErrCode IpAdapterImplLinux::do_start_interface_monitor()
-{
-  _access_mutex = OsalMgr::Inst()->AllocMutex();
-
-  if( _access_mutex == nullptr )
-  {
-    return ( ErrCode::OUT_OF_MEM );
-  }
-
-  return ( ErrCode::OK );
-}
-
-ErrCode IpAdapterImplLinux::do_stop_interface_monitor()
-{
-  if( _interface_addr_list.size() > 0 )
-  {
-    for( auto it = _interface_addr_list.cbegin(); it != _interface_addr_list.cend(); ++it )
-    {
-      if( ( *it ) != nullptr )
-      {
-        delete ( *it );
-      }
-    }
-
-    _interface_addr_list.clear();
-  }
-
-  if( _access_mutex != nullptr )
-  {
-    OsalMgr::Inst()->FreeMutex( _access_mutex );
-    _access_mutex = nullptr;
-  }
-
-  return ( ErrCode::OK );
-}
-
 std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_index( uint8_t u8_index )
 {
   char ascii_addr_buf[64] = { 0 };
@@ -325,6 +289,19 @@ void IpAdapterImplLinux::do_un_init_address_change_notify_mechanism()
   {
     close( netlink_fd );
     netlink_fd = -1;
+  }
+
+  if( _interface_addr_list.size() > 0 )
+  {
+    for( auto it = _interface_addr_list.cbegin(); it != _interface_addr_list.cend(); ++it )
+    {
+      if( ( *it ) != nullptr )
+      {
+        delete ( *it );
+      }
+    }
+
+    _interface_addr_list.clear();
   }
 }
 

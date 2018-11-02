@@ -125,6 +125,9 @@
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborPrettyPrinter.cpp">
       <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\code\stack\common\src\SoStackFacade.cpp">
+      <Filter>Source Files\common\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\stack\export\TransactionKeys.h">
@@ -261,6 +264,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\stack\export\cbor\CborTypedefs.h">
       <Filter>Header Files\common\inc\cbor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\stack\export\SoStackFacade.h">
+      <Filter>Header Files\export</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

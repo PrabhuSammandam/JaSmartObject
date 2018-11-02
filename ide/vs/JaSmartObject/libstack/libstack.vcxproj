@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\..\..\code\stack\common\src\ResourceMgr.cpp" />
     <ClCompile Include="..\..\..\..\code\stack\common\src\ResPropValue.cpp" />
     <ClCompile Include="..\..\..\..\code\stack\common\src\ServerInteraction.cpp" />
+    <ClCompile Include="..\..\..\..\code\stack\common\src\SoStackFacade.cpp" />
     <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigCONResponse.cpp" />
     <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigNONResponse.cpp" />
     <ClCompile Include="..\..\..\..\code\stack\common\src\TestResource\BigPbResponse.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="..\..\..\..\code\stack\export\ResourceConsts.h" />
     <ClInclude Include="..\..\..\..\code\stack\export\ResourceMgr.h" />
     <ClInclude Include="..\..\..\..\code\stack\export\ResPropValue.h" />
+    <ClInclude Include="..\..\..\..\code\stack\export\SoStackFacade.h" />
     <ClInclude Include="..\..\..\..\code\stack\export\StackConfig.h" />
     <ClInclude Include="..\..\..\..\code\stack\export\StackConsts.h" />
     <ClInclude Include="..\..\..\..\code\stack\export\StackEvents.h" />
