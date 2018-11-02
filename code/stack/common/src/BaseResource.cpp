@@ -1,13 +1,16 @@
+#include <cstring>
 #include "BaseResource.h"
 #include "ObserverMgr.h"
 #include "base_utils.h"
 #include "StackConsts.h"
 #include "CborCodec.h"
 #include        "ErrCode.h"
+#include "adapter_mgr.h"
 
 namespace ja_iot {
 namespace stack {
 using namespace base;
+using namespace network;
 BaseResource::BaseResource( std::string uri ) : _uri{ uri }
 {
 }
@@ -144,6 +147,9 @@ uint8_t BaseResource::get_representation( ResInterfaceType interface_type, ResRe
   return ( 1 );
 }
 
+const std::string TRANSPORT_SCHEME_COAP = "coap://";
+static char       sau8_scheme_buffer[100];
+
 uint8_t BaseResource::get_discovery_representation( ResRepresentation &representation )
 {
   representation.add( "href", get_uri() );
@@ -154,6 +160,44 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
   policy.add( "bm", (long) get_property() );
 
   representation.add( "p", std::move( policy ) );
+
+  auto end_points = AdapterManager::Inst().get_endpoints_list();
+
+  if( end_points.size() > 0 )
+  {
+    std::vector<ResRepresentation> ep_list;
+
+    for( auto &ep : end_points )
+    {
+      ResRepresentation ep_object{};
+
+      switch( ep->get_adapter_type() )
+      {
+        case k_adapter_type_ip:
+        {
+          auto idx = 0;
+          snprintf( &sau8_scheme_buffer[idx], 100 - idx, "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
+          idx += strlen( (const char *)&sau8_scheme_buffer[0] );
+
+          ep->get_addr().to_string((uint8_t*) &sau8_scheme_buffer[idx], 100 - idx );
+          idx += strlen( (const char *)&sau8_scheme_buffer[idx] );
+          snprintf( &sau8_scheme_buffer[idx], 100 - idx, "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
+
+          std::string scheme{ &sau8_scheme_buffer[0] };
+          ep_object.add( "ep", std::move( scheme ) );
+
+          printf("%s\n", &sau8_scheme_buffer[0]);
+        }
+        break;
+      }
+
+      ep_list.push_back(std::move(ep_object));
+    }
+
+    representation.add( "eps", std::move( ep_list ) );
+  }
+
+	representation.print();
 
   return ( STACK_STATUS_OK );
 }
@@ -220,7 +264,7 @@ uint8_t BaseResource::check_interface_query( QueryContainer &query_container )
 
   if( query_if_count > res_if_count )
   {
-	  /* query contains more no of interfaces than the resource supports */
+    /* query contains more no of interfaces than the resource supports */
     return ( STACK_STATUS_INVALID_INTERFACE_QUERY );
   }
   else
@@ -269,7 +313,7 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
   if( query_type_count > res_type_count )
   {
-	  /* query contains more number of resource types the resource supported */
+    /* query contains more number of resource types the resource supported */
     return ( STACK_STATUS_INVALID_TYPE_QUERY );
   }
   else
@@ -278,7 +322,7 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
     for( auto &query_rt : query_container.get_query_map() )
     {
-    	/* check for only "rt" query */
+      /* check for only "rt" query */
       if( query_rt.first != rt_string )
       {
         continue;

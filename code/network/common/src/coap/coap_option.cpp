@@ -81,7 +81,7 @@ uint32_t Option::get_integer_value()
   uint32_t   value     = 0;
   const auto pu8_value = get_val();
 
-  for( auto i = 0; i < _u16_len; i++ )
+  for( int i = 0; i < _u16_len; i++ )
   {
     value |= static_cast<uint32_t>( pu8_value[_u16_len - i - 1] & 0xFF ) << i * 8;
   }

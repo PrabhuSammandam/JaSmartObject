@@ -119,7 +119,7 @@ uint32_t CoapOptionsSet::get_integer_value( const uint16_t u16_option_len, uint8
 {
   uint32_t value = 0;
 
-  for( auto i = 0; i < u16_option_len; i++ )
+  for( int i = 0; i < u16_option_len; i++ )
   {
     value |= static_cast<uint32_t>( pu8_option_value[u16_option_len - i - 1] & 0xFF ) << i * 8;
   }

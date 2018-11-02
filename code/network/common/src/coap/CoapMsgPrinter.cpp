@@ -115,7 +115,7 @@ void CoapMsgPrinter::print_coap_msg( ja_iot::network::CoapMsg &coap_msg, uint8_t
 
     auto &token = coap_msg.get_token();
 
-    for( auto i = 0; i < token.get_length(); i++ )
+    for( int i = 0; i < token.get_length(); i++ )
     {
       uint8_t byte = token.get_token()[i];
       printf( "%02X", byte );

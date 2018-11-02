@@ -3,6 +3,11 @@
 	<name>ja-coap-server</name>
 	<comment></comment>
 	<projects>
+		<project>libbase</project>
+		<project>libmemory</project>
+		<project>libnetwork</project>
+		<project>libosal</project>
+		<project>libstack</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

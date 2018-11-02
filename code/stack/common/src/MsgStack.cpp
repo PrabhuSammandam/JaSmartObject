@@ -88,11 +88,11 @@ MsgStack & MsgStack::inst()
   return ( *_pcz_instance );
 }
 
-void MsgStack::initialize( const uint16_t adapter_types )
+void MsgStack::initialize( const uint16_t configured_adapter_types )
 {
   AdapterManager::Inst().set_packet_received_cb( packet_received_callback, this );
 
-  auto ret_status = AdapterManager::Inst().initialize_adapters( adapter_types );
+  auto ret_status = AdapterManager::Inst().initialize_adapters( configured_adapter_types );
 
   if( ret_status != ErrCode::OK )
   {
@@ -101,7 +101,7 @@ void MsgStack::initialize( const uint16_t adapter_types )
 
   DBG_INFO2( "Initialized" );
 
-  ret_status = AdapterManager::Inst().start_adapter( adapter_types );
+  ret_status = AdapterManager::Inst().start_adapter( configured_adapter_types );
 
   if( ret_status != ErrCode::OK )
   {
@@ -128,7 +128,7 @@ void MsgStack::initialize( const uint16_t adapter_types )
 
   _task->Start();
 
-  ResourceMgr::inst().init_default_resources();
+//  ResourceMgr::inst().init_default_resources();
 
   _heart_beat_timer = new OsalTimer{ 10000000, heart_beat_timer_cb, this };
   _heart_beat_timer->start();

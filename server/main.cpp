@@ -19,56 +19,33 @@
 #include <MsgStack.h>
 #include "ResourceMgr.h"
 #include "BinarySwitchResource.h"
+#include "SoStackFacade.h"
 
 using namespace std;
 using namespace ja_iot::base;
 using namespace ja_iot::memory;
 using namespace ja_iot::network;
 using namespace ja_iot::osal;
+using namespace ja_iot::so_stack;
 
 void init_adapter_mgr()
 {
-  MemAlloctorType mem_alloctor_type;
-  NetworkPlatform network_platform;
+  auto &so_stack_facade = SoStackFacade::inst();
 
-#ifdef _OS_LINUX_
-  mem_alloctor_type = MemAlloctorType::kLinux;
-  network_platform  = NetworkPlatform::kLinux;
-#endif
-#ifdef _OS_WINDOWS_
-  mem_alloctor_type = MemAlloctorType::kWindows;
-  network_platform  = NetworkPlatform::kWindows;
-#endif
-#ifdef _OS_FREERTOS_
-  mem_alloctor_type = MemAlloctorType::kFreeRTOS;
-  network_platform  = NetworkPlatform::kFreeRTOS;
-#endif
-
-  if( MemAllocatorFactory::create_set_mem_allocator( mem_alloctor_type ) == nullptr )
+  if( so_stack_facade.initialize() != ErrCode::OK )
   {
-    DBG_ERROR( "main:%d# Failed to allocate the mem allocator", __LINE__ );
+    return;
   }
 
-  OsalMgr::Inst()->Init();
+  so_stack_facade.enable_ipv4( true )
+  .enable_ipv4_mcast( true )
+  .enable_ipv6( true )
+  .enable_ipv6_mcast( true );
 
-  if( INetworkPlatformFactory::create_set_factory( network_platform ) == nullptr )
-  {
-    DBG_ERROR( "main:%d# INetworkPlatformFactory NULL for WINDOWS platform", __LINE__ );
-  }
+  DeviceInfo device_info{ "SimpleClient", "aa", "ocf.1.0.0", "ocf.res.1.3.0" };
+  so_stack_facade.set_device_info( device_info );
 
-  auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
-
-  ip_adapter_config->set_port( IP_ADAPTER_CONFIG_IPV4_UCAST, 56775 );
-
-  ip_adapter_config->set_flag( IP_ADAPTER_CONFIG_IPV4_UCAST, true );
-  ip_adapter_config->set_flag( IP_ADAPTER_CONFIG_IPV4_MCAST, true );
-  // ip_adapter_config->set_flag(IP_ADAPTER_CONFIG_IPV4_UCAST_SECURE, true);
-  // ip_adapter_config->set_flag(IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE, true);
-
-  ip_adapter_config->set_flag( IP_ADAPTER_CONFIG_IPV6_UCAST, true );
-  ip_adapter_config->set_flag( IP_ADAPTER_CONFIG_IPV6_MCAST, true );
-  // ip_adapter_config->set_flag(IP_ADAPTER_CONFIG_IPV6_UCAST_SECURE, true);
-  // ip_adapter_config->set_flag(IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE, true);
+  so_stack_facade.start();
 }
 
 void init_resources()
@@ -81,8 +58,6 @@ void init_resources()
 int main( int argc, char *argv[] )
 {
   init_adapter_mgr();
-
-  MsgStack::inst().initialize( k_adapter_type_ip );
 
   init_resources();
 

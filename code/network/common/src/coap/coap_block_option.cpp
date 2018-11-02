@@ -21,7 +21,7 @@ void BlockOption::decode( uint8_t *pu8_option_buffer, const uint8_t u8_option_bu
 
     uint32_t temp_num = ( u8_lsb_byte & 0xFF ) >> 4;
 
-    for( auto i = 1; i < u8_option_buffer_len; i++ )
+    for( int i = 1; i < u8_option_buffer_len; i++ )
     {
       temp_num += ( pu8_option_buffer[u8_option_buffer_len - i - 1] & 0xff ) << ( i * 8 - 4 );
     }

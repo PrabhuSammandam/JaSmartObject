@@ -13,23 +13,22 @@ class CborDecoderBuffer
 
   public:
     CborDecoderBuffer( void *data, int size )
-		{
-			_data = (unsigned char *)data;
-			_size = size;
-			_offset = 0;
-		}
-		~CborDecoderBuffer()
-		{
-
-		}
+    {
+      _data   = (unsigned char *) data;
+      _size   = size;
+      _offset = 0;
+    }
+    ~CborDecoderBuffer ()
+    {
+    }
 
     bool    has_bytes( int count ) { return ( _size - _offset >= count ); }
     uint8_t peek_byte() { return ( _data[_offset] ); }
 
-		uint8_t get_major_type()
-		{
-			return _data[_offset] >> 5;
-		}
+    uint8_t get_major_type()
+    {
+      return ( _data[_offset] >> 5 );
+    }
 
     template<typename T>
     T get()

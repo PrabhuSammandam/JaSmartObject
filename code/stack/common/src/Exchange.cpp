@@ -27,7 +27,7 @@ Exchange::Exchange( CoapMsg *initiating_message, uint8_t origin ) :
     {
       out_msg = initiating_message;
 
-      /* set expiry for local generated NON exchange, because for local generated CON message message retransmission will take care  */
+      /* set expire for local generated NON exchange, because for local generated CON message message retransmission will take care  */
       if( out_msg->is_non_confirmable() )
       {
         _expiry_time_us = OsalTimer::get_system_time() + NON_EXCHANGE_LIFETIME_US;

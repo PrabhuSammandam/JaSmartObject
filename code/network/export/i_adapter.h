@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <deque>
+#include <vector>
 #include <functional>
 #include <cstdint>
 #include "end_point.h"
@@ -107,7 +107,7 @@ class IAdapter
     virtual void          read_data()                                                                                 = 0;
     virtual uint16_t      get_type()                                                                                  = 0;
     virtual void          set_adapter_event_cb( pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) = 0;
-    virtual base::ErrCode get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list )                             = 0;
+    virtual base::ErrCode get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list )                             = 0;
 };
 }
 }

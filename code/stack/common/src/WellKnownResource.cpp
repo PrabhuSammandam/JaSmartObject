@@ -77,6 +77,8 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
     representation.add( "", std::move(objects) );
   }
 
+	representation.print();
+
   uint8_t *buffer;
   uint16_t buffer_length;
 
@@ -99,6 +101,7 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
 
   for( auto &res : res_list )
   {
+	  /* check whether the resource is discoverable, if it is not then don't include in response */
     if( !static_cast<BaseResource *>( res )->is_discoverable() )
     {
       continue;
@@ -121,6 +124,7 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
       continue;
     }
 #endif
+    /* check whether any specific type of resource is requested */
     if( query_container.get_type_count() > 0 )
     {
       auto type_found = false;

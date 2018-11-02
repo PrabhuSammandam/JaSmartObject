@@ -771,32 +771,18 @@ ErrCode IpAdapterBase::add_socket( uint16_t socket_flags, uint16_t u16_port )
   return ( ret_status );
 }
 
-base::ErrCode IpAdapterBase::get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list )
+base::ErrCode IpAdapterBase::get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list )
 {
-  const auto ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
-
-  auto       interface_address_list = get_interface_address_for_index( 0 );
-
-  for( auto &if_addr : interface_address_list )
+  if( _cz_end_points.size() == 0 )
   {
-    if( ( ( if_addr->is_ipv4() ) && !ip_adapter_config->is_ipv4_enabled() )
-      || ( ( if_addr->is_ipv6() ) && !ip_adapter_config->is_ipv6_enabled() ) )
-    {
-      continue;
-    }
+    ScopedMutex scoped_lock{ _access_mutex };
 
-    auto endpoint = new Endpoint{ k_adapter_type_ip, k_network_flag_ipv4, ip_adapter_config->get_port( IP_ADAPTER_CONFIG_IPV4_UCAST ),
-                                  if_addr->get_index(), IpAddress{ reinterpret_cast<uint8_t *>( if_addr->get_addr() ), if_addr->get_family() } };
+    refresh_end_point_list();
+  }
 
-    if( if_addr->is_ipv6() )
-    {
-      endpoint->set_network_flags( k_network_flag_ipv6 );
-      endpoint->set_port( ip_adapter_config->get_port( IP_ADAPTER_CONFIG_IPV6_UCAST ) );
-    }
-
-    rcz_endpoint_list.push_back( endpoint );
-
-    delete if_addr;
+  for( auto &ep : _cz_end_points )
+  {
+    rcz_endpoint_list.push_back( ep );
   }
 
   return ( ErrCode::OK );
@@ -817,16 +803,18 @@ void IpAdapterBase::update_interface_listening( std::vector<InterfaceAddress *> 
 
   for( auto &if_addr : cz_interface_addr_list )
   {
+    auto interface_index = if_addr->get_index();
+
     if( ( if_addr->is_ipv4() ) && ( ip_adapter_config->is_ipv4_mcast_enabled() || ip_adapter_config->is_ipv4_secure_mcast_enabled() ) )
     {
-      DBG_INFO2( "Starting ipv4 mcast at interface [%d]", if_addr->get_index() );
-      start_ipv4_mcast_at_interface( if_addr->get_index() );
+      DBG_INFO2( "Starting ipv4 mcast at interface [%d]", interface_index );
+      start_ipv4_mcast_at_interface( interface_index );
     }
 
     if( ( if_addr->is_ipv6() ) && ( ip_adapter_config->is_ipv6_mcast_enabled() || ip_adapter_config->is_ipv6_secure_mcast_enabled() ) )
     {
-      DBG_INFO2( "Starting ipv6 mcast at interface [%d]", if_addr->get_index() );
-      start_ipv6_mcast_at_interface( if_addr->get_index() );
+      DBG_INFO2( "Starting ipv6 mcast at interface [%d]", interface_index );
+      start_ipv6_mcast_at_interface( interface_index );
     }
   }
 }
@@ -845,21 +833,25 @@ void IpAdapterBase::refresh_end_point_list( std::vector<InterfaceAddress *> &cz_
 
   delete_items_and_clear_list( _cz_end_points );
 
-  for( auto &if_addr : cz_interface_addr_list )
+  for( auto &socket : _sockets )
   {
-    for( auto &socket : _sockets )
-    {
-      SocketHelper sk_helper{ socket };
+    SocketHelper sk_helper{ socket };
 
-      if( ( if_addr->is_ipv4() && ( ( sk_helper.is_ipv4() || sk_helper.is_ipv4_secure() ) ) )
-        || ( if_addr->is_ipv6() && ( ( sk_helper.is_ipv6() || sk_helper.is_ipv6_secure() ) ) ) )
+    /* select only the non multicast socket */
+    if( !sk_helper.is_multicast() )
+    {
+      for( auto &if_addr : cz_interface_addr_list )
       {
-        auto ep = new Endpoint{ k_adapter_type_ip,
-                                socket->get_flags(),
-                                socket->GetLocalPort(),
-                                if_addr->get_index(),
-                                IpAddress{ if_addr->get_addr(), if_addr->get_family() } };
-        _cz_end_points.push_back( ep );
+        if( ( sk_helper.is_ipv4() && if_addr->is_ipv4() )
+          || ( sk_helper.is_ipv6() && if_addr->is_ipv6() ) )
+        {
+          auto ep = new Endpoint{ k_adapter_type_ip,
+                                  socket->get_flags(),
+                                  socket->GetLocalPort(),
+                                  if_addr->get_index(),
+                                  IpAddress{ (uint8_t *) if_addr->get_addr(), if_addr->get_family() } };
+          _cz_end_points.push_back( ep );
+        }
       }
     }
   }

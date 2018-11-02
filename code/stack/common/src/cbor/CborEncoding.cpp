@@ -1,106 +1,106 @@
 #include "common/inc/cbor/CborTypedefs.h"
 #include "common/inc/cbor/CborEncoding.h"
 
-size_t _cbor_encode_uint8(uint8_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
+size_t _cbor_encode_uint8( uint8_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset )
 {
-	if (value <= 23)
-	{
-		if (buffer_size >= 1)
-		{
-			buffer[0] = value + offset;
-			return (1);
-		}
-	}
-	else
-	{
-		if (buffer_size >= 2)
-		{
-			buffer[0] = 0x18 + offset;
-			buffer[1] = value;
-			return (2);
-		}
-	}
+  if( value <= 23 )
+  {
+    if( buffer_size >= 1 )
+    {
+      buffer[0] = value + offset;
+      return ( 1 );
+    }
+  }
+  else
+  {
+    if( buffer_size >= 2 )
+    {
+      buffer[0] = 0x18 + offset;
+      buffer[1] = value;
+      return ( 2 );
+    }
+  }
 
-	return (0);
+  return ( 0 );
 }
 
-size_t _cbor_encode_uint16(uint16_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
+size_t _cbor_encode_uint16( uint16_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset )
 {
-	if (buffer_size >= 3)
-	{
-		buffer[0] = 0x19 + offset;
-		buffer[1] = static_cast<uint8_t>(value >> 8);
-		buffer[2] = static_cast<uint8_t>(value);
+  if( buffer_size >= 3 )
+  {
+    buffer[0] = 0x19 + offset;
+    buffer[1] = static_cast<uint8_t>( value >> 8 );
+    buffer[2] = static_cast<uint8_t>( value );
 
-		return (3);
-	}
-	else
-	{
-		return (0);
-	}
+    return ( 3 );
+  }
+  else
+  {
+    return ( 0 );
+  }
 }
 
-size_t _cbor_encode_uint32(uint32_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
+size_t _cbor_encode_uint32( uint32_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset )
 {
-	if (buffer_size >= 5)
-	{
-		buffer[0] = 0x1A + offset;
-		buffer[1] = value >> 24;
-		buffer[2] = value >> 16;
-		buffer[3] = value >> 8;
-		buffer[4] = value;
+  if( buffer_size >= 5 )
+  {
+    buffer[0] = 0x1A + offset;
+    buffer[1] = value >> 24;
+    buffer[2] = value >> 16;
+    buffer[3] = value >> 8;
+    buffer[4] = value;
 
-		return (5);
-	}
-	else
-	{
-		return (0);
-	}
+    return ( 5 );
+  }
+  else
+  {
+    return ( 0 );
+  }
 }
 
-size_t _cbor_encode_uint64(uint64_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
+size_t _cbor_encode_uint64( uint64_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset )
 {
-	if (buffer_size >= 9)
-	{
-		buffer[0] = 0x1B + offset;
-		buffer[1] = static_cast<uint8_t>(value >> 56);
-		buffer[2] = static_cast<uint8_t>(value >> 48);
-		buffer[3] = static_cast<uint8_t>(value >> 40);
-		buffer[4] = static_cast<uint8_t>(value >> 32);
-		buffer[5] = static_cast<uint8_t>(value >> 24);
-		buffer[6] = static_cast<uint8_t>(value >> 16);
-		buffer[7] = static_cast<uint8_t>(value >> 8);
-		buffer[8] = static_cast<uint8_t>(value);
+  if( buffer_size >= 9 )
+  {
+    buffer[0] = 0x1B + offset;
+    buffer[1] = static_cast<uint8_t>( value >> 56 );
+    buffer[2] = static_cast<uint8_t>( value >> 48 );
+    buffer[3] = static_cast<uint8_t>( value >> 40 );
+    buffer[4] = static_cast<uint8_t>( value >> 32 );
+    buffer[5] = static_cast<uint8_t>( value >> 24 );
+    buffer[6] = static_cast<uint8_t>( value >> 16 );
+    buffer[7] = static_cast<uint8_t>( value >> 8 );
+    buffer[8] = static_cast<uint8_t>( value );
 
-		return (9);
-	}
-	else
-	{
-		return (0);
-	}
+    return ( 9 );
+  }
+  else
+  {
+    return ( 0 );
+  }
 }
 
-size_t _cbor_encode_uint(uint64_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset)
+size_t _cbor_encode_uint( uint64_t value, unsigned char *buffer, size_t buffer_size, uint8_t offset )
 {
-	if (value <= UINT16_MAX)
-	{
-		if (value <= UINT8_MAX)
-		{
-			return (_cbor_encode_uint8(static_cast<uint8_t>(value), buffer, buffer_size, offset));
-		}
-		else
-		{
-			return (_cbor_encode_uint16(static_cast<uint16_t>(value), buffer, buffer_size, offset));
-		}
-	}
-	else if (value <= UINT32_MAX)
-	{
-		return (_cbor_encode_uint32(static_cast<uint32_t>(value), buffer, buffer_size, offset));
-	}
-	else
-	{
-		return (_cbor_encode_uint64(value, buffer, buffer_size, offset));
-	}
+  if( value <= UINT16_MAX )
+  {
+    if( value <= UINT8_MAX )
+    {
+      return ( _cbor_encode_uint8( static_cast<uint8_t>( value ), buffer, buffer_size, offset ) );
+    }
+    else
+    {
+      return ( _cbor_encode_uint16( static_cast<uint16_t>( value ), buffer, buffer_size, offset ) );
+    }
+  }
+  else if( value <= UINT32_MAX )
+  {
+    return ( _cbor_encode_uint32( static_cast<uint32_t>( value ), buffer, buffer_size, offset ) );
+  }
+  else
+  {
+    return ( _cbor_encode_uint64( value, buffer, buffer_size, offset ) );
+  }
 }
 
 size_t cbor_encode_uint8( uint8_t value, unsigned char *buffer, size_t buffer_size )
@@ -256,7 +256,7 @@ size_t cbor_encode_half( float value, unsigned char *buffer, size_t buffer_size 
   else           /* Normal numbers */
   {
     int8_t logical_exp = (int8_t) ( exp - 127 );
-    //assert( logical_exp == exp - 127 );
+    // assert( logical_exp == exp - 127 );
 
     // Now we know that 2^exp <= 0 logically
     if( logical_exp < -24 )

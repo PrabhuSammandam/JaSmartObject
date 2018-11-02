@@ -125,7 +125,7 @@ class CborEncoder
     typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
     void put_value( T value )
     {
-      auto i = sizeof( T ) - 1;
+      int i = sizeof( T ) - 1;
 
       /* values are encoded in natural order, ie network order */
       for(; i >= 0; i-- )

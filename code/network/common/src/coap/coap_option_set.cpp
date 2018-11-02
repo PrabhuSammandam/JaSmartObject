@@ -87,7 +87,7 @@ uint32_t OptionsSet::get_value( uint16_t u16_option_no )
     auto opt_len  = opt->get_len();
     auto byte_val = opt->get_val();
 
-    for( auto i = 0; i < opt_len; i++ )
+    for( int i = 0; i < opt_len; i++ )
     {
       value |= (uint32_t) ( byte_val[opt_len - i - 1] & 0xFF ) << i * 8;
     }

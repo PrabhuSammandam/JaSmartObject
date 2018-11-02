@@ -58,7 +58,7 @@ class IpAdapterBase : public IAdapter
     uint16_t get_type() override { return ( base::k_adapter_type_ip ); }
 
     void          set_adapter_event_cb( const pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) override { this->_adapter_event_callback = pfn_adapter_event_callback; this->_adapter_event_cb_data = pv_user_data; }
-    base::ErrCode get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list ) override;
+    base::ErrCode get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list ) override;
     void          SEND_TASK_handle_msg( void *msg );
     void          SEND_TASK_delete_msg( void *msg );
 
@@ -96,10 +96,10 @@ class IpAdapterBase : public IAdapter
     void          start_ipv4_mcast_at_interface( uint32_t if_index ) const;
     void          start_ipv6_mcast_at_interface( uint32_t if_index ) const;
     IUdpSocket*   get_socket_by_mask( uint16_t socket_type_mask );
-    void                                  handle_address_change_event();
-    void                 update_interface_listening( std::vector<InterfaceAddress *> &cz_interface_addr_list );
-    void                 refresh_end_point_list( std::vector<InterfaceAddress *> &cz_interface_addr_list );
-    void                 refresh_end_point_list( );
+    void          handle_address_change_event();
+    void          update_interface_listening( std::vector<InterfaceAddress *> &cz_interface_addr_list );
+    void          refresh_end_point_list( std::vector<InterfaceAddress *> &cz_interface_addr_list );
+    void          refresh_end_point_list();
 
   private:
 
@@ -133,7 +133,7 @@ class IpAdapterBase : public IAdapter
     base::PtrMsgQ<IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_{};
 
     osal::Mutex * _access_mutex = nullptr;
-    std::deque<Endpoint *> _cz_end_points{};
+    std::vector<Endpoint *> _cz_end_points{};
 };
 }
 }
