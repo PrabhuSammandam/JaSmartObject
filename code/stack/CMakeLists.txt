@@ -60,6 +60,7 @@ set(COMMON_SRCS
             common/src/TestResource/SmallNonResponseResource.cpp  
             common/src/TestResource/SmallPiggybackResource.cpp  
             common/src/TestResource/SmallSlowResponseResource.cpp
+common/src/SoStackFacade.cpp
             )
             
 set (CBOR_SRCS
