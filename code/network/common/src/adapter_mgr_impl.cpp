@@ -453,6 +453,7 @@ IAdapter * AdapterManager::get_adapter_for_type( const uint16_t u16_adapter_type
 ErrCode AdapterManager::init_adapter( const uint16_t u16_configured_adapter_types_bitmask, const uint16_t to_init_adapter_type )
 {
   auto ret_status = ErrCode::OK;
+  IAdapter* pcz_ip_adapter{};
 
   DBG_INFO( "AdapterManager::init_adapter:%d# ENTER req_adapter_type[%x], to_init_adapter_type[%x]", __LINE__, int(u16_configured_adapter_types_bitmask), int(to_init_adapter_type) );
 
@@ -465,7 +466,7 @@ ErrCode AdapterManager::init_adapter( const uint16_t u16_configured_adapter_type
     goto exit_label_;
   }
 
-  auto pcz_ip_adapter = platform_factory->get_adapter( to_init_adapter_type );
+  pcz_ip_adapter = platform_factory->get_adapter( to_init_adapter_type );
 
   if( pcz_ip_adapter == nullptr )
   {
