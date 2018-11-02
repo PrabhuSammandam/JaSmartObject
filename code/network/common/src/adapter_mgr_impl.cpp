@@ -454,7 +454,7 @@ ErrCode AdapterManager::init_adapter( const uint16_t u16_configured_adapter_type
 {
   auto ret_status = ErrCode::OK;
 
-  DBG_INFO( "AdapterManager::init_adapter:%d# ENTER req_adapter_type[%x], to_init_adapter_type[%x]", __LINE__, int(req_adapter_type), int(to_init_adapter_type) );
+  DBG_INFO( "AdapterManager::init_adapter:%d# ENTER req_adapter_type[%x], to_init_adapter_type[%x]", __LINE__, int(u16_configured_adapter_types_bitmask), int(to_init_adapter_type) );
 
   auto platform_factory = INetworkPlatformFactory::GetCurrFactory();
 
