@@ -108,91 +108,6 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
   return ( pcz_interface_ptr_vector );
 }
 
-#if 0
-std::vector<InterfaceAddress *> IpAdapterImplLinux::get_newly_found_interface_address()
-{
-  std::vector<InterfaceAddress *> if_array;
-
-  char                            buf[4096] = { 0 };
-  struct nlmsghdr *               nh        = nullptr;
-  struct sockaddr_nl              sa        = { .nl_family = 0 };
-
-  struct iovec                    iov = { .iov_base = buf,
-                                          .iov_len  = sizeof( buf ) };
-
-  struct msghdr                   msg = { .msg_name    = (void *) &sa,
-                                          .msg_namelen = sizeof( sa ),
-                                          .msg_iov     = &iov,
-                                          .msg_iovlen  = 1 };
-
-  ScopedMutex lock{ _access_mutex };
-
-  ssize_t len = recvmsg( netlink_fd, &msg, 0 );
-
-  for( nh = (struct nlmsghdr *) buf; NLMSG_OK( nh, len ); nh = NLMSG_NEXT( nh, len ) )
-  {
-    if( ( nh != nullptr ) && ( ( nh->nlmsg_type != RTM_DELADDR ) && ( nh->nlmsg_type != RTM_NEWADDR ) ) )
-    {
-      continue;
-    }
-
-    if( RTM_DELADDR == nh->nlmsg_type )
-    {
-      struct ifaddrmsg *ifa = (struct ifaddrmsg *) NLMSG_DATA( nh );
-
-      if( ifa )
-      {
-        auto   ifiIndex    = ifa->ifa_index;
-        auto   addr_family = ( ifa->ifa_family == AF_INET ) ? IpAddrFamily::IPv4 : IpAddrFamily::IPv6;
-
-        bool   is_found = false;
-        size_t i        = 0;
-
-        for( i = 0; i < _interface_addr_list.size(); ++i )
-        {
-          auto if_addr = _interface_addr_list[i];
-
-          if( ( if_addr->get_index() == ifiIndex ) && ( if_addr->get_family() == addr_family ) )
-          {
-            is_found = true;
-            break;
-          }
-        }
-
-        if( is_found )
-        {
-          auto if_addr = _interface_addr_list[i];
-          _interface_addr_list.erase( _interface_addr_list.cbegin() + i );
-
-          delete if_addr;
-
-          if( this->_adapter_event_callback )
-          {
-            AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_CONNECTION_CHANGED );
-            adapter_event.set_enabled( false );
-
-            this->_adapter_event_callback( &adapter_event, _adapter_event_cb_data );
-          }
-        }
-      }
-
-      continue;
-    }
-
-    // Netlink message type is RTM_NEWADDR.
-    struct ifaddrmsg *ifa = (struct ifaddrmsg *) NLMSG_DATA( nh );
-
-    if( ifa )
-    {
-      int ifiIndex = ifa->ifa_index;
-      if_array = get_interface_address_for_index( ifiIndex );
-    }
-  }
-
-  return ( if_array );
-}
-#endif
-
 void IpAdapterImplLinux::do_init_fast_shutdown_mechanism()
 {
   int ret = -1;
@@ -293,21 +208,11 @@ void IpAdapterImplLinux::do_handle_receive()
     if( shutdown_fds[0] != -1 )
     {
       FD_SET( shutdown_fds[0], &readFds );
-
-      if(shutdown_fds[0] > max_fd)
-      {
-    	  max_fd = shutdown_fds[0];
-      }
     }
 
     if( netlink_fd != -1 )
     {
       FD_SET( netlink_fd, &readFds );
-
-      if(netlink_fd > max_fd)
-      {
-    	  max_fd = netlink_fd;
-      }
     }
 
     int ret = select( max_fd + 1, &readFds, nullptr, nullptr, nullptr );
@@ -343,10 +248,13 @@ void IpAdapterImplLinux::do_handle_receive()
         }
         else if( ( netlink_fd != -1 ) && FD_ISSET( netlink_fd, &readFds ) )
         {
-          FD_CLR( netlink_fd, &readFds );
+		  uint8_t buffer[4096];
+		  recv(netlink_fd, buffer, 4096, 0);
 
           DBG_INFO2("Got address change notification");
           handle_address_change_event();
+
+          FD_CLR( netlink_fd, &readFds );
         }
         else if( ( shutdown_fds[0] != -1 ) && FD_ISSET( shutdown_fds[0], &readFds ) )
         {

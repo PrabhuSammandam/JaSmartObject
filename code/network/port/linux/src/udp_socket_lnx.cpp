@@ -317,15 +317,14 @@ SocketError UdpSocketImplLinux::EnableMulticastLoopback( bool is_enabled )
     return ( SocketError::ERR );
   }
 
-  if( ip_addr_family_ == IpAddrFamily::IPv4 )
-  {
-    uint8_t on = ( is_enabled ) ? 1 : 0;
+  int on = ( is_enabled ) ? 1 : 0;
+  int level = ( ip_addr_family_ == IpAddrFamily::IPv4 ) ?  IPPROTO_IP : IPPROTO_IPV6;
+  int option = ( ip_addr_family_ == IpAddrFamily::IPv4 ) ?  IP_MULTICAST_LOOP : IPV6_MULTICAST_LOOP;
 
-    if( setsockopt( socket_fd_, IPPROTO_IP, IP_MULTICAST_LOOP, (const char *) &on, sizeof( on ) ) )
-    {
-      return ( SocketError::OPTION_SET_FAILED );
-    }
-  }
+	if( setsockopt( socket_fd_, level, option, (const char *) &on, sizeof( on ) ) )
+	{
+	  return ( SocketError::OPTION_SET_FAILED );
+	}
 
   return ( SocketError::OK );
 }

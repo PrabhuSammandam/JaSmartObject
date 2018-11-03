@@ -77,8 +77,6 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
     representation.add( "", std::move(objects) );
   }
 
-	representation.print();
-
   uint8_t *buffer;
   uint16_t buffer_length;
 
@@ -98,6 +96,7 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
 ErrCode get_linked_list_representation( QueryContainer &query_container, std::vector<ResRepresentation> &object_array )
 {
   auto &res_list = ResourceMgr::inst().get_resources_list();
+  std::string str_wk_res_name{ "/oic/res" };
 
   for( auto &res : res_list )
   {
@@ -105,6 +104,11 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
     if( !static_cast<BaseResource *>( res )->is_discoverable() )
     {
       continue;
+    }
+
+    if(res->get_uri() == str_wk_res_name)
+    {
+    	continue;
     }
 
 #if 0

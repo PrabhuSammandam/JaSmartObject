@@ -185,8 +185,6 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
 
           std::string scheme{ &sau8_scheme_buffer[0] };
           ep_object.add( "ep", std::move( scheme ) );
-
-          printf("%s\n", &sau8_scheme_buffer[0]);
         }
         break;
       }
@@ -196,8 +194,6 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
 
     representation.add( "eps", std::move( ep_list ) );
   }
-
-	representation.print();
 
   return ( STACK_STATUS_OK );
 }

@@ -42,14 +42,17 @@ ResourceMgr & ResourceMgr::inst()
 
 ErrCode ResourceMgr::init_default_resources()
 {
-//  _cz_resources_list.push_back( new DeviceResource{} );
+  _cz_resources_list.push_back( new DeviceResource{} );
   _cz_resources_list.push_back( new WellKnownResource{} );
+
+#if _ENABLE_TEST_RESOURCES_
   _cz_resources_list.push_back( new SmallPiggybackResource{} );
   _cz_resources_list.push_back( new SmallSlowResponseResource{} );
   _cz_resources_list.push_back( new SmallNonResponseResource{} );
 	_cz_resources_list.push_back(new BigPbResponse{});
 	_cz_resources_list.push_back(new BigCONResponse{});
 	_cz_resources_list.push_back(new BigNONResponse{});
+#endif
 
   return ( ErrCode::OK );
 }
