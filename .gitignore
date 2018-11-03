@@ -1,2 +1,3 @@
 /ide/vs/JaSmartObject/libmemory/*.user
 *.user
+/build/

@@ -293,11 +293,21 @@ void IpAdapterImplLinux::do_handle_receive()
     if( shutdown_fds[0] != -1 )
     {
       FD_SET( shutdown_fds[0], &readFds );
+
+      if(shutdown_fds[0] > max_fd)
+      {
+    	  max_fd = shutdown_fds[0];
+      }
     }
 
     if( netlink_fd != -1 )
     {
       FD_SET( netlink_fd, &readFds );
+
+      if(netlink_fd > max_fd)
+      {
+    	  max_fd = netlink_fd;
+      }
     }
 
     int ret = select( max_fd + 1, &readFds, nullptr, nullptr, nullptr );
@@ -337,24 +347,6 @@ void IpAdapterImplLinux::do_handle_receive()
 
           DBG_INFO2("Got address change notification");
           handle_address_change_event();
-
-#if 0
-          std::vector<InterfaceAddress *> if_addr_array     = get_newly_found_interface_address();
-          const auto                      ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
-
-          for( auto &if_addr : if_addr_array )
-          {
-            if( ( if_addr->get_family() == IpAddrFamily::IPv4 ) && ip_adapter_config->is_flag_set( IP_ADAPTER_CONFIG_IPV4_MCAST ) )
-            {
-              start_ipv4_mcast_at_interface( if_addr->get_index() );
-            }
-
-            if( ( if_addr->get_family() == IpAddrFamily::IPv6 ) && ip_adapter_config->is_flag_set( IP_ADAPTER_CONFIG_IPV6_MCAST ) )
-            {
-              start_ipv6_mcast_at_interface( if_addr->get_index() );
-            }
-          }
-#endif
         }
         else if( ( shutdown_fds[0] != -1 ) && FD_ISSET( shutdown_fds[0], &readFds ) )
         {
