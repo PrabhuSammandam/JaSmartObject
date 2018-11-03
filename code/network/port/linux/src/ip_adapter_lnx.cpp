@@ -97,38 +97,7 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
 
       DBG_INFO2( "Found interface index[%d], flag[%d], family[%d], addr[%s]", ifindex, ifa->ifa_flags, (int) e_addr_family, &ascii_addr_buf[0] );
       pcz_interface_ptr_vector.push_back( if_addr );
-
-      {
-        ScopedMutex lock{ _access_mutex };
-
-        bool is_found = false;
-
-        for( size_t i = 0; i < _interface_addr_list.size(); ++i )
-        {
-          auto if_addr = _interface_addr_list[i];
-
-          if( ( if_addr->get_index() == (uint32_t) ifindex ) && ( if_addr->get_family() == e_addr_family ) )
-          {
-            is_found = true;
-            break;
-          }
-        }
-
-        if( is_found == false )
-        {
-          auto new_if_addr = new InterfaceAddress{ *if_addr };
-          _interface_addr_list.push_back( new_if_addr );
-
-          if( this->_adapter_event_callback )
-          {
-            AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_CONNECTION_CHANGED );
-            adapter_event.set_enabled( true );
-
-            this->_adapter_event_callback( &adapter_event, _adapter_event_cb_data );
-          }
-        }
-      }
-    }
+    }// for
 
     DBG_INFO2( "Iterating interfaces END" );
 
@@ -139,6 +108,7 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_interface_address_for_in
   return ( pcz_interface_ptr_vector );
 }
 
+#if 0
 std::vector<InterfaceAddress *> IpAdapterImplLinux::get_newly_found_interface_address()
 {
   std::vector<InterfaceAddress *> if_array;
@@ -221,6 +191,7 @@ std::vector<InterfaceAddress *> IpAdapterImplLinux::get_newly_found_interface_ad
 
   return ( if_array );
 }
+#endif
 
 void IpAdapterImplLinux::do_init_fast_shutdown_mechanism()
 {
@@ -289,19 +260,6 @@ void IpAdapterImplLinux::do_un_init_address_change_notify_mechanism()
   {
     close( netlink_fd );
     netlink_fd = -1;
-  }
-
-  if( _interface_addr_list.size() > 0 )
-  {
-    for( auto it = _interface_addr_list.cbegin(); it != _interface_addr_list.cend(); ++it )
-    {
-      if( ( *it ) != nullptr )
-      {
-        delete ( *it );
-      }
-    }
-
-    _interface_addr_list.clear();
   }
 }
 
@@ -377,6 +335,10 @@ void IpAdapterImplLinux::do_handle_receive()
         {
           FD_CLR( netlink_fd, &readFds );
 
+          DBG_INFO2("Got address change notification");
+          handle_address_change_event();
+
+#if 0
           std::vector<InterfaceAddress *> if_addr_array     = get_newly_found_interface_address();
           const auto                      ip_adapter_config = ConfigManager::Inst().get_ip_adapter_config();
 
@@ -392,6 +354,7 @@ void IpAdapterImplLinux::do_handle_receive()
               start_ipv6_mcast_at_interface( if_addr->get_index() );
             }
           }
+#endif
         }
         else if( ( shutdown_fds[0] != -1 ) && FD_ISSET( shutdown_fds[0], &readFds ) )
         {

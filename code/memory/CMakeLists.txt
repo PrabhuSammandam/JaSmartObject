@@ -30,6 +30,8 @@ if(PLATFORM_ESP8266)
                         )
 endif(PLATFORM_ESP8266)
 
+add_definitions(-g)
+
 include_directories(common/inc
                     export
                     port/common/inc

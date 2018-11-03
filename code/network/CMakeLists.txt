@@ -25,6 +25,8 @@ if(PLATFORM_LINUX)
                         )
 endif(PLATFORM_LINUX)
 
+add_definitions(-g)
+
 if(PLATFORM_ESP8266)
 	add_definitions(-D_OS_FREERTOS_
 					-D__ets__

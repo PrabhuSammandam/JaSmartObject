@@ -21,7 +21,13 @@ MutexImplLinux::~MutexImplLinux ()
 
 OsalError MutexImplLinux::Init()
 {
-  int ret_status = pthread_mutex_init( &mutex_impl_, nullptr );
+	pthread_mutexattr_t mutex_attr;
+
+	pthread_mutexattr_init(&mutex_attr);
+
+	pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+
+  int ret_status = pthread_mutex_init( &mutex_impl_, &mutex_attr );
 
   if( ret_status == 0 )
   {

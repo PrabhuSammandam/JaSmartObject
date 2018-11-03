@@ -24,7 +24,7 @@ include_directories(../code/base/export
                     ../code/osal/export
 		    ~/.local/include)
 
-add_definitions(-std=c++14)		  
+add_definitions(-std=c++14 -g)		  
 
 set(SRCS main.cpp BinarySwitchResource.cpp)
 

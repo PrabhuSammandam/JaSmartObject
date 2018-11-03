@@ -42,7 +42,7 @@ ResourceMgr & ResourceMgr::inst()
 
 ErrCode ResourceMgr::init_default_resources()
 {
-  _cz_resources_list.push_back( new DeviceResource{} );
+//  _cz_resources_list.push_back( new DeviceResource{} );
   _cz_resources_list.push_back( new WellKnownResource{} );
   _cz_resources_list.push_back( new SmallPiggybackResource{} );
   _cz_resources_list.push_back( new SmallSlowResponseResource{} );

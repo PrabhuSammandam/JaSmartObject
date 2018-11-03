@@ -22,7 +22,7 @@ if(PLATFORM_ESP8266)
 
 endif(PLATFORM_ESP8266)
 
-add_definitions(-D_LITTLE_ENDIAN_)
+add_definitions(-D_LITTLE_ENDIAN_ -g)
 
 set(SRCS
     common/src/byte_array.cpp

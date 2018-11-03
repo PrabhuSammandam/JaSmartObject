@@ -162,6 +162,7 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
   representation.add( "p", std::move( policy ) );
 
   auto end_points = AdapterManager::Inst().get_endpoints_list();
+#if 1
 
   if( end_points.size() > 0 )
   {
@@ -198,6 +199,7 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
   }
 
 	representation.print();
+#endif
 
   return ( STACK_STATUS_OK );
 }
