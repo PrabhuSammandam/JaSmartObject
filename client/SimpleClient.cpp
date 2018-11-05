@@ -435,31 +435,34 @@ void client_response_callback( ClientResponse *client_response, uint8_t status )
 {
   if( status == CLIENT_RESPONSE_STATUS_OK )
   {
-    cout << "got response" << endl;
-
-    if( ( client_response != nullptr )
-      && ( client_response->get_payload() != nullptr )
-      && client_response->get_payload_len() )
+    if( client_response != nullptr )
     {
-      auto &option_set = client_response->get_option_set();
+    	printf("GOT RESPONSE CODE[%d]\n", client_response->get_code());
 
-      if( option_set.get_content_format() == COAP_CONTENT_FORMAT_CBOR )
+      if( /*( client_response->get_code() == COAP_MSG_CODE_CONTENT_205 )
+        && */( client_response->get_payload() != nullptr )
+        && ( client_response->get_payload_len() > 0 ) )
       {
-        ResRepresentation representation{};
+        auto &option_set = client_response->get_option_set();
 
-        if( CborCodec::decode( client_response->get_payload(), client_response->get_payload_len(), representation ) == ErrCode::OK )
+        if( option_set.get_content_format() == COAP_CONTENT_FORMAT_CBOR )
         {
-          cout << "respresentation print" << endl;
+          ResRepresentation representation{};
 
-          representation.print();
+          if( CborCodec::decode( client_response->get_payload(), client_response->get_payload_len(), representation ) == ErrCode::OK )
+          {
+            cout << "respresentation print" << endl;
+
+            representation.print();
+          }
         }
-      }
-      else
-      {
-        std::string response{ (char *) client_response->get_payload(), client_response->get_payload_len() };
-        printf( "Got Response :\n" );
-        printf( "--------------\n" );
-        printf( "%s\n", response.c_str() );
+        else
+        {
+          std::string response{ (char *) client_response->get_payload(), client_response->get_payload_len() };
+          printf( "Got Response :\n" );
+          printf( "--------------\n" );
+          printf( "%s\n", response.c_str() );
+        }
       }
     }
   }

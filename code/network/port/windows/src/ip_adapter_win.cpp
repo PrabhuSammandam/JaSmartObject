@@ -757,9 +757,9 @@ std::unique_ptr<IP_ADAPTER_ADDRESSES> get_adapters()
       break;
     }
 
-    DBG_INFO( "EXIT SUCCESS" );
+    DBG_INFO2( "EXIT SUCCESS" );
     // Succeeded getting adapters
-    return ( std::unique_ptr<IP_ADAPTER_ADDRESSES>( p_adapter_adrr_start_ptr ) /*p_adapter_adrr_start_ptr*/ );
+    return ( std::unique_ptr<IP_ADAPTER_ADDRESSES>( p_adapter_adrr_start_ptr ) );
   }
 
   if( p_adapter_adrr_start_ptr != nullptr )
@@ -767,7 +767,7 @@ std::unique_ptr<IP_ADAPTER_ADDRESSES> get_adapters()
     delete[] p_adapter_adrr_start_ptr;
   }
 
-  DBG_INFO( "EXIT FAILED" );
+  DBG_INFO2( "EXIT FAILED" );
 
   return ( nullptr );
 }

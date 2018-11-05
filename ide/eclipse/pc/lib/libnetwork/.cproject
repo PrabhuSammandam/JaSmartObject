@@ -376,6 +376,10 @@
                                     <listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
                                     									
                                     <listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_DEBUG_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
                                     								
                                 </option>
                                 								
@@ -410,6 +414,10 @@
                                     <listOptionValue builtIn="false" value="_IP_ADAPTER_"/>
                                     									
                                     <listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_DEBUG_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
                                     								
                                 </option>
                                 								

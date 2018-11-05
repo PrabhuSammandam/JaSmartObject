@@ -301,6 +301,7 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
   if( query_type_count == 0 )
   {
+  /* no 'rt' query passed */
     return ( STACK_STATUS_OK );
   }
 
