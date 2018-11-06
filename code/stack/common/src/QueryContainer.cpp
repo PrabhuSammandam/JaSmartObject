@@ -1,4 +1,5 @@
 #include <string>
+#include <algorithm>
 #include "QueryContainer.h"
 
 namespace ja_iot {
@@ -134,6 +135,61 @@ bool QueryContainer::parse( std::vector<std::string> &query_string_list )
     }
 
     _query_map.emplace( query.substr( 0, start_eq ), query.substr( start_eq + 1 ) );
+  }
+
+  int index = 0;
+  std::vector<std::string> duplicate_keys;
+
+  for(auto& q : _query_map)
+  {
+	  index++;
+
+	  bool dup_found = false;
+	  for(auto& dp_key : duplicate_keys)
+	  {
+		  if(dp_key == q.first)
+		  {
+			  dup_found = true;
+			  auto v_list = _any_of_map.find(dp_key);
+
+			  if(v_list != _any_of_map.end())
+			  {
+				  v_list->second.push_back(q.second);
+			  }
+			  break;
+		  }
+	  }
+
+	  if(dup_found)
+	  {
+		  continue;
+	  }
+
+	  auto it = _query_map.cbegin();
+	  std::advance(it, index);
+
+	  for(; it != _query_map.cend(); ++it)
+	  {
+		  if(q.first == (*it).first)
+		  {
+			  duplicate_keys.push_back(q.first);
+			  std::vector<std::string> v;
+			  v.push_back(q.second);
+			  _any_of_map.insert(std::make_pair(q.first, std::move(v)));
+			  dup_found = true;
+			  break;
+		  }
+	  }
+
+	  if(dup_found == false)
+	  {
+		  _all_of_map.emplace(q.first, q.second);
+	  }
+  }
+
+  for(auto& loop_any_map : _any_of_map)
+  {
+	  std::sort(loop_any_map.second.begin(), loop_any_map.second.end());
   }
 
   return ( true );

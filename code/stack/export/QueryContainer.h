@@ -19,11 +19,15 @@ class QueryContainer
 
     bool                    parse( std::vector<std::string> &query_string_list );
     auto                    & get_query_map() { return ( _query_map ); }
+    auto &get_any_of_map(){return _any_of_map;}
+    auto &get_all_of_map(){return _all_of_map;}
     static std::string      & get_interface_string( const ResInterfaceType interface_type );
     static ResInterfaceType get_interface_enum( std::string &if_string );
 
   private:
     std::multimap<std::string, std::string>   _query_map;
+    std::multimap<std::string, std::vector<std::string>>   _any_of_map;
+    std::multimap<std::string, std::string>   _all_of_map;
 };
 }
 }

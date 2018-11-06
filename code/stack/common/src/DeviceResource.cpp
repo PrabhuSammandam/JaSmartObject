@@ -22,7 +22,7 @@ bool DeviceResource::is_method_supported(uint8_t method)
 	return (method == COAP_MSG_CODE_GET );
 }
 
-uint8_t DeviceResource::handle_get(ja_iot::stack::QueryContainer & query_container, Interaction * interaction)
+uint8_t DeviceResource::handle_get(QueryContainer & query_container, Interaction * interaction)
 {
 	auto request = interaction->get_server_request();
 	auto interface_requested = ResInterfaceType::ReadOnly;
