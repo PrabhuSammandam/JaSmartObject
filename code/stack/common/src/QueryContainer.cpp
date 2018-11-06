@@ -33,6 +33,8 @@ uint8_t QueryContainer::get_interface_count()
   }
 
   return ( interface_count );
+
+//  return _query_map.count(interface_key);
 }
 
 /**
@@ -41,22 +43,23 @@ uint8_t QueryContainer::get_interface_count()
  */
 uint8_t QueryContainer::get_type_count()
 {
-  uint8_t res_type_count = 0;
-
-  if( _query_map.empty() )
-  {
-    return ( res_type_count );
-  }
-
-  for( auto &query : _query_map )
-  {
-    if( query.first == res_type_key )
-    {
-      res_type_count++;
-    }
-  }
-
-  return ( res_type_count );
+	  return _query_map.count(res_type_key);
+//  uint8_t res_type_count = 0;
+//
+//  if( _query_map.empty() )
+//  {
+//    return ( res_type_count );
+//  }
+//
+//  for( auto &query : _query_map )
+//  {
+//    if( query.first == res_type_key )
+//    {
+//      res_type_count++;
+//    }
+//  }
+//
+//  return ( res_type_count );
 }
 
 bool QueryContainer::is_interface_matched( const std::vector<std::string> &if_types )

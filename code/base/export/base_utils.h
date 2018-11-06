@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <vector>
+#include <algorithm>
+
 namespace ja_iot {
 namespace base {
 template<typename T>
@@ -35,6 +38,12 @@ void delete_and_clear( T * &ptr_to_delete )
     delete ptr_to_delete;
     ptr_to_delete = nullptr;
   }
+}
+
+template<typename T>
+bool find_in_list(std::vector<T> list, T& value)
+{
+	return std::find(list.cbegin(), list.cend(), value) != list.cend();
 }
 }
 }

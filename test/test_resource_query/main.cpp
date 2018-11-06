@@ -11,10 +11,12 @@
 #include "coap/coap_options_set.h"
 #include "BaseResource.h"
 #include "StackConsts.h"
+#include "base_utils.h"
 
 using namespace std;
 using namespace ja_iot::stack;
 using namespace ja_iot::network;
+using namespace ja_iot::base;
 
 class TestResource : BaseResource
 {
@@ -114,7 +116,7 @@ public:
 			{
 				if(q.first == "rt")
 				{
-					auto found = std::find(get_types().cbegin(), get_types().cend(), q.second) != get_types().cend();
+					auto found = find_in_list(get_types(), q.second);
 
 					if(!found)
 					{
@@ -124,8 +126,7 @@ public:
 				}
 				else if(q.first == "if")
 				{
-					auto found = std::find(get_interfaces().cbegin(), get_interfaces().cend(), q.second) != get_interfaces().cend();
-
+					auto found = find_in_list(get_interfaces(), q.second);
 					if(!found)
 					{
 						stack_status = STACK_STATUS_INVALID_INTERFACE_QUERY;
@@ -172,9 +173,11 @@ int main()
 
 	container.parse(query_list);
 
-	TestResource test_res{};
+//	TestResource test_res{};
+//	test_res.handle_get(container, nullptr);
 
-	test_res.handle_get(container, nullptr);
+	auto if_cnt = container.get_interface_count();
+	auto type_cnt = container.get_type_count();
 
 	return 0;
 }
