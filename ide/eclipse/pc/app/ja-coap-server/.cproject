@@ -155,7 +155,9 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/Debug_Linux}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/Debug_Windows}&quot;"/>
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/Debug}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libosal/Debug_Linux}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/Debug}&quot;"/>
                                     									
@@ -283,7 +285,9 @@
                         						
                         <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libosal"/>
                         						
-                        <entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libosal/Debug_Windows"/>
+                        <entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libosal/Debug"/>
+                        						
+                        <entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libosal/Debug_Linux"/>
                         						
                         <entry flags="RESOLVED" kind="libraryFile" name="osal" srcPrefixMapping="" srcRootPath=""/>
                         					

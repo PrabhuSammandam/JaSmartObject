@@ -1,9 +1,13 @@
 #include <string>
 #include <algorithm>
 #include "QueryContainer.h"
+#include "base_utils.h"
 
 namespace ja_iot {
 namespace stack {
+
+using namespace base;
+
 std::string       empty_string         = "";
 const std::string interface_key        = "if";
 const std::string res_type_key         = "rt";
@@ -17,24 +21,7 @@ std::string       interface_sensor     = "oic.if.s";
 
 uint8_t QueryContainer::get_interface_count()
 {
-  uint8_t interface_count = 0;
-
-  if( _query_map.empty() )
-  {
-    return ( interface_count );
-  }
-
-  for( auto &query : _query_map )
-  {
-    if( query.first == interface_key )
-    {
-      interface_count++;
-    }
-  }
-
-  return ( interface_count );
-
-//  return _query_map.count(interface_key);
+  return ( _query_map.count( interface_key ) );
 }
 
 /**
@@ -43,47 +30,7 @@ uint8_t QueryContainer::get_interface_count()
  */
 uint8_t QueryContainer::get_type_count()
 {
-	  return _query_map.count(res_type_key);
-//  uint8_t res_type_count = 0;
-//
-//  if( _query_map.empty() )
-//  {
-//    return ( res_type_count );
-//  }
-//
-//  for( auto &query : _query_map )
-//  {
-//    if( query.first == res_type_key )
-//    {
-//      res_type_count++;
-//    }
-//  }
-//
-//  return ( res_type_count );
-}
-
-bool QueryContainer::is_interface_matched( const std::vector<std::string> &if_types )
-{
-  if( _query_map.empty() || if_types.empty() )
-  {
-    return ( false );
-  }
-
-  for( auto &query : _query_map )
-  {
-    if( query.first == interface_key )
-    {
-      for( auto &required_interface : if_types )
-      {
-        if( query.second == required_interface )
-        {
-          return ( true );
-        }
-      }
-    }
-  }
-
-  return ( false );
+  return ( _query_map.count( res_type_key ) );
 }
 
 bool QueryContainer::is_interface_available( const ResInterfaceType interface_type )
@@ -114,16 +61,10 @@ bool QueryContainer::is_res_type_available( const std::string &res_type )
   return ( false );
 }
 
-std::string& QueryContainer::get_first_if_name()
+std::string & QueryContainer::get_first_if_name()
 {
-	for (auto &query : _query_map)
-	{
-		if (query.first == interface_key)
-		{
-			return query.second;
-		}
-	}
-	return (empty_string);
+	auto find_result = _query_map.find(interface_key);
+	return find_result != _query_map.cend() ? find_result->second : empty_string;
 }
 
 bool QueryContainer::parse( std::vector<std::string> &query_string_list )
@@ -140,62 +81,91 @@ bool QueryContainer::parse( std::vector<std::string> &query_string_list )
     _query_map.emplace( query.substr( 0, start_eq ), query.substr( start_eq + 1 ) );
   }
 
-  int index = 0;
+  int                      index = 0;
   std::vector<std::string> duplicate_keys;
 
-  for(auto& q : _query_map)
+  for( auto &q : _query_map )
   {
-	  index++;
+    index++;
 
-	  bool dup_found = false;
-	  for(auto& dp_key : duplicate_keys)
-	  {
-		  if(dp_key == q.first)
-		  {
-			  dup_found = true;
-			  auto v_list = _any_of_map.find(dp_key);
+    bool dup_found = false;
 
-			  if(v_list != _any_of_map.end())
-			  {
-				  v_list->second.push_back(q.second);
-			  }
-			  break;
-		  }
-	  }
+    for( auto &dp_key : duplicate_keys )
+    {
+      if( dp_key == q.first )
+      {
+        dup_found = true;
+        auto v_list = _any_of_map.find( dp_key );
 
-	  if(dup_found)
-	  {
-		  continue;
-	  }
+        if( v_list != _any_of_map.end() )
+        {
+          v_list->second.push_back( q.second );
+        }
 
-	  auto it = _query_map.cbegin();
-	  std::advance(it, index);
+        break;
+      }
+    }
 
-	  for(; it != _query_map.cend(); ++it)
-	  {
-		  if(q.first == (*it).first)
-		  {
-			  duplicate_keys.push_back(q.first);
-			  std::vector<std::string> v;
-			  v.push_back(q.second);
-			  _any_of_map.insert(std::make_pair(q.first, std::move(v)));
-			  dup_found = true;
-			  break;
-		  }
-	  }
+    if( dup_found )
+    {
+      continue;
+    }
 
-	  if(dup_found == false)
-	  {
-		  _all_of_map.emplace(q.first, q.second);
-	  }
-  }
+    auto it = _query_map.cbegin();
+    std::advance( it, index );
 
-  for(auto& loop_any_map : _any_of_map)
-  {
-	  std::sort(loop_any_map.second.begin(), loop_any_map.second.end());
+    for(; it != _query_map.cend(); ++it )
+    {
+      if( q.first == ( *it ).first )
+      {
+        duplicate_keys.push_back( q.first );
+        std::vector<std::string> v;
+        v.push_back( q.second );
+        _any_of_map.insert( std::make_pair( q.first, std::move( v ) ) );
+        dup_found = true;
+        break;
+      }
+    }
+
+    if( dup_found == false )
+    {
+      _all_of_map.emplace( q.first, q.second );
+    }
   }
 
   return ( true );
+}
+
+bool QueryContainer::check_valid_query(std::vector<std::string> & valid_keys)
+{
+	if(_any_of_map.empty() && _all_of_map.empty())
+	{
+		return true;
+	}
+
+	if(valid_keys.empty())
+	{
+		/* there are some query's and if there are no valid keys then return false */
+		return false;
+	}
+
+	for(auto& q : _any_of_map)
+	{
+		if(!find_in_list(valid_keys, q.first))
+		{
+			return false;
+		}
+	}
+
+	for(auto& q : _all_of_map)
+	{
+		if(!find_in_list(valid_keys, q.first))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 std::string & QueryContainer::get_interface_string( const ResInterfaceType interface_type )
@@ -211,7 +181,6 @@ std::string & QueryContainer::get_interface_string( const ResInterfaceType inter
     case ResInterfaceType::Sensor: return ( interface_sensor );
     default:;
   }
-
 
   return ( empty_string );
 }

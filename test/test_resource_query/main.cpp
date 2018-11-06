@@ -20,166 +20,175 @@ using namespace ja_iot::base;
 
 class TestResource : BaseResource
 {
-public:
-	TestResource() : BaseResource("/oic/l")
-	{
-		init();
-	}
+  public:
 
-	bool check_resource_type(std::vector<std::string>& query_type_list, std::vector<std::string>& res_type_list)
-	{
-		if(query_type_list.empty())
-		{
-			return true;
-		}
+    TestResource () : BaseResource( "/oic/l" )
+    {
+      init();
+    }
 
-		if(res_type_list.empty())
-		{
-			return false;
-		}
+    bool check_resource_type( std::vector<std::string> &query_type_list, std::vector<std::string> &res_type_list )
+    {
+      if( query_type_list.empty() )
+      {
+        return ( true );
+      }
 
-		auto found = false;
+      if( res_type_list.empty() )
+      {
+        return ( false );
+      }
 
-		for(auto& rt : query_type_list)
-		{
-			for(auto& res_rt : res_type_list)
-			{
-				if(rt == res_rt)
-				{
-					found = true;
-					break;
-				}
-			}
+      auto found = false;
 
-			if(found)
-			{
-				break;
-			}
-		}
+      for( auto &rt : query_type_list )
+      {
+        for( auto &res_rt : res_type_list )
+        {
+          if( rt == res_rt )
+          {
+            found = true;
+            break;
+          }
+        }
 
-		return found;
-	}
+        if( found )
+        {
+          break;
+        }
+      }
 
-	bool get_intersection(std::vector<std::string>& list1,
-			std::vector<std::string>& list2,
-			std::vector<std::string>& result)
-	{
-		std::set_intersection(list1.begin(), list1.end(), list2.begin(), list2.end(), back_inserter(result));
+      return ( found );
+    }
 
-		return !result.empty();
-	}
+    bool get_intersection( std::vector<std::string> &list1, std::vector<std::string> &list2, std::vector<std::string> &result )
+    {
+      std::set_intersection( list1.begin(), list1.end(), list2.begin(), list2.end(), back_inserter( result ) );
 
-	uint8_t handle_get(QueryContainer &query_container, Interaction *interaction) override
-	{
-		uint8_t stack_status = STACK_STATUS_OK;
-		bool invalid = false;
-		auto& any_of_map = query_container.get_any_of_map();
+      return ( !result.empty() );
+    }
 
-		if(!any_of_map.empty())
-		{
-			for(auto& q : any_of_map)
-			{
-				if(q.first == "rt")
-				{
-					std::vector<std::string> result;
+    uint8_t handle_get( QueryContainer &query_container, Interaction *interaction ) override
+    {
+      uint8_t stack_status = STACK_STATUS_OK;
+      bool    invalid      = false;
+      auto    &any_of_map  = query_container.get_any_of_map();
 
-					if(!get_intersection(q.second, get_types(), result))
-					{
-						stack_status = STACK_STATUS_INVALID_TYPE_QUERY;
-						break;
-					}
-				}
+      if(!query_container.check_valid_query(get_properties_list()))
+      {
+    	  return STACK_STATUS_INVALID_TYPE_QUERY;
+      }
 
-				if(q.first == "if")
-				{
-					std::vector<std::string> result;
+      if( !any_of_map.empty() )
+      {
+        for( auto &q : any_of_map )
+        {
+          if( q.first == "rt" )
+          {
+            std::vector<std::string> result;
 
-					if(!get_intersection(q.second, get_interfaces(), result))
-					{
-						stack_status = STACK_STATUS_INVALID_INTERFACE_QUERY;
-						break;
-					}
-				}
-			}
-		}
+            if( !get_intersection( q.second, get_types(), result ) )
+            {
+              stack_status = STACK_STATUS_INVALID_TYPE_QUERY;
+              break;
+            }
+          }
 
-		if(stack_status != STACK_STATUS_OK)
-		{
-			return stack_status;
-		}
+          if( q.first == "if" )
+          {
+            std::vector<std::string> result;
 
-		auto&  all_of_map = query_container.get_all_of_map();
+            if( !get_intersection( q.second, get_interfaces(), result ) )
+            {
+              stack_status = STACK_STATUS_INVALID_INTERFACE_QUERY;
+              break;
+            }
+          }
+        }
+      }
 
-		if(!all_of_map.empty())
-		{
-			for(auto& q : all_of_map)
-			{
-				if(q.first == "rt")
-				{
-					auto found = find_in_list(get_types(), q.second);
+      if( stack_status != STACK_STATUS_OK )
+      {
+        return ( stack_status );
+      }
 
-					if(!found)
-					{
-						stack_status = STACK_STATUS_INVALID_TYPE_QUERY;
-						invalid = true;
-					}
-				}
-				else if(q.first == "if")
-				{
-					auto found = find_in_list(get_interfaces(), q.second);
-					if(!found)
-					{
-						stack_status = STACK_STATUS_INVALID_INTERFACE_QUERY;
-						invalid = true;
-					}
-				}
+      auto &all_of_map = query_container.get_all_of_map();
 
-				if(invalid)
-				{
-					break;
-				}
-			}
-		}
+      if( !all_of_map.empty() )
+      {
+        for( auto &q : all_of_map )
+        {
+          if( q.first == "rt" )
+          {
+            auto found = find_in_list( get_types(), q.second );
 
-		return STACK_STATUS_OK;
-	}
+            if( !found )
+            {
+              stack_status = STACK_STATUS_INVALID_TYPE_QUERY;
+              invalid      = true;
+            }
+          }
+          else if( q.first == "if" )
+          {
+            auto found = find_in_list( get_interfaces(), q.second );
 
-	void init()
-	{
-		add_type("oic.wk.l");
-		add_interface("oic.if.r");
-		add_interface("oic.if.baseline");
-		set_property(OCF_RESOURCE_PROP_DISCOVERABLE);
+            if( !found )
+            {
+              stack_status = STACK_STATUS_INVALID_INTERFACE_QUERY;
+              invalid      = true;
+            }
+          }
 
-		std::sort(_types.begin(), _types.end());
-		std::sort(_interfaces.begin(), _interfaces.end());
-	}
+          if( invalid )
+          {
+            break;
+          }
+        }
+      }
+
+      return ( STACK_STATUS_OK );
+    }
+
+    std::vector<std::string>& get_properties_list() { return ( _properties ); }
+
+    void init()
+    {
+      add_type( "oic.wk.d" );
+      add_interface( "oic.if.r" );
+      add_interface( "oic.if.baseline" );
+      set_property( OCF_RESOURCE_PROP_DISCOVERABLE );
+
+      _properties.push_back( "if" );
+      _properties.push_back( "rt" );
+      _properties.push_back( "n" );
+      _properties.push_back( "di" );
+      _properties.push_back( "dmv" );
+      _properties.push_back( "icv" );
+    }
+
+  private:
+    std::vector<std::string>   _properties{};
 };
 
 int main()
 {
-	CoapOptionsSet option_set{};
+  CoapOptionsSet option_set{};
 
-//	string query = "if=ifb&rt=c&rt=b&rt=a&name=me&if=ifa";
-//	string query = "if=ifa";
+  // string query = "if=ifb&rt=c&rt=b&rt=a&name=me&if=ifa";
+  // string query = "if=ifa";
 
-	string query = "rt=oic.wk.l&if=oic.if.baseline";
+  string query = "rt=oic.wk.l&if=oic.if.baseline&if=oic.if.a";
 
-	option_set.set_uri_query_string(query);
+  option_set.set_uri_query_string( query );
 
-	auto query_list = option_set.get_uri_querys_list();
+  auto           query_list = option_set.get_uri_querys_list();
 
-	QueryContainer container{};
+  QueryContainer container{};
 
-	container.parse(query_list);
+  container.parse( query_list );
 
-//	TestResource test_res{};
-//	test_res.handle_get(container, nullptr);
+  TestResource test_res{};
+  test_res.handle_get( container, nullptr );
 
-	auto if_cnt = container.get_interface_count();
-	auto type_cnt = container.get_type_count();
-
-	return 0;
+  return ( 0 );
 }
-
-
