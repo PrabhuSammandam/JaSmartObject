@@ -24,7 +24,6 @@ bool DeviceResource::is_method_supported(uint8_t method)
 
 uint8_t DeviceResource::handle_get(QueryContainer & query_container, Interaction * interaction)
 {
-	auto request = interaction->get_server_request();
 	auto interface_requested = ResInterfaceType::ReadOnly;
 
 	if (check_type_query(query_container) != STACK_STATUS_OK)
@@ -65,15 +64,19 @@ void DeviceResource::set_device_info( DeviceInfo &device_info )
 
 uint8_t DeviceResource::get_representation( const ResInterfaceType interface_type, ResRepresentation &representation )
 {
-  /* all are readonly properties */
-  representation.add( "rt", get_types() );
-  representation.add( "if", get_interfaces() );
-  representation.add( "n", _name );
-  representation.add( "di", _device_id );
-  representation.add( "icv", _server_version );
-  representation.add( "dmv", _data_model_version );
+	if(interface_type == ResInterfaceType::BaseLine || interface_type == ResInterfaceType::ReadOnly)
+	{
+	  /* all are readonly properties */
+	  representation.add( "rt", get_types() );
+	  representation.add( "if", get_interfaces() );
+	  representation.add( "n", _name );
+	  representation.add( "di", _device_id );
+	  representation.add( "icv", _server_version );
+	  representation.add( "dmv", _data_model_version );
 
-  return ( STACK_STATUS_OK );
+	  return ( STACK_STATUS_OK );
+	}
+	return STACK_STATUS_INVALID_INTERFACE_QUERY;
 }
 
 void DeviceResource::init()

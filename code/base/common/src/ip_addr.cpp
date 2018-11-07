@@ -534,38 +534,41 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
    * Keep this in mind if you think this function should have been coded
    * to use pointer overlays.  All the world's not a VAX.
    */
-  char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
+  char tmp[45 ];
+  char *tp; // 45 if for length "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"
 
   struct
   {
-    int   base, len;
+    int8_t   base;
+    int8_t len;
   } best, cur = {};
 
-  uint32_t words[16 / 2];
-  int      i;
+  best.base = -1;
+  best.len = 0;
+  cur.base = -1;
+  cur.len = 0;
+
+  uint16_t words[8];
+  int8_t      i;
 
   /*
    * Preprocess:
    *      Copy the input (bytewise) array into a wordwise array.
    *      Find the longest run of 0x00's in src[] for :: shorthanding.
    */
-  memset( words, '\0', sizeof words );
-
-  for( i = 0; i < 16; i++ )
+  for( i = 0; i < 16; i+=2 )
   {
     words[i / 2] = ( src[i] << 8 ) | src[i + 1];
   }
 
-  best.base = -1;
-  cur.base  = -1;
-
-  for( i = 0; i < 16 / 2; i++ )
+  for( i = 0; i < 8; i++ )
   {
     if( words[i] == 0 )
     {
       if( cur.base == -1 )
       {
-        cur.base = i, cur.len = 1;
+        cur.base = i;
+        cur.len = 1;
       }
       else
       {
@@ -604,7 +607,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
    */
   tp = tmp;
 
-  for( i = 0; i < 16 / 2; i++ )
+  for( i = 0; i < 8; i++ )
   {
     /* Are we inside the best run of 0x00's? */
     if( ( best.base != -1 ) && ( i >= best.base ) && ( i < best.base + best.len ) )
@@ -640,7 +643,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
   }
 
   /* Was it a trailing run of 0x00's? */
-  if( ( best.base != -1 ) && ( best.base + best.len == 16 / 2 ) )
+  if( ( best.base != -1 ) && ( best.base + best.len == 8 ) )
   {
     *tp++ = ':';
   }
@@ -716,11 +719,23 @@ void IpAddress::to_string( _in_out_ uint8_t *buf, _in_ uint8_t buf_len )
   }
   else
   {
-    sprintf( (char *) buf, "%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x", address_[0],
-      address_[1], address_[2], address_[3],
-      address_[4], address_[5], address_[6], address_[7],
-      address_[8], address_[9], address_[10], address_[11],
-      address_[12], address_[13], address_[14], address_[15] );
+	  inet_ntop6(address_, (char*)buf, buf_len);
+#if 0
+	  uint16_t words[8];
+
+	  words[0] = (address_[0] << 8) | address_[1];
+	  words[1] = (address_[2] << 8) | address_[3];
+	  words[2] = (address_[4] << 8) | address_[5];
+	  words[3] = (address_[6] << 8) | address_[7];
+	  words[4] = (address_[8] << 8) | address_[9];
+	  words[5] = (address_[10] << 8) | address_[11];
+	  words[6] = (address_[12] << 8) | address_[13];
+	  words[7] = (address_[14] << 8) | address_[15];
+
+    sprintf( (char *) buf, "%x:%x:%x:%x:%x:%x:%x:%x", words[0],
+    		words[1], words[2], words[3],
+			words[4], words[5], words[6], words[7]);
+#endif
   }
 }
 

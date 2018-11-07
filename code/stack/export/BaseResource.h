@@ -17,7 +17,8 @@ class BaseResource : public IResource
     std::vector<std::string>& get_types() override;
     void                    add_type( const std::string &type ) override;
     std::vector<std::string>& get_interfaces() override;
-    void                    add_interface( const std::string &interfaces ) override;
+    void                    add_interface( const std::string &interface ) override;
+    void                    add_interfaces( std::vector<std::string> &interfaces );
     uint8_t                 get_property() override;
     void                    set_property( uint8_t property ) override;
     bool                    is_collection() override;
@@ -27,7 +28,6 @@ class BaseResource : public IResource
     void                    set_unique_id( const std::string &unique_id ) override;
     uint8_t                 get_representation( ResInterfaceType interface_type, ResRepresentation &representation ) override;
     uint8_t                 get_discovery_representation( ResRepresentation &representation ) override;
-    void                    add_interfaces( std::vector<std::string> &interfaces );
 
     virtual bool    is_method_supported( uint8_t method ) { return ( false ); }
     virtual uint8_t handle_get( QueryContainer &query_container, Interaction *interaction );

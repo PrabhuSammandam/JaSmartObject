@@ -5,6 +5,7 @@
  *      Author: prabhu
  */
 
+#include <string.h>
 #include <string>
 #include <algorithm>
 #include "QueryContainer.h"
@@ -12,6 +13,7 @@
 #include "BaseResource.h"
 #include "StackConsts.h"
 #include "base_utils.h"
+#include "ip_addr.h"
 
 using namespace std;
 using namespace ja_iot::stack;
@@ -67,6 +69,7 @@ class TestResource : BaseResource
 
       return ( !result.empty() );
     }
+
 
     uint8_t handle_get( QueryContainer &query_container, Interaction *interaction ) override
     {
@@ -187,8 +190,26 @@ int main()
 
   container.parse( query_list );
 
-  TestResource test_res{};
-  test_res.handle_get( container, nullptr );
+//  TestResource test_res{};
+//  test_res.handle_get( container, nullptr );
+
+  IpAddress ip{IpAddrFamily::IPv6};
+  uint8_t buffer[60];
+
+  IpAddress::from_string("fe80:0000:0000:0000:0eed:8b3c:13d7:cea0", IpAddrFamily::IPv6, ip);
+
+  ip.to_string(buffer, 60);
+  printf("Ip Addr [%s]\n", buffer);
+
+  IpAddress::from_string("0000:0000:0000:0000:0eed:8b3c:13d7:cea0", IpAddrFamily::IPv6, ip);
+
+  ip.to_string(buffer, 60);
+  printf("Ip Addr [%s]\n", buffer);
+
+  IpAddress::from_string("ff02:0000:0000:0000:0000:0000:0000:158", IpAddrFamily::IPv6, ip);
+
+  ip.to_string(buffer, 60);
+  printf("Ip Addr [%s]\n", buffer);
 
   return ( 0 );
 }
