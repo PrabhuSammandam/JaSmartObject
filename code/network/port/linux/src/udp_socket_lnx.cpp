@@ -376,7 +376,6 @@ SocketError UdpSocketImplLinux::EnablePacketInfo( bool is_enabled )
   {
     if( setsockopt( socket_fd_, IPPROTO_IPV6, IPV6_RECVPKTINFO, reinterpret_cast<const char *>( &on ), sizeof on ) )
     {
-    	auto err = errno;
     	printf("UdpSocketImplLinux::EnablePacketInfo: ERRNO %d\n", errno);
       return ( SocketError::OPTION_SET_FAILED );
     }
@@ -385,7 +384,6 @@ SocketError UdpSocketImplLinux::EnablePacketInfo( bool is_enabled )
   {
     if( setsockopt( socket_fd_, IPPROTO_IP, IP_PKTINFO, reinterpret_cast<const char *>( &on ), sizeof on ) )
     {
-    	auto err = errno;
     	printf("UdpSocketImplLinux::EnablePacketInfo: ERRNO %d\n", errno);
       return ( SocketError::OPTION_SET_FAILED );
     }
