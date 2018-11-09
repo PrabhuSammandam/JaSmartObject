@@ -16,7 +16,6 @@ $ cmake -DADAPTER=IP -DPLATFORM_LINUX=ON
 esp8266<br>
 $cmake -G "MSYS Makefiles" -DADAPTER=IP -DPLATFORM_ESP8266=ON -DCMAKE_TOOLCHAIN_FILE=/home/psammand/cmake/toolchain.ESP8266.cmake ..
 
-<br>
-Windows
-In MSYS terminal
+Windows<br>
+In MSYS terminal<br>
 $ cmake -G"MSYS Makefiles" -DADAPTER=IP -DPLATFORM_WINDOWS=ON ..
