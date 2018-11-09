@@ -57,8 +57,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${HOME}/.local/include&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory/memory/export}&quot;"/>
@@ -106,8 +104,6 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${HOME}/.local/include&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
                                     									
@@ -210,18 +206,6 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmemory}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="../~/.local/include"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libbase/base/export}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libmemory/memory/export}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libnetwork/network/export}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libosal/osal/export}&quot;"/>
-                                    									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/lnx_pc_libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
                                     									
