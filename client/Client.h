@@ -68,10 +68,10 @@ class BaseRequestInfo
     BaseRequestInfo( ja_iot::network::Endpoint &endpoint, std::string uri_path, ja_iot::stack::client_response_cb response_cb );
 
   public:
-    ja_iot::network::Endpoint         _endpoint;
+    ja_iot::network::Endpoint         _endpoint{};
     uint8_t                           _msg_type = COAP_MSG_TYPE_CON;
-    std::string                       _uri_path;
-    std::string                       _uri_query;
+    std::string                       _uri_path{};
+    std::string                       _uri_query{};
     ja_iot::stack::client_response_cb _response_cb = nullptr;
 };
 
@@ -93,11 +93,11 @@ class PutRequestInfo: public BaseRequestInfo
     void set_payload( std::string &payload );
 
   public:
-    uint16_t _accept_format;
-    uint16_t _content_format;
-    uint16_t _block2_size;
-    int8_t * _payload_buf;
-    uint16_t _payload_buf_len;
+    uint16_t _accept_format{};
+    uint16_t _content_format{};
+    uint16_t _block2_size{};
+    int8_t * _payload_buf{};
+    uint16_t _payload_buf_len{};
 };
 
 typedef class PutRequestInfo PostRequestInfo;
