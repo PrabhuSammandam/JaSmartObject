@@ -32,6 +32,8 @@ enum Ipv6AddrScope
   GLOBAL    = 0xE
 };
 
+#define IS_IPV4( __x__ ) (__x__ == IpAddrFamily::IPv4 )
+
 class IpAddress
 {
   public:
@@ -90,15 +92,15 @@ class IpAddress
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std {
-  template<> struct hash<ja_iot::base::IpAddress>
+template<> struct hash<ja_iot::base::IpAddress>
+{
+  typedef ja_iot::base::IpAddress argument_type;
+  typedef size_t result_type;
+  result_type operator () ( argument_type const &s ) const noexcept
   {
-    typedef ja_iot::base::IpAddress argument_type;
-    typedef size_t result_type;
-    result_type operator () (argument_type const &s) const noexcept
-    {
-      auto        &ip_address = const_cast<argument_type &>(s);
+    auto &ip_address = const_cast<argument_type &>( s );
 
-      return ja_iot::base::Hash::get_hash(ip_address.get_addr(), ip_address.get_addr_family() == ja_iot::base::IpAddrFamily::IPv4 ? 4 : 16);
-    }
-  };
+    return ( ja_iot::base::Hash::get_hash( ip_address.get_addr(), ip_address.get_addr_family() == ja_iot::base::IpAddrFamily::IPv4 ? 4 : 16 ) );
+  }
+};
 }

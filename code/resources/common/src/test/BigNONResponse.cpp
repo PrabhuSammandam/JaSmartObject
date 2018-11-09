@@ -1,22 +1,23 @@
+#ifdef COMPILE_TEST_RESOURCES
 /*
- * BigPbResponse.cpp
+ * BigNONResponse.cpp
  *
  *  Created on: Feb 2, 2018
  *      Author: psammand
  */
 #include <string.h>
-#include "common/inc/TestResource/BigPbResponse.h"
+#include "common/inc/test/BigNONResponse.h"
 #include "QueryContainer.h"
 #include "StackConsts.h"
 
-namespace ja_iot {
-namespace stack {
-BigPbResponse::BigPbResponse () : BaseResource{ "/big/pb" }
+namespace ja_iot::resources {
+using namespace stack;
+BigNONResponse::BigNONResponse () : BaseResource{ "/big/non" }
 {
   init();
 }
 
-uint8_t BigPbResponse::handle_request( Interaction *interaction )
+uint8_t BigNONResponse::handle_request( Interaction *interaction )
 {
   auto request = interaction->get_server_request();
 
@@ -29,6 +30,7 @@ uint8_t BigPbResponse::handle_request( Interaction *interaction )
 
   auto response = new ServerResponse{};
 
+  response->set_type( COAP_MSG_TYPE_NON );
   response->set_code( COAP_MSG_CODE_CONTENT_205 );
   response->get_option_set().set_content_format( COAP_CONTENT_FORMAT_PLAIN );
 
@@ -44,9 +46,9 @@ uint8_t BigPbResponse::handle_request( Interaction *interaction )
   return ( STACK_STATUS_OK );
 }
 
-void BigPbResponse::init()
+void BigNONResponse::init()
 {
   set_property( OCF_RESOURCE_PROP_DISCOVERABLE );
 }
 }
-}
+#endif

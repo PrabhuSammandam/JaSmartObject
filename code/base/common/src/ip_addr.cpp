@@ -31,7 +31,7 @@ IpAddress::IpAddress( uint8_t *pu8_addr, const IpAddrFamily ip_address_family ) 
 {
   if( pu8_addr != nullptr )
   {
-    if( address_family_ == IpAddrFamily::IPv4 )
+    if( is_ipv4() )
     {
       address_[0] = pu8_addr[0];
       address_[1] = pu8_addr[1];
@@ -70,7 +70,7 @@ bool IpAddress::is_broadcast()
 
 bool IpAddress::is_multicast()
 {
-  if( address_family_ == IpAddrFamily::IPv4 )
+  if( is_ipv4() )
   {
     if( ( address_[0] >= 224 ) && ( address_[0] <= 239 ) )
     {
@@ -152,7 +152,7 @@ Ipv6AddrScope IpAddress::get_addr_scope( const char *ipv6_ascii_addr )
 
 bool IpAddress::from_string( const char *addr_string, IpAddrFamily ip_addr_family, IpAddress &ip_address )
 {
-  if( ip_addr_family == IpAddrFamily::IPv4 )
+  if( IS_IPV4(ip_addr_family) )
   {
     return ( inet_pton4( addr_string, ip_address.get_addr(), 1 ) == 1 );
   }
@@ -507,7 +507,7 @@ static int inet_pton6( const char *src, uint8_t *dst )
 static const char* inet_ntop4( const uint8_t *src, char *dst, size_t size )
 {
   static const char fmt[]   = "%u.%u.%u.%u";
-  char              tmp[15] = { 0 }; // 255.255.255.255
+  char              tmp[16] = { 0 }; // 255.255.255.255
 
   if( sprintf( (char *) tmp, (const char *) fmt, src[0], src[1], src[2], src[3] ) >
     (int) size )
@@ -527,40 +527,25 @@ static const char* inet_ntop4( const uint8_t *src, char *dst, size_t size )
  */
 static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
 {
-  /*
-   * Note that int32_t and int16_t need only be "at least" large enough
-   * to contain a value of the specified size.  On some systems, like
-   * Crays, there is no such thing as an integer variable with 16 bits.
-   * Keep this in mind if you think this function should have been coded
-   * to use pointer overlays.  All the world's not a VAX.
-   */
-  char tmp[45 ];
-  char *tp; // 45 if for length "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"
+  char  tmp[45];// 45 if for length "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"
+  char *tp;
 
   struct
   {
-    int8_t   base;
-    int8_t len;
+    int8_t   base = -1;
+    int8_t   len  = 0;
   } best, cur = {};
 
-  best.base = -1;
-  best.len = 0;
-  cur.base = -1;
-  cur.len = 0;
-
   uint16_t words[8];
-  int8_t      i;
+  int8_t   i;
 
-  /*
-   * Preprocess:
-   *      Copy the input (bytewise) array into a wordwise array.
-   *      Find the longest run of 0x00's in src[] for :: shorthanding.
-   */
-  for( i = 0; i < 16; i+=2 )
+  /* Copy the input (bytewise) array into a wordwise array. */
+  for( i = 0; i < 16; i += 2 )
   {
     words[i / 2] = ( src[i] << 8 ) | src[i + 1];
   }
 
+  /* Find the longest run of 0x00's in src[] for :: shorthanding. */
   for( i = 0; i < 8; i++ )
   {
     if( words[i] == 0 )
@@ -568,7 +553,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
       if( cur.base == -1 )
       {
         cur.base = i;
-        cur.len = 1;
+        cur.len  = 1;
       }
       else
       {
@@ -602,9 +587,7 @@ static const char* inet_ntop6( const uint8_t *src, char *dst, size_t size )
     best.base = -1;
   }
 
-  /*
-   * Format the result.
-   */
+  /* Format the result.*/
   tp = tmp;
 
   for( i = 0; i < 8; i++ )
@@ -676,85 +659,42 @@ void IpAddress::set_addr( _in_ uint8_t *ip_addr, _in_ IpAddrFamily ip_addr_famil
 {
   this->address_family_ = ip_addr_family;
 
-  if( ip_addr_family == IpAddrFamily::IPv4 )
-  {
-    address_[0] = ip_addr[0];
-    address_[1] = ip_addr[1];
-    address_[2] = ip_addr[2];
-    address_[3] = ip_addr[3];
-  }
-  else
-  {
-    memcpy( (void *) &address_[0], (void *) ip_addr, 16 );
-  }
+  memcpy( (void *) &address_[0], (void *) ip_addr, is_ipv4() ? 4 : 16 );
 }
 
 bool IpAddress::is_valid()
 {
-  uint8_t u8_no_of_bytes = 16;
-
-  if( address_family_ == IpAddrFamily::IPv4 )
-  {
-    u8_no_of_bytes = 4;
-  }
+  uint8_t u8_no_of_bytes = is_ipv4() ? 4 : 16;
 
   for( auto i = 0; i < u8_no_of_bytes; ++i )
   {
-    if( address_[i] == 0 )
+    if( address_[i] != 0 )
     {
-      return ( false );
+      return ( true );
     }
   }
 
-  return ( true );
+  return ( false );
 }
 
 void IpAddress::to_string( _in_out_ uint8_t *buf, _in_ uint8_t buf_len )
 {
   buf[0] = '\0';
 
-  if( address_family_ == IpAddrFamily::IPv4 )
+  if( is_ipv4() )
   {
     sprintf( (char *) buf, "%d.%d.%d.%d", address_[0], address_[1], address_[2], address_[3] );
   }
   else
   {
-	  inet_ntop6(address_, (char*)buf, buf_len);
-#if 0
-	  uint16_t words[8];
-
-	  words[0] = (address_[0] << 8) | address_[1];
-	  words[1] = (address_[2] << 8) | address_[3];
-	  words[2] = (address_[4] << 8) | address_[5];
-	  words[3] = (address_[6] << 8) | address_[7];
-	  words[4] = (address_[8] << 8) | address_[9];
-	  words[5] = (address_[10] << 8) | address_[11];
-	  words[6] = (address_[12] << 8) | address_[13];
-	  words[7] = (address_[14] << 8) | address_[15];
-
-    sprintf( (char *) buf, "%x:%x:%x:%x:%x:%x:%x:%x", words[0],
-    		words[1], words[2], words[3],
-			words[4], words[5], words[6], words[7]);
-#endif
+    inet_ntop6( address_, (char *) buf, buf_len );
   }
 }
 
 bool IpAddress::operator == ( const IpAddress &other )
 {
-  if( this->address_family_ != other.address_family_ )
-  {
-    return ( false );
-  }
-
-  for( auto i = 0; i < 16; i++ )
-  {
-    if( address_[i] != other.address_[i] )
-    {
-      return ( false );
-    }
-  }
-
-  return ( true );
+  return ( ( this->address_family_ == other.address_family_ ) &&
+         ( memcmp( address_, other.address_, ( address_family_ == IpAddrFamily::IPv4 ) ? 4 : 16 ) == 0 ) );
 }
 }
 }

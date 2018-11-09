@@ -18,8 +18,8 @@
 #include "adapter_mgr.h"
 #include <MsgStack.h>
 #include "ResourceMgr.h"
-#include "BinarySwitchResource.h"
 #include "SoStackFacade.h"
+#include "BinarySwitchResourceBase.h"
 
 using namespace std;
 using namespace ja_iot::base;
@@ -27,6 +27,18 @@ using namespace ja_iot::memory;
 using namespace ja_iot::network;
 using namespace ja_iot::osal;
 using namespace ja_iot::so_stack;
+using namespace ja_iot::resources;
+
+class MySwitch : public BinarySwitchResourceBase
+{
+  public:
+    MySwitch () : BinarySwitchResourceBase( "/light/1" ) {}
+
+    void handle_property_change()
+    {
+      cout << "switch actuated" << endl;
+    }
+};
 
 void init_adapter_mgr()
 {
@@ -50,7 +62,7 @@ void init_adapter_mgr()
 
 void init_resources()
 {
-  auto switch_res = new BinarySwitchResource{};
+  auto switch_res = new MySwitch{};
 
   ResourceMgr::inst().add_resource( switch_res );
 }

@@ -10,17 +10,19 @@
 #include "ResourceMgr.h"
 #include "common/inc/DeviceResource.h"
 #include "common/inc/WellKnownResource.h"
-#include "common/inc/TestResource/SmallPiggyBackResource.h"
-#include "common/inc/TestResource/SmallSlowResponseResource.h"
-#include "common/inc/TestResource/SmallNonResponseResource.h"
-#include "common/inc/TestResource/BigPbResponse.h"
-#include "common/inc/TestResource/BigCONResponse.h"
-#include "common/inc/TestResource/BigNONResponse.h"
+
+#include "../../../resources/common/inc/test/BigCONResponse.h"
+#include "../../../resources/common/inc/test/BigNONResponse.h"
+#include "../../../resources/common/inc/test/BigPbResponse.h"
+#include "../../../resources/common/inc/test/SmallNonResponseResource.h"
+#include "../../../resources/common/inc/test/SmallPiggyBackResource.h"
+#include "../../../resources/common/inc/test/SmallSlowResponseResource.h"
 
 namespace ja_iot {
 namespace stack {
 using namespace ja_iot::base;
 
+static uint32_t _u32_resource_id = 1;
 ResourceMgr *ResourceMgr::_p_instance{ nullptr };
 ResourceMgr::ResourceMgr ()
 {
@@ -42,17 +44,8 @@ ResourceMgr & ResourceMgr::inst()
 
 ErrCode ResourceMgr::init_default_resources()
 {
-  _cz_resources_list.push_back( new DeviceResource{} );
-  _cz_resources_list.push_back( new WellKnownResource{} );
-
-#if _ENABLE_TEST_RESOURCES_
-  _cz_resources_list.push_back( new SmallPiggybackResource{} );
-  _cz_resources_list.push_back( new SmallSlowResponseResource{} );
-  _cz_resources_list.push_back( new SmallNonResponseResource{} );
-	_cz_resources_list.push_back(new BigPbResponse{});
-	_cz_resources_list.push_back(new BigCONResponse{});
-	_cz_resources_list.push_back(new BigNONResponse{});
-#endif
+  add_resource( new DeviceResource{} );
+  add_resource( new WellKnownResource{} );
 
   return ( ErrCode::OK );
 }
@@ -77,7 +70,7 @@ IResource * ResourceMgr::find_resource_by_uri( const std::string &rstr_res_uri )
 
 uint16_t ResourceMgr::get_no_of_resources()
 {
-  return ( (uint16_t)_cz_resources_list.size() );
+  return ( (uint16_t) _cz_resources_list.size() );
 }
 
 std::vector<IResource *> & ResourceMgr::get_resources_list()
@@ -87,6 +80,7 @@ std::vector<IResource *> & ResourceMgr::get_resources_list()
 
 ErrCode ResourceMgr::add_resource( IResource *pcz_resource )
 {
+  pcz_resource->set_unique_id( std::to_string( _u32_resource_id++ ) );
   _cz_resources_list.push_back( pcz_resource );
   return ( ErrCode::OK );
 }

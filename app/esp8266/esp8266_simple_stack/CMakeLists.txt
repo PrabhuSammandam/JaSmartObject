@@ -23,6 +23,7 @@ include_directories(code
                     ../../../code/osal/export
                     ../../../code/network/export
                     ../../../code/stack/export
+                    ../../../code/resources/export
                     ${ESP8266_SDK_INCLUDES})
 
 set(SRCS
@@ -37,6 +38,7 @@ set(SRCS
 add_executable(esp8266_server ${SRCS})
 cotire(esp8266_server)
 target_link_libraries(esp8266_server
+                      resources
                       stack
                       network
                       mbedtls

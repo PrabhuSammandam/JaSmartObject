@@ -1,3 +1,4 @@
+#ifdef COMPILE_TEST_RESOURCES
 /*
  * SmallPiggyBackResource.h
  *
@@ -11,8 +12,8 @@
 #include "BaseResource.h"
 #include "Exchange.h"
 
-namespace ja_iot {
-namespace stack {
+namespace ja_iot::resources {
+using namespace stack;
 
 class SmallPiggybackResource : public BaseResource
 {
@@ -25,4 +26,4 @@ class SmallPiggybackResource : public BaseResource
     void init();
 };
 }
-}
+#endif

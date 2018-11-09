@@ -2,6 +2,7 @@
 #include "QueryContainer.h"
 #include "DeviceInfo.h"
 #include "StackConsts.h"
+#include"ResourceMgr.h"
 
 namespace ja_iot {
 namespace stack {
@@ -54,25 +55,18 @@ uint8_t DeviceResource::handle_get(QueryContainer & query_container, Interaction
 	return (stack_status);
 }
 
-void DeviceResource::set_device_info( DeviceInfo &device_info )
-{
-  _name               = device_info.get_name();
-  _device_id          = device_info.get_device_id();
-  _server_version     = device_info.get_server_version();
-  _data_model_version = device_info.get_data_model_version();
-}
-
 uint8_t DeviceResource::get_representation( const ResInterfaceType interface_type, ResRepresentation &representation )
 {
 	if(interface_type == ResInterfaceType::BaseLine || interface_type == ResInterfaceType::ReadOnly)
 	{
+		auto& device_info = ResourceMgr::inst().get_device_info();
 	  /* all are readonly properties */
 	  representation.add( "rt", get_types() );
 	  representation.add( "if", get_interfaces() );
-	  representation.add( "n", _name );
-	  representation.add( "di", _device_id );
-	  representation.add( "icv", _server_version );
-	  representation.add( "dmv", _data_model_version );
+	  representation.add( "n", device_info.get_name());
+	  representation.add( "di", device_info.get_device_id());
+	  representation.add( "icv", device_info.get_server_version());
+	  representation.add( "dmv", device_info.get_data_model_version());
 
 	  return ( STACK_STATUS_OK );
 	}

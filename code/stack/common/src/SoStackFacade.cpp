@@ -85,13 +85,7 @@ ErrCode SoStackFacade::initialize()
 
 ja_iot::base::ErrCode SoStackFacade::set_device_info( DeviceInfo &device_info )
 {
-  auto device_res = ResourceMgr::inst().find_resource_by_uri( "/oic/d" );
-
-  if( device_res != nullptr )
-  {
-    static_cast<DeviceResource *>( device_res )->set_device_info( device_info );
-  }
-
+  ResourceMgr::inst().set_device_info( device_info );
   return ( ErrCode::OK );
 }
 SoStackFacade::~SoStackFacade ()

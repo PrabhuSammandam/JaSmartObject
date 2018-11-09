@@ -6,13 +6,17 @@
 #include "CborCodec.h"
 #include        "ErrCode.h"
 #include "adapter_mgr.h"
+#include "ResourceMgr.h"
 
-namespace ja_iot {
-namespace stack {
+namespace ja_iot::stack {
 using namespace base;
 using namespace network;
 BaseResource::BaseResource( std::string uri ) : _uri{ uri }
 {
+  _property_name_list.push_back( "rt" );
+  _property_name_list.push_back( "if" );
+  _property_name_list.push_back( "di" );
+  _property_name_list.push_back( "n" );
 }
 
 uint8_t BaseResource::handle_request( Interaction *interaction )
@@ -109,12 +113,12 @@ void BaseResource::add_interface( const std::string &interfaces )
 
 uint8_t BaseResource::get_property()
 {
-  return ( _property );
+  return ( _attribute );
 }
 
 void BaseResource::set_property( const uint8_t property )
 {
-  _property = property;
+  _attribute = property;
 }
 
 bool BaseResource::is_collection()
@@ -152,9 +156,12 @@ static char       sau8_scheme_buffer[100];
 
 uint8_t BaseResource::get_discovery_representation( ResRepresentation &representation )
 {
+  auto &device_info = ResourceMgr::inst().get_device_info();
+
   representation.add( "href", get_uri() );
   representation.add( "rt", get_types() );
   representation.add( "if", get_interfaces() );
+  representation.add( "di", device_info.get_device_id() );
 
   ResRepresentation policy;
   policy.add( "bm", (long) get_property() );
@@ -177,10 +184,10 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
         {
           auto idx = 0;
           snprintf( &sau8_scheme_buffer[idx], 100 - idx, "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
-          idx += strlen( (const char *)&sau8_scheme_buffer[0] );
+          idx += strlen( (const char *) &sau8_scheme_buffer[0] );
 
-          ep->get_addr().to_string((uint8_t*) &sau8_scheme_buffer[idx], 100 - idx );
-          idx += strlen( (const char *)&sau8_scheme_buffer[idx] );
+          ep->get_addr().to_string( (uint8_t *) &sau8_scheme_buffer[idx], 100 - idx );
+          idx += strlen( (const char *) &sau8_scheme_buffer[idx] );
           snprintf( &sau8_scheme_buffer[idx], 100 - idx, "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
 
           std::string scheme{ &sau8_scheme_buffer[0] };
@@ -189,7 +196,7 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
         break;
       }
 
-      ep_list.push_back(std::move(ep_object));
+      ep_list.push_back( std::move( ep_object ) );
     }
 
     representation.add( "eps", std::move( ep_list ) );
@@ -197,7 +204,45 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
 
   return ( STACK_STATUS_OK );
 }
-void BaseResource::add_interfaces( std::vector<std::string> &interfaces )
+void BaseResource::get_endpoint_list_representation( ResRepresentation &rcz_res_rep )
+{
+  auto end_points = AdapterManager::Inst().get_endpoints_list();
+
+  if( end_points.empty() )
+  {
+    return;
+  }
+
+  RepObjectArray ep_array;
+
+  for( auto &ep : end_points )
+  {
+    ResRepresentation ep_object{};
+
+    switch( ep->get_adapter_type() )
+    {
+      case k_adapter_type_ip:
+      {
+        auto idx = 0;
+        snprintf( &sau8_scheme_buffer[idx], 100 - idx, "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
+        idx += strlen( (const char *) &sau8_scheme_buffer[0] );
+
+        ep->get_addr().to_string( (uint8_t *) &sau8_scheme_buffer[idx], 100 - idx );
+        idx += strlen( (const char *) &sau8_scheme_buffer[idx] );
+        snprintf( &sau8_scheme_buffer[idx], 100 - idx, "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
+
+        std::string scheme{ &sau8_scheme_buffer[0] };
+        ep_object.add( "ep", std::move( scheme ) );
+      }
+      break;
+    }
+
+    ep_array.push_back( std::move( ep_object ) );
+  }
+
+  rcz_res_rep.add( "eps", std::move( ep_array ) );
+}
+void BaseResource::add_interfaces( InterfaceArray &interfaces )
 {
   for( auto &if_name : interfaces )
   {
@@ -301,7 +346,7 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
 
   if( query_type_count == 0 )
   {
-  /* no 'rt' query passed */
+    /* no 'rt' query passed */
     return ( STACK_STATUS_OK );
   }
 
@@ -345,6 +390,5 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
   }
 
   return ( STACK_STATUS_OK );
-}
 }
 }

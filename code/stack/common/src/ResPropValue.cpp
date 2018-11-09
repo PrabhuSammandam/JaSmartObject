@@ -124,7 +124,7 @@ void print_array( std::vector<T> &array, uint8_t indent )
 }
 
 template<>
-void print_array( std::vector<bool> &array, uint8_t indent )
+void print_array( RepBoolArray &array, uint8_t indent )
 {
   for( auto v : array )
   {
@@ -133,7 +133,7 @@ void print_array( std::vector<bool> &array, uint8_t indent )
 }
 
 template<>
-void print_array( std::vector<long> &array, uint8_t indent )
+void print_array( RepIntegerArray &array, uint8_t indent )
 {
   for( auto &v : array )
   {
@@ -142,7 +142,7 @@ void print_array( std::vector<long> &array, uint8_t indent )
 }
 
 template<>
-void print_array( std::vector<double> &array, uint8_t indent )
+void print_array( RepNumberArray &array, uint8_t indent )
 {
   for( auto &v : array )
   {
@@ -151,7 +151,7 @@ void print_array( std::vector<double> &array, uint8_t indent )
 }
 
 template<>
-void print_array( std::vector<std::string> &array, uint8_t indent )
+void print_array( RepStringArray &array, uint8_t indent )
 {
   for( auto &v : array )
   {
@@ -160,7 +160,7 @@ void print_array( std::vector<std::string> &array, uint8_t indent )
 }
 
 template<>
-void print_array( std::vector<ResRepresentation> &array, uint8_t indent )
+void print_array( RepObjectArray &array, uint8_t indent )
 {
   for( auto &v : array )
   {

@@ -1,11 +1,12 @@
+#ifdef COMPILE_TEST_RESOURCES
 #pragma once
 
 #include <string>
 #include "BaseResource.h"
 #include "Exchange.h"
 
-namespace ja_iot {
-namespace stack {
+namespace ja_iot::resources {
+using namespace stack;
 class SmallSlowResponseResource : public BaseResource
 {
   public:
@@ -17,4 +18,4 @@ class SmallSlowResponseResource : public BaseResource
     void init();
 };
 }
-}
+#endif

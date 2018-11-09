@@ -1,17 +1,18 @@
+#ifdef COMPILE_TEST_RESOURCES
 #include <MsgStack.h>
 #include <string.h>
-#include "common/inc/TestResource/SmallSlowResponseResource.h"
+#include "common/inc/test/SmallSlowResponseResource.h"
 #include "QueryContainer.h"
 #include "DeviceInfo.h"
 #include "StackConsts.h"
 #include "OsalTimer.h"
 #include "StackEvents.h"
 
-using namespace ja_iot::osal;
-using namespace ja_iot::network;
 
-namespace ja_iot {
-namespace stack {
+namespace ja_iot::resources {
+using namespace stack;
+using namespace osal;
+using namespace network;
 struct RequestInfo
 {
   RequestInfo( CoapMsgToken &token, Endpoint endpoint ) : _token{ token }, _endpoint{ endpoint }
@@ -79,4 +80,4 @@ void SmallSlowResponseResource::init()
   set_property( OCF_RESOURCE_PROP_DISCOVERABLE );
 }
 }
-}
+#endif

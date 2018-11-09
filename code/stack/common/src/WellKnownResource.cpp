@@ -38,17 +38,17 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
 
   query_container.parse( request->get_option_set().get_uri_querys_list() );
 
-	if (check_interface_query(query_container) != STACK_STATUS_OK)
-	{
-		return (STACK_STATUS_INVALID_INTERFACE_QUERY);
-	}
+  if( check_interface_query( query_container ) != STACK_STATUS_OK )
+  {
+    return ( STACK_STATUS_INVALID_INTERFACE_QUERY );
+  }
 
   auto requested_interface = ResInterfaceType::LinksList;
 
   if( query_container.get_interface_count() > 0 )
   {
-		requested_interface = QueryContainer::get_interface_enum(query_container.get_first_if_name());
-	}
+    requested_interface = QueryContainer::get_interface_enum( query_container.get_first_if_name() );
+  }
 
   std::vector<ResRepresentation> objects{};
 
@@ -61,20 +61,20 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
 
   if( requested_interface == ResInterfaceType::BaseLine )
   {
-		std::vector<ResRepresentation> baseline_rep_array{};
+    std::vector<ResRepresentation> baseline_rep_array{};
 
-		ResRepresentation base_rep{};
+    ResRepresentation base_rep{};
 
-		base_rep.add( "rt", get_types() );
-		base_rep.add( "if", get_interfaces() );
-		base_rep.add( "links", std::move(objects));
+    base_rep.add( "rt", get_types() );
+    base_rep.add( "if", get_interfaces() );
+    base_rep.add( "links", std::move( objects ) );
 
-		baseline_rep_array.push_back(std::move(base_rep));
-		representation.add("", std::move(baseline_rep_array));
+    baseline_rep_array.push_back( std::move( base_rep ) );
+    representation.add( "", std::move( baseline_rep_array ) );
   }
   else
   {
-    representation.add( "", std::move(objects) );
+    representation.add( "", std::move( objects ) );
   }
 
   uint8_t *buffer;
@@ -96,38 +96,22 @@ uint8_t WellKnownResource::handle_request( Interaction *interaction )
 ErrCode get_linked_list_representation( QueryContainer &query_container, std::vector<ResRepresentation> &object_array )
 {
   auto &res_list = ResourceMgr::inst().get_resources_list();
+
   std::string str_wk_res_name{ "/oic/res" };
 
   for( auto &res : res_list )
   {
-	  /* check whether the resource is discoverable, if it is not then don't include in response */
+    /* check whether the resource is discoverable, if it is not then don't include in response */
     if( !static_cast<BaseResource *>( res )->is_discoverable() )
     {
       continue;
     }
 
-    if(res->get_uri() == str_wk_res_name)
+    if( res->get_uri() == str_wk_res_name )
     {
-    	continue;
+//      continue;
     }
 
-#if 0
-    bool if_found = false;
-
-    for( auto &if_name : res->get_interfaces() )
-    {
-      if( if_name == QueryContainer::get_interface_string( ResInterfaceType::BaseLine ) )
-      {
-        if_found = true;
-        break;
-      }
-    }
-
-    if( !if_found )
-    {
-      continue;
-    }
-#endif
     /* check whether any specific type of resource is requested */
     if( query_container.get_type_count() > 0 )
     {
@@ -160,14 +144,17 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
 
 uint8_t WellKnownResource::get_representation( const ResInterfaceType interface_type, ResRepresentation &representation )
 {
-	return 0;
+  return ( 0 );
 }
 
 uint8_t WellKnownResource::get_discovery_representation( ResRepresentation &representation )
 {
-  return ( 0 );
-}
+	BaseResource::get_discovery_representation(representation);
 
+	representation.add<std::string>("rel", "self");
+
+	return 0;
+}
 void WellKnownResource::init()
 {
   add_type( "oic.wk.res" );
@@ -175,6 +162,5 @@ void WellKnownResource::init()
   add_interface( "oic.if.baseline" );
   set_property( OCF_RESOURCE_PROP_DISCOVERABLE );
 }
-
 }
 }

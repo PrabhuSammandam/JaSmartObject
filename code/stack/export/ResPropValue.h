@@ -86,22 +86,28 @@ class ResRepresentation
     ResPropMap   _props;
 };
 
+typedef std::vector<ResRepresentation> RepObjectArray;
+typedef std::vector<std::string> RepStringArray;
+typedef std::vector<bool> RepBoolArray;
+typedef std::vector<long> RepIntegerArray;
+typedef std::vector<double> RepNumberArray;
+
 union PropUnion
 {
   PropUnion() {
   }
   ~PropUnion () {
   }
-  bool                           b;
-  long                           l;
-  double                         d;
-  std::string                    str;
-  ResRepresentation              obj;
-  std::vector<bool>              b_arr;
-  std::vector<long>              l_arr;
-  std::vector<double>            d_arr;
-  std::vector<std::string>       s_arr;
-  std::vector<ResRepresentation> o_arr;
+  bool              b;
+  long              l;
+  double            d;
+  std::string       str;
+  ResRepresentation obj;
+  RepBoolArray      b_arr;
+  RepIntegerArray   l_arr;
+  RepNumberArray    d_arr;
+  RepStringArray    s_arr;
+  RepObjectArray    o_arr;
 };
 
 template<typename T> struct res_prop_type_trait
@@ -139,34 +145,34 @@ template<> struct res_prop_type_trait<ResRepresentation>
   typedef ResRepresentation PROP_VALUE;
 };
 
-template<> struct res_prop_type_trait<std::vector<bool> >
+template<> struct res_prop_type_trait<RepBoolArray>
 {
   static constexpr ResPropValType   PROP_VAL_TYPE = ResPropValType::boolean_array;
-  typedef std::vector<bool> PROP_VALUE;
+  typedef RepBoolArray PROP_VALUE;
 };
 
-template<> struct res_prop_type_trait<std::vector<long> >
+template<> struct res_prop_type_trait<RepIntegerArray>
 {
   static constexpr ResPropValType   PROP_VAL_TYPE = ResPropValType::integer_array;
-  typedef std::vector<long> PROP_VALUE;
+  typedef RepIntegerArray PROP_VALUE;
 };
 
-template<> struct res_prop_type_trait<std::vector<double> >
+template<> struct res_prop_type_trait<RepNumberArray>
 {
   static constexpr ResPropValType   PROP_VAL_TYPE = ResPropValType::number_array;
-  typedef std::vector<double> PROP_VALUE;
+  typedef RepNumberArray PROP_VALUE;
 };
 
-template<> struct res_prop_type_trait<std::vector<std::string> >
+template<> struct res_prop_type_trait<RepStringArray>
 {
   static constexpr ResPropValType   PROP_VAL_TYPE = ResPropValType::string_array;
-  typedef std::vector<std::string> PROP_VALUE;
+  typedef RepStringArray PROP_VALUE;
 };
 
-template<> struct res_prop_type_trait<std::vector<ResRepresentation> >
+template<> struct res_prop_type_trait<RepObjectArray>
 {
   static constexpr ResPropValType   PROP_VAL_TYPE = ResPropValType::obj_array;
-  typedef std::vector<ResRepresentation> PROP_VALUE;
+  typedef RepObjectArray PROP_VALUE;
 };
 
 template<typename T>
@@ -209,7 +215,7 @@ struct PropTraits<std::string> : res_prop_type_trait<std::string>
 };
 
 template<>
-struct PropTraits<std::vector<bool> > : res_prop_type_trait<std::vector<bool> >
+struct PropTraits<RepBoolArray> : res_prop_type_trait<RepBoolArray>
 {
   static void      initialize( PropUnion &value ) { new(&value.b_arr) PROP_VALUE; }
   static PROP_VALUE& get_value( PropUnion &value ) { return ( value.b_arr ); }
@@ -218,7 +224,7 @@ struct PropTraits<std::vector<bool> > : res_prop_type_trait<std::vector<bool> >
 };
 
 template<>
-struct PropTraits<std::vector<long> > : res_prop_type_trait<std::vector<long> >
+struct PropTraits<RepIntegerArray> : res_prop_type_trait<RepIntegerArray>
 {
   static void      initialize( PropUnion &value ) { new(&value.l_arr) PROP_VALUE; }
   static PROP_VALUE& get_value( PropUnion &value ) { return ( value.l_arr ); }
@@ -227,7 +233,7 @@ struct PropTraits<std::vector<long> > : res_prop_type_trait<std::vector<long> >
 };
 
 template<>
-struct PropTraits<std::vector<double> > : res_prop_type_trait<std::vector<double> >
+struct PropTraits<RepNumberArray> : res_prop_type_trait<RepNumberArray>
 {
   static void      initialize( PropUnion &value ) { new(&value.d_arr) PROP_VALUE; }
   static PROP_VALUE& get_value( PropUnion &value ) { return ( value.d_arr ); }
@@ -236,7 +242,7 @@ struct PropTraits<std::vector<double> > : res_prop_type_trait<std::vector<double
 };
 
 template<>
-struct PropTraits<std::vector<std::string> > : res_prop_type_trait<std::vector<std::string> >
+struct PropTraits<RepStringArray> : res_prop_type_trait<RepStringArray>
 {
   static void      initialize( PropUnion &value ) { new(&value.s_arr) PROP_VALUE; }
   static PROP_VALUE& get_value( PropUnion &value ) { return ( value.s_arr ); }
@@ -257,7 +263,7 @@ struct PropTraits<std::vector<std::string> > : res_prop_type_trait<std::vector<s
  * 7. std::vector<long>
  * 8. std::vector<double>
  * 9. std::vector<std::string>
- * 10. std::vector<ResRepresentation>
+ * 10. RepObjectArray
  *
  * The special purpose of this class is that value is stored in the union. So because of union small memory is used
  * for the value and also supports the different data types with single unified interface.
@@ -394,7 +400,7 @@ struct PropTraits<ResRepresentation> : res_prop_type_trait<ResRepresentation>
 };
 
 template<>
-struct PropTraits<std::vector<ResRepresentation> > : res_prop_type_trait<std::vector<ResRepresentation> >
+struct PropTraits<RepObjectArray> : res_prop_type_trait<RepObjectArray>
 {
   static void      initialize( PropUnion &value ) { new(&value.o_arr) PROP_VALUE; }
   static PROP_VALUE& get_value( PropUnion &value ) { return ( value.o_arr ); }

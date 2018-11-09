@@ -54,12 +54,6 @@ set(COMMON_SRCS
             common/src/MessageSender.cpp
             common/src/ResourceMgr.cpp
             common/src/MulticastClientInteraction.cpp
-            common/src/TestResource/BigCONResponse.cpp  
-            common/src/TestResource/BigNONResponse.cpp  
-            common/src/TestResource/BigPbResponse.cpp  
-            common/src/TestResource/SmallNonResponseResource.cpp  
-            common/src/TestResource/SmallPiggybackResource.cpp  
-            common/src/TestResource/SmallSlowResponseResource.cpp
 common/src/SoStackFacade.cpp
             )
             

@@ -8,6 +8,7 @@ endif()
 
 if(PLATFORM_WINDOWS)
     add_definitions(-D_OS_WINDOWS_)
+    set(PLATFORM_LIBS ws2_32 iphlpapi bcrypt)
 endif(PLATFORM_WINDOWS)
 
 if(PLATFORM_LINUX)
@@ -22,11 +23,12 @@ include_directories(../code/base/export
                     ../code/debug/export
                     ../code/stack/export
                     ../code/osal/export
+                    ../code/resources/export
 		    ~/.local/include)
 
 add_definitions(-std=c++14 -g)		  
 
-set(SRCS main.cpp BinarySwitchResource.cpp)
+set(SRCS main.cpp)
 
 add_executable(ja-coap-server ${SRCS})
-target_link_libraries(ja-coap-server stack osal network memory base pthread)
+target_link_libraries(ja-coap-server resources stack network osal memory base pthread ${PLATFORM_LIBS})

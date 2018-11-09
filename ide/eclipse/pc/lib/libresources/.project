@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>ja-coap-server</name>
+	<name>libresources</name>
 	<comment></comment>
 	<projects>
-		<project>libbase</project>
-		<project>libmemory</project>
-		<project>libnetwork</project>
-		<project>libosal</project>
-		<project>libstack</project>
-		<project>libresources</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -32,9 +26,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>server</name>
+			<name>resources</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/server</locationURI>
+			<locationURI>$%7BPARENT-5-PROJECT_LOC%7D/code/resources</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

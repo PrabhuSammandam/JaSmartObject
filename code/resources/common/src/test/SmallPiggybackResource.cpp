@@ -1,26 +1,28 @@
+#ifdef COMPILE_TEST_RESOURCES
 /*
- * BigNONResponse.cpp
+ * SmallPiggybackResource.cpp
  *
  *  Created on: Feb 2, 2018
  *      Author: psammand
  */
+
 #include <string.h>
-#include "common/inc/TestResource/BigNONResponse.h"
+#include "common/inc/test/SmallPiggyBackResource.h"
 #include "QueryContainer.h"
 #include "StackConsts.h"
 
-namespace ja_iot {
-namespace stack {
-BigNONResponse::BigNONResponse () : BaseResource{ "/big/non" }
+namespace ja_iot::resources {
+using namespace stack;
+SmallPiggybackResource::SmallPiggybackResource () : BaseResource{ "/small/pb" }
 {
   init();
 }
 
-uint8_t BigNONResponse::handle_request( Interaction *interaction )
+uint8_t SmallPiggybackResource::handle_request( Interaction *interaction )
 {
   auto request = interaction->get_server_request();
 
-  if( /*(request->get_code() == COAP_MSG_CODE_PUT)
+  if( /*( request->get_code() == COAP_MSG_CODE_PUT )
        ||*/( request->get_code() == COAP_MSG_CODE_POST )
     || ( request->get_code() == COAP_MSG_CODE_DEL ) )
   {
@@ -29,11 +31,11 @@ uint8_t BigNONResponse::handle_request( Interaction *interaction )
 
   auto response = new ServerResponse{};
 
-  response->set_type( COAP_MSG_TYPE_NON );
+  response->set_type( COAP_MSG_TYPE_CON );
   response->set_code( COAP_MSG_CODE_CONTENT_205 );
   response->get_option_set().set_content_format( COAP_CONTENT_FORMAT_PLAIN );
 
-  char *payload     = (char *) "A CoAP server which translates incoming CoAP requests to corresponding HTTP requests which are sent to a backend HTTP server; responses are translated to CoAP and sent over to the CoAP client. crosscoap allows CoAP clients to consume content from an existing HTTP application, without adding specific CoAP functionality to the application itself.";
+  char *payload     = (char *) "Let us meet";
   auto  dyn_payload = new uint8_t[strlen( payload ) + 1];
   memcpy( dyn_payload, payload, strlen( payload ) );
   dyn_payload[strlen( payload )] = '\0';
@@ -45,9 +47,9 @@ uint8_t BigNONResponse::handle_request( Interaction *interaction )
   return ( STACK_STATUS_OK );
 }
 
-void BigNONResponse::init()
+void SmallPiggybackResource::init()
 {
   set_property( OCF_RESOURCE_PROP_DISCOVERABLE );
 }
 }
-}
+#endif

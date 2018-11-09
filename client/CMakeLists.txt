@@ -8,6 +8,7 @@ endif()
 
 if(PLATFORM_WINDOWS)
     add_definitions(-D_OS_WINDOWS_)
+    set(PLATFORM_LIBS ws2_32 iphlpapi bcrypt)
 endif(PLATFORM_WINDOWS)
 
 if(PLATFORM_LINUX)
@@ -22,6 +23,7 @@ include_directories(../code/base/export
                     ../code/debug/export
                     ../code/stack/export
                     ../code/osal/export
+                    ../code/resources/export
 		    ~/.local/include
 		    ./tclap)
 
@@ -30,4 +32,4 @@ add_definitions(-std=c++14)
 set(SRCS Client.cpp SimpleClient.cpp)
 
 add_executable(ja-coap-client ${SRCS})
-target_link_libraries(ja-coap-client stack osal network memory base pthread)
+target_link_libraries(ja-coap-client resources stack osal network memory base pthread ${PLATFORM_LIBS})
