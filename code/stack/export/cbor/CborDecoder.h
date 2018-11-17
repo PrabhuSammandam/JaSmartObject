@@ -1,7 +1,8 @@
 #pragma once
 
-#include "cbor/ICborDecoderListener.h"
-#include "cbor/CborDecoderBuffer.h"
+#include <cmath>
+#include <cbor/CborDecoderBuffer.h>
+#include <cbor/ICborDecoderListener.h>
 
 namespace ja_iot {
 namespace stack {

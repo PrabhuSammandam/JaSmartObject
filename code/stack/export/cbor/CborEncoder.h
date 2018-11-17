@@ -3,7 +3,7 @@
 #ifndef CBOR_ENCODER
 #define CBOR_ENCODER
 
-#include "CborEncoderBuffer.h"
+#include <cbor/CborEncoderBuffer.h>
 #include <string>
 #include <type_traits>
 
@@ -40,10 +40,18 @@ class CborEncoder
       write_type_value( (uint8_t) CborType::TEXT_STRING, size );
       _dst_buffer->put_bytes( (const uint8_t *) data, size );
     }
-    void write_string( std::string &str )
+    void write_string( const std::string &str )
     {
       write_type_value( (uint8_t) CborType::TEXT_STRING, (unsigned int) str.size() );
       _dst_buffer->put_bytes( (const uint8_t *) str.c_str(), (int) str.size() );
+    }
+    void write_string( const char *str)
+    {
+    	if(str != nullptr)
+    	{
+      write_type_value( (uint8_t) CborType::TEXT_STRING, ::strlen(str) );
+      _dst_buffer->put_bytes( (const uint8_t *) str, ::strlen(str) );
+    	}
     }
 
     void write_array( uint16_t size ) { write_type_value( (uint8_t) CborType::ARRAY, size ); }
@@ -55,7 +63,7 @@ class CborEncoder
 
     /**
      * This api used for int, long values to encode. Even though bool is integral type in c++,
-     * in CBOR bool values are encoded as 0xF4 or 0xF5. Inside this template function it is not
+     * in CBOR bool values are encoded as 0xF4 or 0xF5. Inside the template function it is not
      * known how to find whether it is bool or not.
      *
      * @param value
@@ -116,7 +124,7 @@ class CborEncoder
       }
     }
 
-    void write( std::string &rstr_value )
+    void write( const std::string &rstr_value )
     {
       write_string( rstr_value );
     }
@@ -132,6 +140,26 @@ class CborEncoder
       {
         _dst_buffer->put_byte( static_cast<uint8_t>( ( value >> ( i * 8 ) ) ) );
       }
+    }
+
+    template<typename T,
+    typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
+    bool write_map_entry(const std::string& key, T value)
+    {
+    	write(key);
+    	write(value);
+
+    	return true;
+    }
+
+    template<typename T,
+    typename std::enable_if<std::is_class<T>::value, int>::type = 0>
+    bool write_map_entry(const std::string& key, const T& value)
+    {
+    	write(key);
+    	write(value);
+
+    	return true;
     }
 
   private:

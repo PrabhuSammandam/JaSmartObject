@@ -9,6 +9,8 @@
 #include "common/inc/security/SecurityDataTypes.h"
 #include "StackConsts.h"
 #include "CborCodec.h"
+#include "cbor/CborDecoder.h"
+#include "cbor/CborEncoder.h"
 
 namespace ja_iot::resources {
 DeviceOwnerXferMethodRes::DeviceOwnerXferMethodRes () : BaseResource( "/oic/sec/doxm" )
@@ -22,6 +24,20 @@ bool DeviceOwnerXferMethodRes::is_method_supported( uint8_t method )
 
 uint8_t DeviceOwnerXferMethodRes::handle_get( QueryContainer &query_container, Interaction *interaction )
 {
+	auto buffer = new uint8_t[1024];
+
+	  CborEncoderBuffer cz_encode_buffer{ buffer, 1024 };
+	  CborEncoder cz_encoder{ &cz_encode_buffer };
+
+	  cz_encoder.write_map(8);
+	  cz_encoder.write_map_entry("oxmsel", _selected_owner_xfer_method);
+	  cz_encoder.write_map_entry("sct", _supported_credential_type);
+	  cz_encoder.write_map_entry("owned", _is_owned);
+	  cz_encoder.write_map_entry( "deviceuuid",  _device_uuid.to_string()  );
+	  cz_encoder.write_map_entry( "devowneruuid",  _device_owner_uuid.to_string()  );
+	  cz_encoder.write_map_entry( "rowneruuid", _resource_owner_uuid.to_string()  );
+
+
   ResRepresentation rep{};
   auto stack_status = get_representation( ResInterfaceType::BaseLine, rep );
 

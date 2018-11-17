@@ -5,10 +5,10 @@
  *      Author: psammand
  */
 
+#include <cbor/CborDecoderBuffer.h>
+#include <cbor/CborEncoder.h>
+#include <cbor/ICborDecoderListener.h>
 #include <CborCodec.h>
-#include <common/inc/cbor/CborEncoder.h>
-#include <common/inc/cbor/ICborDecoderListener.h>
-#include <common/inc/cbor/CborDecoderBuffer.h>
 #include <stack>
 #include "ResPropValue.h"
 #include "common/inc/cbor/CborItem.h"
