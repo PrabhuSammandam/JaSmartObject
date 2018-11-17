@@ -97,19 +97,12 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
 {
   auto &res_list = ResourceMgr::inst().get_resources_list();
 
-  std::string str_wk_res_name{ "/oic/res" };
-
   for( auto &res : res_list )
   {
     /* check whether the resource is discoverable, if it is not then don't include in response */
     if( !static_cast<BaseResource *>( res )->is_discoverable() )
     {
       continue;
-    }
-
-    if( res->get_uri() == str_wk_res_name )
-    {
-//      continue;
     }
 
     /* check whether any specific type of resource is requested */

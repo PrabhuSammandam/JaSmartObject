@@ -35,7 +35,7 @@ constexpr uint16_t          IP_ADAPTER_RECEIVER_TASK_STACK_SIZE  = 0;
 constexpr uint16_t          IP_ADAPTER_RECEIVER_TASK_PRIORITY    = 0;
 constexpr const char *const IP_ADAPTER_RECEIVER_TASK_NAME        = "ip_r_task";
 
-constexpr uint16_t          JA_COAP_CONFIG_MAX_PAYLOAD_SIZE = 1024;//512;
+constexpr uint16_t          JA_COAP_CONFIG_MAX_PAYLOAD_SIZE = 2048;//512;
 constexpr uint16_t          JA_COAP_CONFIG_MAX_OPTION_SIZE  = 1034;
 
 constexpr uint16_t          k_resource_uri_path_max_size = 128;

@@ -1,6 +1,11 @@
 #include "CollectionResource.h"
 #include "StackConsts.h"
 #include "CborCodec.h"
+
+/**
+ *
+ */
+
 CollectionResource::CollectionResource() : BaseResource{ "/master/bedroom" }
 {
 	init();

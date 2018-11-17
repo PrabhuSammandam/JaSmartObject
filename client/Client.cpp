@@ -16,7 +16,7 @@ using namespace ja_iot::stack;
 /*********************BaseRequestInfo**********************************************/
 /**********************************************************************************/
 
-BaseRequestInfo::BaseRequestInfo( ja_iot::network::Endpoint &endpoint, std::string uri_path, client_response_cb response_cb ) :
+BaseRequestInfo::BaseRequestInfo( Endpoint &endpoint, std::string uri_path, client_response_cb response_cb ) :
   _endpoint{ endpoint }, _uri_path{ uri_path }, _response_cb{ response_cb }
 {
 }
@@ -24,7 +24,7 @@ BaseRequestInfo::BaseRequestInfo( ja_iot::network::Endpoint &endpoint, std::stri
 /**********************************************************************************/
 /*********************GetRequestInfo**********************************************/
 /**********************************************************************************/
-GetRequestInfo::GetRequestInfo( ja_iot::network::Endpoint &endpoint, std::string uri_path, client_response_cb response_cb ) :
+GetRequestInfo::GetRequestInfo( Endpoint &endpoint, std::string uri_path, client_response_cb response_cb ) :
   BaseRequestInfo{ endpoint, uri_path, response_cb }
 {
 }
