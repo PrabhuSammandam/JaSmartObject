@@ -12,5 +12,6 @@ constexpr uint8_t STACK_STATUS_INVALID_METHOD          = 4;
 constexpr uint8_t STACK_STATUS_SLOW_RESPONSE           = 5;
 constexpr uint8_t STACK_STATUS_REJECT                  = 6;
 constexpr uint8_t STACK_STATUS_INVALID_PARAMETER       = 7;
+constexpr uint8_t STACK_STATUS_BAD_REQUEST             = 8;
 }
 }

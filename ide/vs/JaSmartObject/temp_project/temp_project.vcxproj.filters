@@ -23,9 +23,6 @@
     <ClInclude Include="umm_malloc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResPropValue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,10 +37,10 @@
     <ClCompile Include="CborTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResPropValue.cpp">
+    <ClCompile Include="umm_malloc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="umm_malloc.c">
+    <ClCompile Include="test_uuid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

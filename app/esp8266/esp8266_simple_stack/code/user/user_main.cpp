@@ -26,12 +26,14 @@
 #include "user/resources/SwitchResource.h"
 #include "ResourceMgr.h"
 #include "ResPropValue.h"
+#include "SoStackFacade.h"
 
 using namespace ja_iot::base;
 using namespace ja_iot::osal;
 using namespace ja_iot::network;
 using namespace ja_iot::memory;
 using namespace ja_iot::stack;
+using namespace ja_iot::so_stack;
 
 constexpr uint8_t STATUS_LED = 5;
 constexpr uint8_t RELAY = 13;
@@ -84,29 +86,18 @@ extern "C" void user_init( void )
   init_board();
   print_system_info();
 
-  auto mem_alloctor = MemAllocatorFactory::create_mem_allocator( MemAlloctorType::kFreeRTOS );
+  auto &so_stack_facade = SoStackFacade::inst();
 
-  if( mem_alloctor == nullptr )
+  if( so_stack_facade.initialize() != ErrCode::OK )
   {
-    printf( PSTR( "MemAllocatorFactory NULL for FreeRTOS platform\n" ) );
+    return;
   }
 
-  MemAllocatorFactory::set( mem_alloctor );
+  so_stack_facade.enable_ipv4( true )
+  .enable_ipv4_mcast( true );
 
-  OsalMgr::Inst()->Init();
-
-  auto platform_factory = INetworkPlatformFactory::create_factory( NetworkPlatform::kEsp8266 );
-
-  if( platform_factory == nullptr )
-  {
-    printf( PSTR( "INetworkPlatformFactory NULL for FreeRTOS platform\n" ) );
-  }
-
-  INetworkPlatformFactory::set_curr_factory( platform_factory );
-
-  ConfigManager::Inst().get_ip_adapter_config()->set_port( IP_ADAPTER_CONFIG_IPV4_UCAST, 56775 );
-  ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV4_UCAST, true );
-  ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV4_MCAST, true );
+  DeviceInfo device_info{ "SimpleClient", "aa", "ocf.1.0.0", "ocf.res.1.3.0" };
+  so_stack_facade.set_device_info( device_info );
 
   wifi_set_event_handler_cb( wifi_task_cb );
   wifi_set_opmode( STATION_MODE );
@@ -146,7 +137,10 @@ static void wifi_task_cb( System_Event_t *evt )
               , IP2STR( &evt->event_info.got_ip.gw ) );
 
       ja_gpio_led_on( STATUS_LED );
-      MsgStack::inst().initialize( k_adapter_type_ip );
+
+      SoStackFacade::inst().start();
+      //ResourceMgr::inst().init_default_resources();
+      //MsgStack::inst().initialize( k_adapter_type_ip );
 
       auto switch_resource = new SwitchResource{};
       ResourceMgr::inst().add_resource( switch_resource );

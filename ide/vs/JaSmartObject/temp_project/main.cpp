@@ -15,15 +15,19 @@ using namespace ja_iot::memory;
 using namespace JaCoAP;
 using namespace ja_iot::stack;
 
-extern void run_cbor_test_suite();
+extern void test_uuid();
 
-int main( int argc, char *argv[] )
+int main()
+{
+	test_uuid();
+	return 0;
+}
+
+int main__( int argc, char *argv[] )
 {
   const auto mem_allocator = MemAllocatorFactory::create_mem_allocator( MemAlloctorType::kWindows );
   MemAllocatorFactory::set( mem_allocator );
   OsalMgr::Inst()->Init();
-
-  run_cbor_test_suite();
 
   auto semaphore = OsalMgr::Inst()->alloc_semaphore();
 

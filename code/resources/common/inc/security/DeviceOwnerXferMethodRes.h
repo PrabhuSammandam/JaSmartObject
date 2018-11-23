@@ -21,7 +21,7 @@ using namespace stack;
 class DoxmObject
 {
   public:
-    void    encode_to_cbor( CborEncoder &cz_cbor_encoder );
+    void    encode_to_cbor( CborEncoder &cz_cbor_encoder);
     uint8_t decode_from_cbor( ResRepresentation &cz_res_rep, uint8_t u8_device_state );
     void    set_to_default();
     void    copy_updatable_props( DoxmObject &src );

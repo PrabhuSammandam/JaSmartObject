@@ -62,5 +62,6 @@ bool find_in_list( std::vector<T> &list, const T &value )
 {
   return ( std::find( list.cbegin(), list.cend(), value ) != list.cend() );
 }
+
 }
 }

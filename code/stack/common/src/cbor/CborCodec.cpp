@@ -464,6 +464,7 @@ static ErrCode decode_representation( CborItem *root_map_item, ResRepresentation
  */
 ErrCode CborCodec::encode( ResRepresentation &rcz_res_rep, uint8_t * &rpu8_dst_buffer, uint16_t &ru16_dst_buffer_len )
 {
+#if 0
   /* initialize the buffers */
   ru16_dst_buffer_len = 0;
 
@@ -486,6 +487,12 @@ ErrCode CborCodec::encode( ResRepresentation &rcz_res_rep, uint8_t * &rpu8_dst_b
   encode_representation( rcz_res_rep, cz_encoder );
 
   ru16_dst_buffer_len = cz_encode_buffer.size();
+#endif
+
+  CborEncoder cz_encoder{1024};
+  encode_representation( rcz_res_rep, cz_encoder );
+  rpu8_dst_buffer = cz_encoder.get_buf();
+  ru16_dst_buffer_len = cz_encoder.get_buf_len();
 
   return ( ErrCode::OK );
 

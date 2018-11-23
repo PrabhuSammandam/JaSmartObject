@@ -35,6 +35,7 @@
     <ClCompile Include="..\..\..\..\code\resources\common\src\BinarySwitchResourceBase.cpp" />
     <ClCompile Include="..\..\..\..\code\resources\common\src\core\DeviceResource.cpp" />
     <ClCompile Include="..\..\..\..\code\resources\common\src\core\WellKnownResource.cpp" />
+    <ClCompile Include="..\..\..\..\code\resources\common\src\ResModuleInterface.cpp" />
     <ClCompile Include="..\..\..\..\code\resources\common\src\security\AccessControlEntry.cpp" />
     <ClCompile Include="..\..\..\..\code\resources\common\src\security\AccessControlListRes.cpp" />
     <ClCompile Include="..\..\..\..\code\resources\common\src\security\Credential.cpp" />

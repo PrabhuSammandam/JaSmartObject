@@ -301,7 +301,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ResPropValue.h" />
     <ClInclude Include="SimpleAllocator.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -312,15 +311,12 @@
     <ClCompile Include="CborTests.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ResPropsTest.cpp" />
-    <ClCompile Include="ResPropValue.cpp" />
+    <ClCompile Include="test_uuid.cpp" />
     <ClCompile Include="umm_malloc.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libbase\libbase.vcxproj">
       <Project>{f16b5842-63d3-42c0-8e49-b3e1bb958fb5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\libcbor\libcbor.vcxproj">
-      <Project>{0a6db6c8-6940-4642-87fe-b05a48c89226}</Project>
     </ProjectReference>
     <ProjectReference Include="..\libmemory\libmemory.vcxproj">
       <Project>{da1c0566-9b05-4e32-a7dd-99c85ab6f07b}</Project>

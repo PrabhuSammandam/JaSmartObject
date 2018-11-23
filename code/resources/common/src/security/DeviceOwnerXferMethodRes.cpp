@@ -38,10 +38,31 @@ bool DeviceOwnerXferMethodRes::is_method_supported( uint8_t method )
   return ( method == COAP_MSG_CODE_GET || method == COAP_MSG_CODE_POST );
 }
 
+void to_lower(std::string& str)
+{
+	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
 uint8_t DeviceOwnerXferMethodRes::handle_get( QueryContainer &query_container, Interaction *interaction )
 {
-  (void) query_container;
-  CborEncoder cz_encoder{ 256 };
+	for(auto& q : query_container.get_all_of_map())
+	{
+		auto key = q.first;
+		to_lower(key);
+
+		if(key == "owned")
+		{
+			to_lower(q.second);
+
+			if ((q.second == "true" && !_doxm_obj.is_owned())
+				|| (q.second == "false" && _doxm_obj.is_owned()))
+			{
+				return STACK_STATUS_OK;
+			}
+		}
+	}
+
+	CborEncoder cz_encoder{ 256 };
 
   cz_encoder.start_map();
   _doxm_obj.encode_to_cbor( cz_encoder );
@@ -115,7 +136,7 @@ void DeviceOwnerXferMethodRes::init()
 /**********************************   DoxmObject             *****************************************************/
 /*****************************************************************************************************************/
 
-void DoxmObject::encode_to_cbor( CborEncoder &cz_encoder )
+void DoxmObject::encode_to_cbor( CborEncoder &cz_encoder)
 {
   cz_encoder.write_map_entry( DOXM_PROP_OXMS, _owner_xfer_method_array );
   cz_encoder.write_map_entry( DOXM_PROP_OXMSEL, _selected_owner_xfer_method );
@@ -193,6 +214,7 @@ uint8_t DoxmObject::decode_from_cbor( ResRepresentation &cz_res_rep, uint8_t u8_
 void DoxmObject::set_to_default()
 {
   _owner_xfer_method_array.clear();
+	_owner_xfer_method_array.push_back((uint8_t)DeviceOwnerXferMethodType::RANDOM_PIN);
   _selected_owner_xfer_method = (uint8_t) DeviceOwnerXferMethodType::RANDOM_PIN;
   _supported_credential_type  = CREDENTIAL_TYPE_SYMMETRIC_PAIR_WISE_KEY | CREDENTIAL_TYPE_ASYMMETRIC_SIGNING_KEY_WITH_CERT;
   _is_owned                   = false;
