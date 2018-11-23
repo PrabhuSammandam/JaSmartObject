@@ -34,6 +34,7 @@ set(SRCS
 
 add_executable(esp8266_net_app ${SRCS})
 target_link_libraries(esp8266_net_app
+                      -Wl,--start-group
                       network
                       mbedtls
                       gcc
@@ -62,4 +63,5 @@ target_link_libraries(esp8266_net_app
                       supc++
                       c
                       minic
-                      hal)
+                      hal
+                      -Wl,--end-group)

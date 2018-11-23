@@ -32,4 +32,4 @@ add_definitions(-std=c++14)
 set(SRCS Client.cpp SimpleClient.cpp)
 
 add_executable(ja-coap-client ${SRCS})
-target_link_libraries(ja-coap-client resources stack osal network memory base pthread ${PLATFORM_LIBS})
+target_link_libraries(ja-coap-client -Wl,--start-group base memory osal network stack resources -Wl,--end-group pthread ${PLATFORM_LIBS})

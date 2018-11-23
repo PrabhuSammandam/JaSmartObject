@@ -28,7 +28,8 @@ set(SRCS
     common/src/byte_array.cpp
     common/src/Hash.cpp
     common/src/ip_addr.cpp
-    common/src/ip_socket_addr.cpp)
+    common/src/ip_socket_addr.cpp
+    common/src/Uuid.cpp)
 
 include_directories(common/inc export ../memory/export)
 

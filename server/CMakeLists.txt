@@ -31,4 +31,4 @@ add_definitions(-std=c++14 -g)
 set(SRCS main.cpp)
 
 add_executable(ja-coap-server ${SRCS})
-target_link_libraries(ja-coap-server resources stack network osal memory base pthread ${PLATFORM_LIBS})
+target_link_libraries(ja-coap-server -Wl,--start-group base memory osal network stack resources -Wl,--end-group pthread ${PLATFORM_LIBS} )
