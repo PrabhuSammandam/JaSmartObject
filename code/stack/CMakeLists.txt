@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.6)
 
 project(libstack)
 
-add_definitions(-D_LITTLE_ENDIAN_ -D_WIN32_WINNT=0x0600)
+add_definitions(-D_LITTLE_ENDIAN_)
 add_definitions(-D_DEBUG_=1 -D_STACK_DEBUG_=1)
 
 if(PLATFORM_WINDOWS)
-    add_definitions(-D_OS_WINDOWS_)
+    add_definitions(-D_OS_WINDOWS_ -D_WIN32_WINNT=0x0600)
     include_directories(port/windows/inc)
 endif(PLATFORM_WINDOWS)
 
@@ -34,7 +34,8 @@ include_directories(common/inc
                     ../memory/export
                     ../debug/export
                     ../osal/export
-                    ../network/export)
+                    ../network/export
+                    ../resources/export)
                     
 set(COMMON_SRCS
             common/src/BaseInteraction.cpp
@@ -44,11 +45,9 @@ set(COMMON_SRCS
             common/src/ResPropValue.cpp
             common/src/TokenProvider.cpp
             common/src/BaseResource.cpp
-            common/src/DeviceResource.cpp
             common/src/MessageIdProvider.cpp
             common/src/QueryContainer.cpp
             common/src/ServerInteraction.cpp
-            common/src/WellKnownResource.cpp
             common/src/BlockTransferStatus.cpp
             common/src/Exchange.cpp
             common/src/MessageSender.cpp

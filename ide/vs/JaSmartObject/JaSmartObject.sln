@@ -40,6 +40,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ja-coap-server", "ja-coap-s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BedroomCollection", "BedroomCollection\BedroomCollection.vcxproj", "{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libresources", "libresources\libresources.vcxproj", "{262527DD-E8FC-4387-9E7F-696301F84F2A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_security_resources", "test_security_resources\test_security_resources.vcxproj", "{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -244,6 +248,38 @@ Global
 		{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F}.Release|x64.Build.0 = Release|x64
 		{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F}.Release|x86.ActiveCfg = Release|Win32
 		{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F}.Release|x86.Build.0 = Release|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Debug|ARM.ActiveCfg = Debug|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Debug|x64.ActiveCfg = Debug|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Debug|x64.Build.0 = Debug|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Debug|x86.ActiveCfg = Debug|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Debug|x86.Build.0 = Debug|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|ARM.ActiveCfg = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|ARM.Build.0 = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|x64.ActiveCfg = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|x64.Build.0 = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|x86.ActiveCfg = Release|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.raspberry_debug|x86.Build.0 = Release|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Release|ARM.ActiveCfg = Release|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Release|x64.ActiveCfg = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Release|x64.Build.0 = Release|x64
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Release|x86.ActiveCfg = Release|Win32
+		{262527DD-E8FC-4387-9E7F-696301F84F2A}.Release|x86.Build.0 = Release|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Debug|ARM.ActiveCfg = Debug|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Debug|x64.ActiveCfg = Debug|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Debug|x64.Build.0 = Debug|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Debug|x86.ActiveCfg = Debug|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Debug|x86.Build.0 = Debug|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|ARM.ActiveCfg = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|ARM.Build.0 = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|x64.ActiveCfg = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|x64.Build.0 = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|x86.ActiveCfg = Release|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.raspberry_debug|x86.Build.0 = Release|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|ARM.ActiveCfg = Release|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x64.ActiveCfg = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x64.Build.0 = Release|x64
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x86.ActiveCfg = Release|Win32
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -259,6 +295,8 @@ Global
 		{0A58B22A-66B7-4432-8504-9666361E677D} = {D36EABCB-5B27-4E9C-B606-6B767E14DFF2}
 		{5ACC37DD-73FC-4EEB-8859-9464FD773178} = {D36EABCB-5B27-4E9C-B606-6B767E14DFF2}
 		{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F} = {D36EABCB-5B27-4E9C-B606-6B767E14DFF2}
+		{262527DD-E8FC-4387-9E7F-696301F84F2A} = {4EE62742-1D7A-48C2-AA79-F7A4944FCEE4}
+		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED} = {393A36E0-76AB-445D-9C2B-74CAF4A1FB13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1CFFD3D-EF89-4B67-9031-8200B858074E}

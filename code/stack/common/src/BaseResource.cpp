@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <cstring>
 #include "BaseResource.h"
 #include "ObserverMgr.h"
@@ -8,7 +9,8 @@
 #include "adapter_mgr.h"
 #include "ResourceMgr.h"
 
-namespace ja_iot::stack {
+namespace ja_iot{
+namespace stack {
 using namespace base;
 using namespace network;
 BaseResource::BaseResource( std::string uri ) : _uri{ uri }
@@ -183,12 +185,12 @@ uint8_t BaseResource::get_discovery_representation( ResRepresentation &represent
         case k_adapter_type_ip:
         {
           auto idx = 0;
-          snprintf( &sau8_scheme_buffer[idx], 100 - idx, "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
+          sprintf( &sau8_scheme_buffer[idx], "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
           idx += strlen( (const char *) &sau8_scheme_buffer[0] );
 
           ep->get_addr().to_string( (uint8_t *) &sau8_scheme_buffer[idx], 100 - idx );
           idx += strlen( (const char *) &sau8_scheme_buffer[idx] );
-          snprintf( &sau8_scheme_buffer[idx], 100 - idx, "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
+          sprintf( &sau8_scheme_buffer[idx], "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
 
           std::string scheme{ &sau8_scheme_buffer[0] };
           ep_object.add( "ep", std::move( scheme ) );
@@ -224,12 +226,12 @@ void BaseResource::get_endpoint_list_representation( ResRepresentation &rcz_res_
       case k_adapter_type_ip:
       {
         auto idx = 0;
-        snprintf( &sau8_scheme_buffer[idx], 100 - idx, "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
+        sprintf( &sau8_scheme_buffer[idx], "coap%s://%s", ( ep->is_secure() ? "s" : "" ), ( ep->is_ipv4() ? "" : "[" ) );
         idx += strlen( (const char *) &sau8_scheme_buffer[0] );
 
         ep->get_addr().to_string( (uint8_t *) &sau8_scheme_buffer[idx], 100 - idx );
         idx += strlen( (const char *) &sau8_scheme_buffer[idx] );
-        snprintf( &sau8_scheme_buffer[idx], 100 - idx, "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
+        sprintf( &sau8_scheme_buffer[idx], "%s:%d", ( ep->is_ipv4() ? "" : "]" ), ep->get_port() );
 
         std::string scheme{ &sau8_scheme_buffer[0] };
         ep_object.add( "ep", std::move( scheme ) );
@@ -242,6 +244,17 @@ void BaseResource::get_endpoint_list_representation( ResRepresentation &rcz_res_
 
   rcz_res_rep.add( "eps", std::move( ep_array ) );
 }
+
+void BaseResource::encode_resource_type( CborEncoder &cz_cbor_encoder )
+{
+  cz_cbor_encoder.write_map_entry( "rt", _types );
+}
+
+void BaseResource::encode_resource_interface( CborEncoder &cz_cbor_encoder )
+{
+  cz_cbor_encoder.write_map_entry( "if", _interfaces );
+}
+
 void BaseResource::add_interfaces( InterfaceArray &interfaces )
 {
   for( auto &if_name : interfaces )
@@ -288,6 +301,19 @@ uint8_t BaseResource::set_response( Interaction *interaction, ResRepresentation 
   {
     return ( STACK_STATUS_OUT_OF_MEMORY );
   }
+
+  return ( STACK_STATUS_OK );
+}
+
+uint8_t BaseResource::set_cbor_response( Interaction *interaction, uint8_t *pu8_buffer, uint16_t u16_buf_len )
+{
+  auto response = new ServerResponse{};
+
+  response->set_code( COAP_MSG_CODE_CONTENT_205 );
+  response->get_option_set().set_content_format( COAP_CONTENT_FORMAT_CBOR );
+  response->set_payload( pu8_buffer, u16_buf_len );
+
+  interaction->set_server_response( response );
 
   return ( STACK_STATUS_OK );
 }
@@ -390,5 +416,6 @@ uint8_t BaseResource::check_type_query( QueryContainer &query_container )
   }
 
   return ( STACK_STATUS_OK );
+}
 }
 }

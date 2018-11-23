@@ -1,7 +1,7 @@
 #include <MsgStack.h>
 #include <string.h>
 #include "coap/coap_msg.h"
-#include "common/inc/WellKnownResource.h"
+#include "core/WellKnownResource.h"
 #include "QueryContainer.h"
 #include "ResourceMgr.h"
 #include "StackConsts.h"
@@ -10,12 +10,12 @@
 #include "CborCodec.h"
 #include "ErrCode.h"
 
-using namespace ja_iot::osal;
-using namespace ja_iot::network;
-using namespace ja_iot::base;
 
 namespace ja_iot {
-namespace stack {
+namespace resources {
+using namespace osal;
+using namespace network;
+using namespace base;
 ErrCode get_linked_list_representation( QueryContainer &query_container, std::vector<ResRepresentation> &object_array );
 WellKnownResource::WellKnownResource () : BaseResource{ "/oic/res" }
 {
@@ -24,7 +24,6 @@ WellKnownResource::WellKnownResource () : BaseResource{ "/oic/res" }
 
 uint8_t WellKnownResource::handle_request( Interaction *interaction )
 {
-  ErrCode ret_status = ErrCode::OK;
   auto    request    = interaction->get_server_request();
 
   if( ( request->get_code() == COAP_MSG_CODE_PUT )
@@ -133,11 +132,6 @@ ErrCode get_linked_list_representation( QueryContainer &query_container, std::ve
   }
 
   return ( ErrCode::OK );
-}
-
-uint8_t WellKnownResource::get_representation( const ResInterfaceType interface_type, ResRepresentation &representation )
-{
-  return ( 0 );
 }
 
 uint8_t WellKnownResource::get_discovery_representation( ResRepresentation &representation )

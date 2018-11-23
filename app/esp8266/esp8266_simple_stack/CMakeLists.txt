@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.6)
 project(esp8266_server C CXX)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
-include(cotire)
+#include(cotire)
 
 add_definitions(-D__ets__
                 -D__STDC_NO_ATOMICS__=1
@@ -36,7 +36,7 @@ set(SRCS
     code/user/common/ja_key_mgr.c)
 
 add_executable(esp8266_server ${SRCS})
-cotire(esp8266_server)
+#cotire(esp8266_server)
 target_link_libraries(esp8266_server
                       resources
                       stack

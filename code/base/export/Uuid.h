@@ -11,7 +11,8 @@
 
 constexpr uint8_t UUID_STRING_LEN = 37;
 
-namespace ja_iot::base {
+namespace ja_iot{
+namespace base {
 class Uuid
 {
   public:
@@ -29,6 +30,7 @@ class Uuid
     void operator   >> ( std::string &uuid_string );
     Uuid & operator << ( std::string &uuid_string );
 
+    void clear();
     bool is_nil();
     std::string to_string();
     void        from_string( std::string &uuid_string );
@@ -36,4 +38,5 @@ class Uuid
   private:
     uint8_t   _uuid[16];
 };
+}
 }

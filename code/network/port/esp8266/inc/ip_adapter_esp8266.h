@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <vector>
 #include "i_adapter.h"
 #include "config_network.h"
 #include "i_udp_socket.h"
@@ -43,7 +44,7 @@ class IpAdapterImplEsp8266 : public IAdapter
 
     void set_adapter_event_cb( const pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) override;
 
-    base::ErrCode get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list ) override;
+    base::ErrCode get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list ) override;
 
     void receive_task_loop();
 

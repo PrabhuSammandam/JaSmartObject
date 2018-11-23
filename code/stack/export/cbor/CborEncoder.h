@@ -3,6 +3,7 @@
 #ifndef CBOR_ENCODER
 #define CBOR_ENCODER
 
+#include <vector>
 #include <cbor/CborEncoderBuffer.h>
 #include <string>
 #include <type_traits>
@@ -24,42 +25,55 @@ enum class CborType
 class CborEncoder
 {
   private:
-    CborEncoderBuffer * _dst_buffer;
+    CborEncoderBuffer _dst_buffer{};
 
   public:
-    CborEncoder( CborEncoderBuffer *dst_buffer ) : _dst_buffer{ dst_buffer } {}
+    CborEncoder( uint16_t buff_size )
+    {
+      auto buffer = new uint8_t[buff_size];
+
+      new(&_dst_buffer) CborEncoderBuffer{ buffer, buff_size };
+    }
+    CborEncoder( CborEncoderBuffer *dst_buffer ) : _dst_buffer{ *dst_buffer } {}
     ~CborEncoder () {}
+
+    uint8_t* get_buf() { return ( _dst_buffer.data() ); }
+    uint16_t get_buf_len() { return ( _dst_buffer.size() ); }
 
     void write_byte_string( const uint8_t *pu8_data, uint16_t u16_size )
     {
       write_type_value( (uint8_t) CborType::BYTE_STRING, u16_size );
-      _dst_buffer->put_bytes( pu8_data, u16_size );
+      _dst_buffer.put_bytes( pu8_data, u16_size );
     }
     void write_string( const char *data, uint16_t size )
     {
       write_type_value( (uint8_t) CborType::TEXT_STRING, size );
-      _dst_buffer->put_bytes( (const uint8_t *) data, size );
+      _dst_buffer.put_bytes( (const uint8_t *) data, size );
     }
     void write_string( const std::string &str )
     {
       write_type_value( (uint8_t) CborType::TEXT_STRING, (unsigned int) str.size() );
-      _dst_buffer->put_bytes( (const uint8_t *) str.c_str(), (int) str.size() );
+      _dst_buffer.put_bytes( (const uint8_t *) str.c_str(), (int) str.size() );
     }
-    void write_string( const char *str)
+    void write_string( const char *str )
     {
-    	if(str != nullptr)
-    	{
-      write_type_value( (uint8_t) CborType::TEXT_STRING, ::strlen(str) );
-      _dst_buffer->put_bytes( (const uint8_t *) str, ::strlen(str) );
-    	}
+      if( str != nullptr )
+      {
+        write_type_value( (uint8_t) CborType::TEXT_STRING, ::strlen( str ) );
+        _dst_buffer.put_bytes( (const uint8_t *) str, ::strlen( str ) );
+      }
     }
 
     void write_array( uint16_t size ) { write_type_value( (uint8_t) CborType::ARRAY, size ); }
     void write_map( uint16_t size ) { write_type_value( (uint8_t) CborType::MAP, size ); }
     void write_tag( const unsigned int tag ) { write_type_value( (uint8_t) CborType::TAG, tag ); }
     void write_special( int special ) { write_type_value( (uint8_t) CborType::SPECIAL, special ); }
-    void write_null() { _dst_buffer->put_byte( 0xf6 ); }
-    void write_undefined() { _dst_buffer->put_byte( 0xf7 ); }
+    void write_null() { _dst_buffer.put_byte( 0xf6 ); }
+    void write_undefined() { _dst_buffer.put_byte( 0xf7 ); }
+    void start_map() { _dst_buffer.put_byte( 0xBF ); }
+    void end_map() { _dst_buffer.put_byte( 0xFF ); }
+    void start_array() { _dst_buffer.put_byte( 0x9F ); }
+    void end_array() { _dst_buffer.put_byte( 0xFF ); }
 
     /**
      * This api used for int, long values to encode. Even though bool is integral type in c++,
@@ -79,7 +93,7 @@ class CborEncoder
 
     void write( bool value )
     {
-      _dst_buffer->put_byte( ( value ) ? 0xf5 : 0xf4 );
+      _dst_buffer.put_byte( ( value ) ? 0xf5 : 0xf4 );
     }
 
     void write( float value )
@@ -107,7 +121,7 @@ class CborEncoder
         };
 
         f = (float) value;
-        _dst_buffer->put_byte( (uint8_t) ( 224 + 26 ) );
+        _dst_buffer.put_byte( (uint8_t) ( 224 + 26 ) );
         put_value<uint32_t>( static_cast<uint32_t>( i ) );
       }
       else
@@ -119,7 +133,7 @@ class CborEncoder
         };
 
         f = value;
-        _dst_buffer->put_byte( (uint8_t) ( 224 + 27 ) );
+        _dst_buffer.put_byte( (uint8_t) ( 224 + 27 ) );
         put_value<uint64_t>( i );
       }
     }
@@ -138,28 +152,75 @@ class CborEncoder
       /* values are encoded in natural order, ie network order */
       for(; i >= 0; i-- )
       {
-        _dst_buffer->put_byte( static_cast<uint8_t>( ( value >> ( i * 8 ) ) ) );
+        _dst_buffer.put_byte( static_cast<uint8_t>( ( value >> ( i * 8 ) ) ) );
       }
     }
 
     template<typename T,
     typename std::enable_if<std::is_integral<T>::value, int>::type = 0>
-    bool write_map_entry(const std::string& key, T value)
+    bool write_map_entry( const std::string &key, T value )
     {
-    	write(key);
-    	write(value);
+      write( key );
+      write( value );
 
-    	return true;
+      return ( true );
     }
 
     template<typename T,
     typename std::enable_if<std::is_class<T>::value, int>::type = 0>
-    bool write_map_entry(const std::string& key, const T& value)
+    bool write_map_entry( const std::string &key, const T &value )
     {
-    	write(key);
-    	write(value);
+      write( key );
+      write( value );
 
-    	return true;
+      return ( true );
+    }
+
+    bool write_map_entry( const std::string &key, const std::string &value )
+    {
+      if( !key.empty() )
+      {
+        write( key );
+        write( value );
+      }
+
+      return ( true );
+    }
+
+    template<typename T>
+    bool write_map_entry( const std::string &key, const std::vector<T> &value, bool write_empty_array = false )
+    {
+      if( value.empty() && !write_empty_array )
+      {
+        return ( true );
+      }
+
+      write( key );
+      write_array( value );
+
+      return ( true );
+    }
+
+    template<typename T>
+    bool write_array( const std::vector<T> &array_values )
+    {
+      int array_length = array_values.size();
+
+      if( array_length == 0 )
+      {
+        write_null();
+      }
+      else
+      {
+        write_array( array_length );
+
+        for( auto i = 0; i < array_length; i++ )
+        {
+          write( array_values[i] );
+        }
+      }
+
+      return ( true );
     }
 
   private:
@@ -169,26 +230,26 @@ class CborEncoder
 
       if( u64_value < 24ULL )
       {
-        _dst_buffer->put_byte( (uint8_t) ( u8_major_type | u64_value ) );
+        _dst_buffer.put_byte( (uint8_t) ( u8_major_type | u64_value ) );
       }
       else if( u64_value < 256ULL )
       {
-        _dst_buffer->put_byte( (uint8_t) ( u8_major_type | 24 ) );
+        _dst_buffer.put_byte( (uint8_t) ( u8_major_type | 24 ) );
         put_value<uint8_t>( static_cast<uint8_t>( u64_value ) );
       }
       else if( u64_value < 65536ULL )
       {
-        _dst_buffer->put_byte( (uint8_t) ( u8_major_type | 25 ) );
+        _dst_buffer.put_byte( (uint8_t) ( u8_major_type | 25 ) );
         put_value<uint16_t>( static_cast<uint16_t>( u64_value ) );
       }
       else if( u64_value < 4294967296ULL )
       {
-        _dst_buffer->put_byte( (uint8_t) ( u8_major_type | 26 ) );
+        _dst_buffer.put_byte( (uint8_t) ( u8_major_type | 26 ) );
         put_value<uint32_t>( static_cast<uint32_t>( u64_value ) );
       }
       else
       {
-        _dst_buffer->put_byte( (uint8_t) ( u8_major_type | 27 ) );
+        _dst_buffer.put_byte( (uint8_t) ( u8_major_type | 27 ) );
         put_value<uint64_t>( u64_value );
       }
     }

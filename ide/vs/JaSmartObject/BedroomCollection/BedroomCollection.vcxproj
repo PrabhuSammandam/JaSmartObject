@@ -35,6 +35,9 @@
     <ProjectReference Include="..\libosal\libosal.vcxproj">
       <Project>{5cb76774-7741-4e09-aac0-b520b59740c7}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libresources\libresources.vcxproj">
+      <Project>{262527dd-e8fc-4387-9e7f-696301f84f2a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libstack\libstack.vcxproj">
       <Project>{11642c3a-9558-41a1-9342-4fc0b6e20ae0}</Project>
     </ProjectReference>
@@ -130,7 +133,8 @@
       <PreprocessorDefinitions>_OS_WINDOWS_;_IP_ADAPTER_;_LITTLE_ENDIAN_;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\..\code\memory\export;..\..\..\..\code\network\export;..\..\..\..\code\osal\export;..\..\..\..\code\stack\export;..\..\..\..\code\base\export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\code\memory\export;..\..\..\..\code\network\export;..\..\..\..\code\osal\export;..\..\..\..\code\stack\export;..\..\..\..\code\resources\export;..\..\..\..\code\base\export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

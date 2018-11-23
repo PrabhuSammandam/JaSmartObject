@@ -14,7 +14,6 @@
 #include "MsgStack.h"
 #include "config_mgr.h"
 #include "ResourceMgr.h"
-#include "common/inc/DeviceResource.h"
 
 #define __FILE_NAME__ "SoStackFacade"
 
@@ -57,7 +56,7 @@ ErrCode SoStackFacade::initialize()
 #endif
 #ifdef _OS_FREERTOS_
   mem_alloctor_type = MemAlloctorType::kFreeRTOS;
-  network_platform  = NetworkPlatform::kFreeRTOS;
+  network_platform  = NetworkPlatform::kEsp8266;
 #endif
 
   const auto mem_allocator = MemAllocatorFactory::create_set_mem_allocator( mem_alloctor_type );

@@ -399,6 +399,11 @@ void ServerInteraction::handle_fully_downloaded_request()
           u8_error_code = COAP_MSG_CODE_INTERNAL_SERVER_ERROR_500;
         }
         break;
+        case STACK_STATUS_INVALID_PARAMETER:
+        {
+          u8_error_code = COAP_MSG_CODE_NOT_ACCEPTABLE_406;
+        }
+        break;
         case STACK_STATUS_INVALID_INTERFACE_QUERY:
         case STACK_STATUS_INVALID_TYPE_QUERY:
         {

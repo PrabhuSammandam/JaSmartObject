@@ -18,6 +18,8 @@ struct CborItem
   void      set_stream( bool v = true ) { _is_stream = v; }
   cbor_type get_type() { return ( (cbor_type) _type ); }
   void      set_type( cbor_type type ) { this->_type = type; }
+	bool is_map() { return _type == CBOR_TYPE_MAP; }
+	bool is_array() { return _type == CBOR_TYPE_ARRAY; }
 
   virtual size_t encode( uint8_t *buffer, size_t buffer_len ) { return ( 0 ); }
 

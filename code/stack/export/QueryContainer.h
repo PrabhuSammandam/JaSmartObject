@@ -15,6 +15,7 @@ class QueryContainer
     bool       is_interface_available( ResInterfaceType interface_type );
     bool       is_res_type_available( const std::string &res_type );
     std::string& get_first_if_name();
+    ResInterfaceType get_first_interface(ResInterfaceType default_interface);
 
     bool                    parse( std::vector<std::string> &query_string_list );
     auto                    & get_query_map() { return ( _query_map ); }

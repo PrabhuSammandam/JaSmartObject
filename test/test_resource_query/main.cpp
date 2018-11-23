@@ -173,7 +173,7 @@ class TestResource : BaseResource
     std::vector<std::string>   _properties{};
 };
 
-int main()
+static int main_()
 {
   CoapOptionsSet option_set{};
 

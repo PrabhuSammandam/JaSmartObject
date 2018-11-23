@@ -9,6 +9,7 @@
 #include "StackConsts.h"
 #include "BinarySwitchResourceBase.h"
 #include "CborCodec.h"
+#include "cbor/CborEncoder.h"
 
 /* Consolidated properties
  * oic.core.json
@@ -21,7 +22,8 @@
  * 5. value : bool
  * */
 
-namespace ja_iot::resources {
+namespace ja_iot {
+namespace resources {
 using namespace base;
 BinarySwitchResourceBase::BinarySwitchResourceBase( std::string uri ) : BaseResource{ uri }
 {
@@ -53,31 +55,21 @@ uint8_t BinarySwitchResourceBase::handle_get( QueryContainer &query_container, I
     return ( STACK_STATUS_INVALID_TYPE_QUERY );
   }
 
-  auto interface_requested = ResInterfaceType::Actuator;
+  CborEncoder cz_encoder{ 128 };
+  auto interface_requested = query_container.get_first_interface( ResInterfaceType::Actuator );
 
-  if( query_container.get_interface_count() > 0 )
+  cz_encoder.start_map();
+
+  if( interface_requested == ResInterfaceType::BaseLine )
   {
-    interface_requested = QueryContainer::get_interface_enum( query_container.get_first_if_name() );
+    cz_encoder.write_map_entry( "rt", get_types() );
+    cz_encoder.write_map_entry( "if", get_interfaces() );
   }
 
-  ResRepresentation rep;
-  get_representation( interface_requested, rep );
+  cz_encoder.write_map_entry( "value", _value );
+  cz_encoder.end_map();
 
-  ResRepresentation representation{};
-  representation.add( "", std::move( rep ) );
-
-  uint8_t *buffer;
-  uint16_t buffer_length;
-
-  if( CborCodec::encode( representation, buffer, buffer_length ) == ErrCode::OK )
-  {
-    auto response = new ServerResponse{};
-    response->set_code( COAP_MSG_CODE_CONTENT_205 );
-    response->get_option_set().set_content_format( COAP_CONTENT_FORMAT_CBOR );
-    response->set_payload( buffer, buffer_length );
-
-    interaction->set_server_response( response );
-  }
+  BaseResource::set_cbor_response(interaction, cz_encoder.get_buf(), cz_encoder.get_buf_len());
 
   return ( STACK_STATUS_OK );
 }
@@ -96,12 +88,7 @@ uint8_t BinarySwitchResourceBase::handle_post( QueryContainer &query_container, 
     return ( STACK_STATUS_INVALID_TYPE_QUERY );
   }
 
-  auto interface_requested = ResInterfaceType::Actuator;
-
-  if( query_container.get_interface_count() > 0 )
-  {
-    interface_requested = QueryContainer::get_interface_enum( query_container.get_first_if_name() );
-  }
+  auto interface_requested = query_container.get_first_interface( ResInterfaceType::Actuator );
 
   ResRepresentation rep;
 
@@ -144,5 +131,6 @@ void BinarySwitchResourceBase::init()
   set_property( OCF_RESOURCE_PROP_DISCOVERABLE | OCF_RESOURCE_PROP_OBSERVABLE );
 
   add_property_name( "value" );
+}
 }
 }

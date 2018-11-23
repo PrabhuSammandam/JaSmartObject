@@ -358,7 +358,7 @@ void IpAdapterImplEsp8266::set_adapter_event_cb( const pfn_adapter_event_cb pfn_
   _adapter_event_cb_data = pv_user_data;
 }
 
-ErrCode IpAdapterImplEsp8266::get_endpoints_list( std::deque<Endpoint *> &rcz_endpoint_list )
+ErrCode IpAdapterImplEsp8266::get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list )
 {
   return ( ErrCode::OK );
 }

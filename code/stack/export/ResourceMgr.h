@@ -6,7 +6,7 @@
 #include <memory>
 #include "ErrCode.h"
 #include "IResource.h"
-#include "DeviceInfo.h"  
+#include "DeviceInfo.h"
 
 namespace ja_iot {
 namespace stack {
@@ -25,12 +25,17 @@ class ResourceMgr
     base::ErrCode remove_resource( IResource *pcz_resource );
     base::ErrCode remove_all_resources();
     DeviceInfo& get_device_info() { return ( _device_info ); }
-		void      set_device_info(DeviceInfo &device_info) { _device_info = std::move(device_info); }
+    void      set_device_info( DeviceInfo &device_info ) { _device_info = std::move( device_info ); }
+
+    IResource* get_device_owner_xfer_method_res();
+    IResource* get_access_control_list_res();
+    IResource* get_provisioning_status_res();
+    IResource* get_credential_res();
 
   private:
     ResourceMgr ();
     ~ResourceMgr ();
-		  
+
   private:
     static ResourceMgr * _p_instance;
     std::vector<IResource *> _cz_resources_list{};
@@ -39,7 +44,7 @@ class ResourceMgr
     ResourceMgr & operator = ( const ResourceMgr &other )     = delete;
     ResourceMgr & operator = ( ResourceMgr &&other ) noexcept = delete;
 
-    DeviceInfo _device_info;
+    DeviceInfo   _device_info;
 };
 }
 }

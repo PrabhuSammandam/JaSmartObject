@@ -5,7 +5,6 @@
 
 namespace ja_iot {
 namespace stack {
-
 using namespace base;
 
 std::string       empty_string         = "";
@@ -21,7 +20,7 @@ std::string       interface_sensor     = "oic.if.s";
 
 uint8_t QueryContainer::get_interface_count()
 {
-  return ( _query_map.count( interface_key ) );
+  return (uint8_t)( _query_map.count( interface_key ) );
 }
 
 /**
@@ -63,8 +62,19 @@ bool QueryContainer::is_res_type_available( const std::string &res_type )
 
 std::string & QueryContainer::get_first_if_name()
 {
-	auto find_result = _query_map.find(interface_key);
-	return find_result != _query_map.cend() ? find_result->second : empty_string;
+  auto find_result = _query_map.find( interface_key );
+
+  return ( find_result != _query_map.cend() ? find_result->second : empty_string );
+}
+
+ResInterfaceType QueryContainer::get_first_interface( ResInterfaceType default_interface )
+{
+  if( get_interface_count() > 0 )
+  {
+    return ( QueryContainer::get_interface_enum( get_first_if_name() ) );
+  }
+
+  return ( default_interface );
 }
 
 bool QueryContainer::parse( std::vector<std::string> &query_string_list )
@@ -136,36 +146,36 @@ bool QueryContainer::parse( std::vector<std::string> &query_string_list )
   return ( true );
 }
 
-bool QueryContainer::check_valid_query(std::vector<std::string> & valid_keys)
+bool QueryContainer::check_valid_query( std::vector<std::string> &valid_keys )
 {
-	if(_any_of_map.empty() && _all_of_map.empty())
-	{
-		return true;
-	}
+  if( _any_of_map.empty() && _all_of_map.empty() )
+  {
+    return ( true );
+  }
 
-	if(valid_keys.empty())
-	{
-		/* there are some query's and if there are no valid keys then return false */
-		return false;
-	}
+  if( valid_keys.empty() )
+  {
+    /* there are some query's and if there are no valid keys then return false */
+    return ( false );
+  }
 
-	for(auto& q : _any_of_map)
-	{
-		if(!find_in_list(valid_keys, q.first))
-		{
-			return false;
-		}
-	}
+  for( auto &q : _any_of_map )
+  {
+    if( !find_in_list( valid_keys, q.first ) )
+    {
+      return ( false );
+    }
+  }
 
-	for(auto& q : _all_of_map)
-	{
-		if(!find_in_list(valid_keys, q.first))
-		{
-			return false;
-		}
-	}
+  for( auto &q : _all_of_map )
+  {
+    if( !find_in_list( valid_keys, q.first ) )
+    {
+      return ( false );
+    }
+  }
 
-	return true;
+  return ( true );
 }
 
 std::string & QueryContainer::get_interface_string( const ResInterfaceType interface_type )

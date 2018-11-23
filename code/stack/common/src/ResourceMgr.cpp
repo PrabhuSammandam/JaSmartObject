@@ -6,21 +6,16 @@
  */
 #include <vector>
 #include <algorithm>
-#include <vector>
 #include "ResourceMgr.h"
-#include "common/inc/DeviceResource.h"
-#include "common/inc/WellKnownResource.h"
-
-#include "../../../resources/common/inc/test/BigCONResponse.h"
-#include "../../../resources/common/inc/test/BigNONResponse.h"
-#include "../../../resources/common/inc/test/BigPbResponse.h"
-#include "../../../resources/common/inc/test/SmallNonResponseResource.h"
-#include "../../../resources/common/inc/test/SmallPiggyBackResource.h"
-#include "../../../resources/common/inc/test/SmallSlowResponseResource.h"
+#include "ResModuleInterface.h"
 
 namespace ja_iot {
+using namespace resources;
 namespace stack {
 using namespace ja_iot::base;
+
+IResource *     _device_res   = nullptr;
+IResource *     _platform_res = nullptr;
 
 static uint32_t _u32_resource_id = 1;
 ResourceMgr *ResourceMgr::_p_instance{ nullptr };
@@ -44,9 +39,8 @@ ResourceMgr & ResourceMgr::inst()
 
 ErrCode ResourceMgr::init_default_resources()
 {
-  add_resource( new DeviceResource{} );
-  add_resource( new WellKnownResource{} );
-
+  resource_module_init_core_resources();
+  resource_module_init_secure_virtual_resources();
   return ( ErrCode::OK );
 }
 
@@ -68,6 +62,26 @@ IResource * ResourceMgr::find_resource_by_uri( const std::string &rstr_res_uri )
   return ( nullptr );
 }
 
+#if 0
+IResource * ResourceMgr::find_resource_by_uri( const std::string_view res_uri )
+{
+  if( res_uri.empty() || ( _cz_resources_list.empty() == true ) )
+  {
+    return ( nullptr );
+  }
+
+  for( auto &pcz_loop_resource : this->_cz_resources_list )
+  {
+    if( pcz_loop_resource->get_uri() == res_uri )
+    {
+      return ( pcz_loop_resource );
+    }
+  }
+
+  return ( nullptr );
+}
+#endif
+
 uint16_t ResourceMgr::get_no_of_resources()
 {
   return ( (uint16_t) _cz_resources_list.size() );
@@ -80,7 +94,10 @@ std::vector<IResource *> & ResourceMgr::get_resources_list()
 
 ErrCode ResourceMgr::add_resource( IResource *pcz_resource )
 {
-  pcz_resource->set_unique_id( std::to_string( _u32_resource_id++ ) );
+  char buf[30];
+
+  sprintf( &buf[0], "%d", _u32_resource_id++ );
+  pcz_resource->set_unique_id( std::string( &buf[0] ) );
   _cz_resources_list.push_back( pcz_resource );
   return ( ErrCode::OK );
 }
@@ -109,6 +126,29 @@ ErrCode ResourceMgr::remove_all_resources()
   _cz_resources_list.clear();
 
   return ( ErrCode::OK );
+}
+
+#define CHECK_NULL_OR_FIND_AND_RETURN( _RES_PTR_, _URI_ ) \
+  static IResource *_RES_PTR_; \
+  if( _RES_PTR_ == nullptr ) \
+  { \
+    _RES_PTR_ = find_resource_by_uri( _URI_ ); \
+  } return _RES_PTR_;
+IResource * ResourceMgr::get_device_owner_xfer_method_res()
+{
+  CHECK_NULL_OR_FIND_AND_RETURN( _doxm_res, "/oic/sec/doxm" );
+}
+IResource * ResourceMgr::get_access_control_list_res()
+{
+  CHECK_NULL_OR_FIND_AND_RETURN( _acl_res, "/oic/sec/acl" );
+}
+IResource * ResourceMgr::get_provisioning_status_res()
+{
+  CHECK_NULL_OR_FIND_AND_RETURN( _pstat_res, "/oic/sec/pstat" );
+}
+IResource * ResourceMgr::get_credential_res()
+{
+  CHECK_NULL_OR_FIND_AND_RETURN( _cred_res, "/oic/sec/cred" );
 }
 }
 }

@@ -41,15 +41,26 @@ void delete_and_clear( T * &ptr_to_delete )
 }
 
 template<typename T>
-bool find_in_list(std::vector<T>& list, T& value)
+void delete_list( std::vector<T *> &list )
 {
-	return std::find(list.cbegin(), list.cend(), value) != list.cend();
+  for( auto &item : list )
+  {
+    delete item;
+  }
+
+  list.clear();
 }
 
 template<typename T>
-bool find_in_list(std::vector<T>& list, const T& value)
+bool find_in_list( std::vector<T> &list, T &value )
 {
-	return std::find(list.cbegin(), list.cend(), value) != list.cend();
+  return ( std::find( list.cbegin(), list.cend(), value ) != list.cend() );
+}
+
+template<typename T>
+bool find_in_list( std::vector<T> &list, const T &value )
+{
+  return ( std::find( list.cbegin(), list.cend(), value ) != list.cend() );
 }
 }
 }

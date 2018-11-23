@@ -8,24 +8,23 @@ namespace stack {
 class CborEncoderBuffer
 {
   private:
-    uint8_t *  _buffer;
-    uint32_t   _capacity;
-    uint32_t   _offset;
+    uint8_t *  _buffer = nullptr;
+    uint32_t   _capacity = 0;
+    uint32_t   _offset = 0;
     bool       _is_owned = true;
 
   public:
+    CborEncoderBuffer(){}
     CborEncoderBuffer( uint32_t capacity )
     {
       this->_capacity = capacity;
       this->_buffer   = new uint8_t[capacity];
-      this->_offset   = 0;
     }
     CborEncoderBuffer( uint8_t *buffer, uint32_t capacity )
     {
       this->_is_owned = false;
       this->_capacity = capacity;
       this->_buffer   = buffer;
-      this->_offset   = 0;
     }
     virtual ~CborEncoderBuffer ()
     {

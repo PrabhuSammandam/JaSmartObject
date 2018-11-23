@@ -8,7 +8,8 @@
 #include "Uuid.h"
 #include "string.h"
 
-namespace ja_iot::base {
+namespace ja_iot{
+namespace base {
 std::string hex_to_str( uint8_t *data, int len );
 Uuid::Uuid () : _uuid{ 0 }
 {
@@ -66,6 +67,11 @@ Uuid & Uuid::operator << ( std::string &uuid_string )
   return ( *this );
 }
 
+void Uuid::clear()
+{
+	::memset(&_uuid[0], 0, 16);
+}
+
 bool Uuid::is_nil()
 {
   for( auto i = 0; i < 16; i++ )
@@ -102,5 +108,6 @@ std::string hex_to_str( uint8_t *data, int len )
   }
 
   return ( s );
+}
 }
 }

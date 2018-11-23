@@ -9,7 +9,8 @@
 
 #include "BaseResource.h"
 
-namespace ja_iot::resources {
+namespace ja_iot {
+namespace resources {
 using namespace ja_iot::stack;
 
 class BinarySwitchResourceBase : public BaseResource
@@ -32,4 +33,5 @@ class BinarySwitchResourceBase : public BaseResource
 
     bool   _value = false;
 };
+}
 }

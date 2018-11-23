@@ -12,7 +12,7 @@
 #include "ResourceMgr.h"
 #include "QueryContainer.h"
 #include "ResPropValue.h"
-#include "cbor/CborCodec.h"
+#include "CborCodec.h"
 #include "ErrCode.h"
 
 constexpr uint8_t RELAY = 13;

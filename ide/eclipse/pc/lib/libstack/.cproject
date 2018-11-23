@@ -332,6 +332,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/export}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -344,6 +346,8 @@
                                     <listOptionValue builtIn="false" value="_OS_WINDOWS_"/>
                                     								
                                 </option>
+                                								
+                                <option id="gnu.cpp.compiler.option.dialect.std.1898191730" superClass="gnu.cpp.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1425071952" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                                 							
@@ -368,6 +372,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/export}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -391,7 +397,7 @@
                             							
                             <tool id="cdt.managedbuild.tool.gnu.assembler.lib.debug.1359660796" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.lib.debug">
                                 								
-                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.both.asm.option.include.paths.2142987690" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.both.asm.option.include.paths.2142987690" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libbase/base/export}&quot;"/>
                                     									
@@ -404,6 +410,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/export}&quot;"/>
                                     								
                                 </option>
                                 								

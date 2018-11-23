@@ -4,8 +4,10 @@
 #include "IResource.h"
 #include "QueryContainer.h"
 #include "common_typedefs.h"
+#include "cbor/CborEncoder.h"
 
-namespace ja_iot::stack {
+namespace ja_iot {
+namespace stack {
 class OcfExchange;
 
 class BaseResource : public IResource
@@ -29,12 +31,13 @@ class BaseResource : public IResource
     uint8_t       get_representation( ResInterfaceType interface_type, ResRepresentation &representation ) override;
     uint8_t       get_discovery_representation( ResRepresentation &representation ) override;
 
-    virtual bool    is_method_supported( uint8_t method ) { return ( false ); }
+    virtual bool    is_method_supported( uint8_t method ) { (void)method;return ( false ); }
     virtual uint8_t handle_get( QueryContainer &query_container, Interaction *interaction );
     virtual uint8_t handle_post( QueryContainer &query_container, Interaction *interaction );
     virtual uint8_t handle_put( QueryContainer &query_container, Interaction *interaction );
     virtual uint8_t handle_delete( QueryContainer &query_container, Interaction *interaction );
     uint8_t         set_response( Interaction *interaction, ResRepresentation &representation );
+    uint8_t set_cbor_response(Interaction *interaction, uint8_t* pu8_buffer, uint16_t u16_buf_len);
 
     bool    is_discoverable() { return ( ( _attribute & OCF_RESOURCE_PROP_DISCOVERABLE ) != 0 ); }
     uint8_t check_interface_query( QueryContainer &query_container );
@@ -45,6 +48,8 @@ class BaseResource : public IResource
 
   protected:
     void get_endpoint_list_representation( ResRepresentation &rcz_res_rep );
+    void encode_resource_type(CborEncoder& cz_cbor_encoder);
+    void encode_resource_interface(CborEncoder& cz_cbor_encoder);
 
   protected:
     uint8_t                    _attribute = 0;
@@ -54,4 +59,5 @@ class BaseResource : public IResource
     InterfaceArray             _interfaces;
     std::vector<std::string>   _property_name_list;
 };
+}
 }
