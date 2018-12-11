@@ -31,7 +31,7 @@ namespace ja_iot
     {
     public:
 
-      PtrMsgQ()
+			PtrMsgQ() : _msgList{0}
       {
       }
 

@@ -25,6 +25,9 @@
     <ProjectReference Include="..\libbase\libbase.vcxproj">
       <Project>{f16b5842-63d3-42c0-8e49-b3e1bb958fb5}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libmbedtls\libmbedtls.vcxproj">
+      <Project>{898f6815-072d-4e9f-8331-5e3fc0d17e28}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libmemory\libmemory.vcxproj">
       <Project>{da1c0566-9b05-4e32-a7dd-99c85ab6f07b}</Project>
     </ProjectReference>
@@ -126,7 +129,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_OS_WINDOWS_;_IP_ADAPTER_;_LITTLE_ENDIAN_;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_ENABLE_SECURE_;_OS_WINDOWS_;_IP_ADAPTER_;_LITTLE_ENDIAN_;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\..\code\memory\export;..\..\..\..\code\network\export;..\..\..\..\code\osal\export;..\..\..\..\code\stack\export;..\..\..\..\code\resources\export;..\..\..\..\code\base\export;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

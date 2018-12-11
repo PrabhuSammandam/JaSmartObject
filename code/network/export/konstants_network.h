@@ -11,8 +11,8 @@
 
 namespace ja_iot {
 namespace network {
-  constexpr uint16_t          COAP_PORT        = 5683; //5685; // 5683
-    constexpr uint16_t          COAP_SECURE_PORT = 5684; //5686; // 5684
+constexpr uint16_t          COAP_PORT        = 5683;   // 5685; // 5683
+constexpr uint16_t          COAP_SECURE_PORT = 5684;     // 5686; // 5684
 
 constexpr const char *const IPV4_MULTICAST_ADDRESS                    = "224.0.1.187";
 constexpr const char *const IPV6_MULTICAST_ADDRESS_INTERFACE_LOCAL    = "ff01::158";
@@ -22,6 +22,5 @@ constexpr const char *const IPV6_MULTICAST_ADDRESS_ADMIN_LOCAL        = "ff04::1
 constexpr const char *const IPV6_MULTICAST_ADDRESS_SITE_LOCAL         = "ff05::158";
 constexpr const char *const IPV6_MULTICAST_ADDRESS_ORGANIZATION_LOCAL = "ff08::158";
 constexpr const char *const IPV6_MULTICAST_ADDRESS_GLOBAL             = "ff0e::158";
-
 }
 }

@@ -30,6 +30,13 @@ class AceResource
     uint8_t get_wildcard() { return ( _wildcard ); }
     void    set_wildcard( uint8_t wildcard ) { _wildcard = wildcard; }
 
+    bool is_all_discoverable() { return ( _wildcard == ACL_WILDCARD_ALL_DISCOVERABLE ); }
+    bool is_all_non_discoverable() { return ( _wildcard == ACL_WILDCARD_ALL_NON_DISCOVERABLE ); }
+    bool is_all_resources() { return ( _wildcard == ACL_WILDCARD_ALL_RESOURCES ); }
+
+		bool is_matched(const std::string &href, bool is_discoverable);
+		bool is_matched(const std::string &href, const std::vector<std::string> &rt_array, const std::vector<std::string> &if_array, bool is_discoverable);
+
     std::vector<std::string>& get_types() { return ( _types ); }
     std::vector<std::string>& get_interfaces() { return ( _interfaces ); }
 
@@ -136,6 +143,9 @@ class AccessControlEntry
 
     AceResourceList   & get_resources_array() { return ( _resources_array ); }
     AceTimePatternList& get_validities_array() { return ( _validities_array ); }
+
+		bool has_resource(const std::string &href, bool is_discoverable);
+    bool has_resource( const std::string &href, const std::vector<std::string> &rt_array, const std::vector<std::string> &if_array, bool is_discoverable );
 
     void    encode_to_cbor( CborEncoder &cz_cbor_encoder );
     uint8_t decode_from_cbor( ResRepresentation &cbor_ace_obj );

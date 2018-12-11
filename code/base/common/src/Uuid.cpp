@@ -132,6 +132,21 @@ void Uuid::from_string( std::string &uuid_string )
 	}
 }
 
+bool Uuid::is_valid_uuid_string(std::string & uuid_string)
+{
+	if (uuid_string.length() == 36)
+	{
+		if (uuid_string[8] == '-'
+			&& uuid_string[13] == '-'
+			&&uuid_string[18] == '-'
+			&&uuid_string[23] == '-')
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 constexpr char hexmap[] = { '0', '1', '2', '3', '4', '5', '6', '7',
                             '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 

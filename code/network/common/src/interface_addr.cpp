@@ -9,10 +9,10 @@
 #include <interface_addr.h>
 #include <ip_addr.h>
 
-using namespace ja_iot::base;
 
 namespace ja_iot {
 namespace network {
+using namespace base;
 InterfaceAddress::InterfaceAddress( const uint32_t index, const uint32_t flags, const base::IpAddrFamily family, const char *address ) :
   index_{ index }, flags_{ flags }, family_{ family }
 {

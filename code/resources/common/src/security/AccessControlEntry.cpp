@@ -14,6 +14,102 @@
 namespace ja_iot {
 namespace resources {
 using namespace ja_iot::stack;
+inline bool AceResource::is_matched( const std::string &href, bool is_discoverable )
+{
+  if( _href.empty() )
+  {
+    if( _wildcard != ACL_WILDCARD_NONE )
+    {
+      if( is_all_resources()
+        || ( is_all_discoverable() && is_discoverable )
+        || ( is_all_non_discoverable() && !is_discoverable ) )
+      {
+        return ( true );
+      }
+    }
+  }
+  else
+  {
+    if( ( _href == href )
+      || ( _href == "*" ) )
+    {
+      return ( true );
+    }
+  }
+
+  return ( false );
+}
+bool AceResource::is_matched( const std::string &href, const std::vector<std::string> &rt_array, const std::vector<std::string> &if_array, bool is_discoverable )
+{
+  if( !_href.empty()
+    && ( _href != href )
+    && ( _href != "*" ) )
+  {
+    return ( false );
+  }
+
+  if( !_types.empty() )
+  {
+    if( rt_array.empty() )
+    {
+      return ( false );
+    }
+
+    bool found = false;
+
+    for( auto &res_rt_type : _types )
+    {
+      if( std::find( rt_array.cbegin(), rt_array.cend(), res_rt_type ) != rt_array.cend() )
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if( !found )
+    {
+      return ( false );
+    }
+  }
+
+  if( !_interfaces.empty() )
+  {
+    if( if_array.empty() )
+    {
+      return ( false );
+    }
+
+    bool found = false;
+
+    for( auto &res_if_type : _interfaces )
+    {
+      if( std::find( if_array.cbegin(), if_array.cend(), res_if_type ) != if_array.cend() )
+      {
+        found = true;
+        break;
+      }
+    }
+
+    if( !found )
+    {
+      return ( false );
+    }
+  }
+
+  if( _wildcard == ACL_WILDCARD_NONE )
+  {
+    return ( false );
+  }
+
+  if( is_all_resources()
+    || ( is_all_discoverable() && is_discoverable )
+    || ( is_all_non_discoverable() && !is_discoverable ) )
+  {
+    return ( true );
+  }
+
+  return ( false );
+}
 void AceResource::encode_to_cbor( CborEncoder &cz_cbor_encoder )
 {
   cz_cbor_encoder.start_map();
@@ -92,6 +188,32 @@ bool AccessControlEntry::is_same( const AccessControlEntry &other )
          && _validities_array == other._validities_array );
 }
 
+bool AccessControlEntry::has_resource( const std::string &href, bool is_discoverable )
+{
+  for( auto res_entry : _resources_array )
+  {
+    if( res_entry->is_matched( href, is_discoverable ) )
+    {
+      return ( true );
+    }
+  }
+
+  return ( false );
+}
+
+bool AccessControlEntry::has_resource( const std::string &href, const std::vector<std::string> &rt_array, const std::vector<std::string> &if_array, bool is_discoverable )
+{
+  for( auto res_entry : _resources_array )
+  {
+    if( res_entry->is_matched( href, rt_array, if_array, is_discoverable ) )
+    {
+      return ( true );
+    }
+  }
+
+  return ( false );
+}
+
 void AccessControlEntry::encode_to_cbor( CborEncoder &cz_cbor_encoder )
 {
   cz_cbor_encoder.start_map();
@@ -120,84 +242,85 @@ void AccessControlEntry::encode_to_cbor( CborEncoder &cz_cbor_encoder )
   cz_cbor_encoder.end_map();
 }
 
-uint8_t AccessControlEntry::decode_from_cbor(ResRepresentation & cbor_ace_obj)
+uint8_t AccessControlEntry::decode_from_cbor( ResRepresentation &cbor_ace_obj )
 {
-	/**************************** resources *****************************/
-	RepObjectArray cbor_ace_res_obj_array;
+  /**************************** resources *****************************/
+  RepObjectArray cbor_ace_res_obj_array;
 
-	if (cbor_ace_obj.get_prop("resources", cbor_ace_res_obj_array))
-	{
-		_resources_array.reserve(cbor_ace_res_obj_array.size());
-	}
+  if( cbor_ace_obj.get_prop( "resources", cbor_ace_res_obj_array ) )
+  {
+    _resources_array.reserve( cbor_ace_res_obj_array.size() );
+  }
 
-	for (auto &cbor_ace_res_obj : cbor_ace_res_obj_array)
-	{
-		auto new_ace_resource = new AceResource{};
+  for( auto &cbor_ace_res_obj : cbor_ace_res_obj_array )
+  {
+    auto new_ace_resource = new AceResource{};
 
-		cbor_ace_res_obj.get_prop("href", new_ace_resource->get_href());
-		cbor_ace_res_obj.get_prop("rt", new_ace_resource->get_types());
-		cbor_ace_res_obj.get_prop("if", new_ace_resource->get_interfaces());
+    cbor_ace_res_obj.get_prop( "href", new_ace_resource->get_href() );
+    cbor_ace_res_obj.get_prop( "rt", new_ace_resource->get_types() );
+    cbor_ace_res_obj.get_prop( "if", new_ace_resource->get_interfaces() );
 
-		std::string str_prop;
+    std::string str_prop;
 
-		if (cbor_ace_res_obj.get_prop("wc", str_prop))
-		{
-			if (str_prop[0] == '*')
-			{
-				new_ace_resource->set_wildcard(ACL_WILDCARD_ALL_RESOURCES);
-			}
-			else if (str_prop[0] == '+')
-			{
-				new_ace_resource->set_wildcard(ACL_WILDCARD_ALL_DISCOVERABLE);
-			}
-			else if (str_prop[0] == '-')
-			{
-				new_ace_resource->set_wildcard(ACL_WILDCARD_ALL_NON_DISCOVERABLE);
-			}
-		}
+    if( cbor_ace_res_obj.get_prop( "wc", str_prop ) )
+    {
+      if( str_prop[0] == '*' )
+      {
+        new_ace_resource->set_wildcard( ACL_WILDCARD_ALL_RESOURCES );
+      }
+      else if( str_prop[0] == '+' )
+      {
+        new_ace_resource->set_wildcard( ACL_WILDCARD_ALL_DISCOVERABLE );
+      }
+      else if( str_prop[0] == '-' )
+      {
+        new_ace_resource->set_wildcard( ACL_WILDCARD_ALL_NON_DISCOVERABLE );
+      }
+    }
 
-		_resources_array.push_back(new_ace_resource);
-	}
+    _resources_array.push_back( new_ace_resource );
+  }
 
-	_permission = (uint8_t)cbor_ace_obj.get_prop<long>("permission");
+  _permission = (uint8_t) cbor_ace_obj.get_prop<long>( "permission" );
 
-	ResRepresentation cbor_ace_subject_obj{};
-	if (cbor_ace_obj.get_prop("subject", cbor_ace_subject_obj))
-	{
-		if (cbor_ace_subject_obj.has_prop("uuid"))
-		{
-			_subject = new AceSubjectUuid{};
-			std::string str_prop;
-			cbor_ace_subject_obj.get_prop("uuid", str_prop);
+  ResRepresentation cbor_ace_subject_obj{};
 
-			((AceSubjectUuid *)_subject)->get_uuid() << str_prop;
-		}
-		else if (cbor_ace_subject_obj.has_prop("conntype"))
-		{
-			std::string str_prop;
-			cbor_ace_subject_obj.get_prop("conntype", str_prop);
-			uint8_t connection_type{};
+  if( cbor_ace_obj.get_prop( "subject", cbor_ace_subject_obj ) )
+  {
+    if( cbor_ace_subject_obj.has_prop( "uuid" ) )
+    {
+      _subject = new AceSubjectUuid{};
+      std::string str_prop;
+      cbor_ace_subject_obj.get_prop( "uuid", str_prop );
 
-			if (str_prop == "auth-crypt")
-			{
-				connection_type = ACE_SUBJECT_CONNECTION_TYPE_AUTHENTICATED_ENCRYPTED;
-			}
-			else if (str_prop == "anon-clear")
-			{
-				connection_type = ACE_SUBJECT_CONNECTION_TYPE_ANONYMOUS_UNENCRYPTED;
-			}
+      ( (AceSubjectUuid *) _subject )->get_uuid() << str_prop;
+    }
+    else if( cbor_ace_subject_obj.has_prop( "conntype" ) )
+    {
+      std::string str_prop;
+      cbor_ace_subject_obj.get_prop( "conntype", str_prop );
+      uint8_t connection_type{};
 
-			_subject = new AceSubjectConnection{ connection_type };
-		}
-		else if (cbor_ace_subject_obj.has_prop("role"))
-		{
-			_subject = new AceSubjectRole{};
-			cbor_ace_subject_obj.get_prop("role", ((AceSubjectRole *)_subject)->get_role());
-			cbor_ace_subject_obj.get_prop("authority", ((AceSubjectRole *)_subject)->get_authority());
-		}
-	}
+      if( str_prop == "auth-crypt" )
+      {
+        connection_type = ACE_SUBJECT_CONNECTION_TYPE_AUTHENTICATED_ENCRYPTED;
+      }
+      else if( str_prop == "anon-clear" )
+      {
+        connection_type = ACE_SUBJECT_CONNECTION_TYPE_ANONYMOUS_UNENCRYPTED;
+      }
 
-	return COAP_MSG_CODE_CHANGED_204;
+      _subject = new AceSubjectConnection{ connection_type };
+    }
+    else if( cbor_ace_subject_obj.has_prop( "role" ) )
+    {
+      _subject = new AceSubjectRole{};
+      cbor_ace_subject_obj.get_prop( "role", ( (AceSubjectRole *) _subject )->get_role() );
+      cbor_ace_subject_obj.get_prop( "authority", ( (AceSubjectRole *) _subject )->get_authority() );
+    }
+  }
+
+  return ( COAP_MSG_CODE_CHANGED_204 );
 }
 }
 }

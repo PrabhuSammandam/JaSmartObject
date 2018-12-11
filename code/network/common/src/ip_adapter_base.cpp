@@ -521,6 +521,23 @@ IUdpSocket * IpAdapterBase::get_socket_by_mask( uint16_t socket_type_mask )
   return ( nullptr );
 }
 
+void IpAdapterBase::send_data_to_socket( IUdpSocket *pcz_udp_socket, Endpoint &endpoint, const data_buffer_t& data_buffer ) const
+{
+  const auto send_status = pcz_udp_socket->SendData( endpoint.get_addr(), endpoint.get_port(), data_buffer._pu8_data, data_buffer._u16_data_len );
+
+  if( send_status != SocketError::OK && _event_handler)
+  {
+	AdapterEvent cz_adapter_event{ ADAPTER_EVENT_TYPE_ERROR, &endpoint, data_buffer._pu8_data, data_buffer._u16_data_len, k_adapter_type_ip };
+	cz_adapter_event.set_error_code( ErrCode::SEND_DATA_FAILED );
+
+	_event_handler->handle_event(cz_adapter_event);
+
+//	if( _adapter_event_callback != nullptr )
+//	{
+//	  _adapter_event_callback( &cz_adapter_event, _adapter_event_cb_data );
+//	}
+  }
+}
 /**********************************************************************************************************************/
 /*************************                   PRIVATE FUNCTIONS                                *************************/
 /**********************************************************************************************************************/
@@ -565,7 +582,7 @@ int32_t IpAdapterBase::post_data_to_send_task( Endpoint &end_point, const uint8_
     return ( -1 );
   }
 
-  return ( 1 );
+  return ( (int32_t)u16_data_length );
 }
 
 ErrCode IpAdapterBase::open_socket( const IpAddrFamily ip_addr_family, const bool is_multicast, IUdpSocket *pcz_udp_socket, const uint16_t port )
@@ -906,10 +923,10 @@ exit_label_:
  */
 IpAdapterQMsg * IpAdapterBase::create_new_send_msg( const Endpoint &end_point, const uint8_t *data, uint16_t data_length, const bool is_multicast )
 {
+  ScopedMutex lock{sender_task_mutex_};
+
   /* allocate new message */
-  sender_task_mutex_->Lock();
   auto pcz_new_ip_adapter_msg = ip_adapter_msg_q_list_.Alloc();
-  sender_task_mutex_->Unlock();
 
   if( pcz_new_ip_adapter_msg == nullptr )
   {
@@ -921,9 +938,7 @@ IpAdapterQMsg * IpAdapterBase::create_new_send_msg( const Endpoint &end_point, c
 
   if( pcz_new_ip_adapter_msg->_data == nullptr )
   {
-    sender_task_mutex_->Lock();
     ip_adapter_msg_q_list_.Free( pcz_new_ip_adapter_msg );
-    sender_task_mutex_->Unlock();
 
     return ( nullptr );
   }
@@ -936,6 +951,19 @@ IpAdapterQMsg * IpAdapterBase::create_new_send_msg( const Endpoint &end_point, c
   return ( pcz_new_ip_adapter_msg );
 }
 
+/*
+ * There are two ways to send message
+ * 1. unicast message
+ * 2. multicast message
+ *
+ * For unicast message it is straight forward and need destination address and
+ * destination port.
+ *
+ * For multicast message it needs to be sent in all the interfaces, but the socket
+ * used to send the message should be unicast socket and also before sending need to
+ * select the interface to send the multicast message.
+ * */
+
 /***
  * Handles the new message arrived for the task.
  * @param pv_adapter_q_msg
@@ -944,7 +972,61 @@ void IpAdapterBase::SEND_TASK_handle_msg( void *pv_adapter_q_msg )
 {
   if( pv_adapter_q_msg != nullptr )
   {
-    do_handle_send_msg( static_cast<IpAdapterQMsg *>( pv_adapter_q_msg ) );
+	auto ip_adapter_q_msg = (IpAdapterQMsg *)pv_adapter_q_msg;
+
+	do_handle_send_msg( ip_adapter_q_msg );
+
+    auto       &endpoint        = ip_adapter_q_msg->end_point_;
+    const auto pu8_data         = ip_adapter_q_msg->_data;
+    const auto u16_data_len     = ip_adapter_q_msg->_dataLength;
+    const auto network_flag     = endpoint.get_network_flags();
+    const auto is_secure        = is_bit_set( network_flag, k_network_flag_secure );
+    const auto is_ipv4_transfer = is_bit_set( network_flag, k_network_flag_ipv4 );
+    const auto is_ipv6_transfer = is_bit_set( network_flag, k_network_flag_ipv6 );
+
+    DBG_INFO2(
+      "ENTER data_len[%d], mcast[%d], port[%d], adapter[%x], if_index[%d], nw_flag[%x]",
+      u16_data_len,
+      ip_adapter_q_msg->is_multicast,
+      endpoint.get_port(),
+      endpoint.get_adapter_type(),
+      endpoint.get_if_index(),
+      endpoint.get_network_flags() );
+
+    if( ip_adapter_q_msg->is_multicast )
+    {
+      auto ipv4_socket = ( is_ipv4_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv4_secure_ucast : k_network_flag_ipv4 ) : nullptr;
+      auto ipv6_socket = ( is_ipv6_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv6_secure_ucast : k_network_flag_ipv6 ) : nullptr;
+
+      endpoint.set_port( is_secure ? COAP_SECURE_PORT : COAP_PORT );
+
+      auto if_addr_array = get_interface_address_for_index( 0 );
+
+      for( auto &if_addr : if_addr_array )
+      {
+        if( ( ipv4_socket != nullptr ) && if_addr->is_ipv4() )
+        {
+          ipv4_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
+          ipv4_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
+        }
+
+        if( ( ipv6_socket != nullptr ) && if_addr->is_ipv6() )
+        {
+          ipv6_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
+          ipv6_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
+        }
+      }
+    }
+    else     // it is unicast
+    {
+      clear_bit( (uint16_t) network_flag, k_network_flag_multicast );
+      auto socket = get_socket_by_mask( network_flag );
+
+      if( socket != nullptr )
+      {
+        send_data_to_socket( socket, endpoint, data_buffer_t{ pu8_data, u16_data_len });
+      }
+    }
   }
 }
 

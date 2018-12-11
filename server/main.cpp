@@ -51,8 +51,12 @@ void init_adapter_mgr()
 
   so_stack_facade.enable_ipv4( true )
   .enable_ipv4_mcast( true )
+		.enable_ipv4_secure(true)
+		.enable_ipv4_mcast_secure(true)
   .enable_ipv6( true )
-  .enable_ipv6_mcast( true );
+  .enable_ipv6_mcast( true )
+		.enable_ipv6_secure(true)
+		.enable_ipv6_mcast_secure(true);
 
   DeviceInfo device_info{ "SimpleClient", "aa", "ocf.1.0.0", "ocf.res.1.3.0" };
   so_stack_facade.set_device_info( device_info );

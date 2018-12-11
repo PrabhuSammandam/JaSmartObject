@@ -29,6 +29,9 @@
     <ProjectReference Include="..\libbase\libbase.vcxproj">
       <Project>{f16b5842-63d3-42c0-8e49-b3e1bb958fb5}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\libmbedtls\libmbedtls.vcxproj">
+      <Project>{898f6815-072d-4e9f-8331-5e3fc0d17e28}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\libmemory\libmemory.vcxproj">
       <Project>{da1c0566-9b05-4e32-a7dd-99c85ab6f07b}</Project>
     </ProjectReference>

@@ -1,9 +1,13 @@
+#include <base_utils.h>
+
 /*
  * IpAdapterWindows.cpp
  *
  *  Created on: Jul 3, 2017
  *      Author: psammand
  */
+#define __FILE_NAME__ "IpAdapterImplWindows"
+
 
 #ifdef _OS_WINDOWS_
 
@@ -12,27 +16,8 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <config_network.h>
-#include <konstants_network.h>
-#include <interface_addr.h>
-#include <ip_addr.h>
-#include <i_udp_socket.h>
-#include <i_adapter.h>
-#include <port/windows/inc/udp_socket_win.h>
-#include <end_point.h>
-#include <Task.h>
-#include <base_consts.h>
-#include <common/inc/ip_adapter_base.h>
-#include <port/windows/inc/ip_adapter_win.h>
-#include <i_interface_monitor.h>
-#include <i_nwk_platform_factory.h>
-#include <ip_adapter_config.h>
 #include <common/inc/logging_network.h>
-#include <common/inc/common_utils.h>
-#include <IMemAllocator.h>
-#include <config_mgr.h>
-#include <base_utils.h>
-#include "OsalMgr.h"
+#include <port/windows/inc/ip_adapter_win.h>
 
 #ifdef __GNUC__
 #include <guiddef.h>
@@ -61,7 +46,6 @@
 
 #endif /*_MSC_VER*/
 
-#define __FILE_NAME__ "IpAdapterImplWindows"
 
 using namespace ja_iot::osal;
 using namespace ja_iot::base;
@@ -268,6 +252,9 @@ void IpAdapterImplWindows::add_socket_to_event_array( UdpSocketImplWindows *udp_
   DBG_INFO2( "EXIT" );
 }
 
+void IpAdapterImplWindows::do_handle_send_msg(IpAdapterQMsg *msg)
+{
+}
 
 void IpAdapterImplWindows::do_handle_receive()
 {
@@ -485,7 +472,18 @@ void IpAdapterImplWindows::handle_received_socket_data( const SOCKET socket_fd, 
     : reinterpret_cast<struct in_pktinfo *>( pu8_pkt_info )->ipi_ifindex;
 
 
-  if( this->_adapter_event_callback )
+//  if( this->_adapter_event_callback )
+//  {
+//    Endpoint endpoint{ k_adapter_type_ip, u16_network_flag, u16_recvd_port, u32_if_index, ip_addr };
+//    auto         received_data = new uint8_t[recv_len];
+//    memcpy( &received_data[0], &_pu8_receive_buffer[0], recv_len );
+//
+//    AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_PACKET_RECEIVED, &endpoint, &received_data[0], recv_len, k_adapter_type_ip );
+//
+//    this->_adapter_event_callback( &adapter_event, _adapter_event_cb_data );
+//  }
+
+  if( _event_handler )
   {
     Endpoint endpoint{ k_adapter_type_ip, u16_network_flag, u16_recvd_port, u32_if_index, ip_addr };
     auto         received_data = new uint8_t[recv_len];
@@ -493,7 +491,7 @@ void IpAdapterImplWindows::handle_received_socket_data( const SOCKET socket_fd, 
 
     AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_PACKET_RECEIVED, &endpoint, &received_data[0], recv_len, k_adapter_type_ip );
 
-    this->_adapter_event_callback( &adapter_event, _adapter_event_cb_data );
+    _event_handler->handle_event( adapter_event );
   }
 }
 
@@ -510,92 +508,6 @@ uint16_t IpAdapterImplWindows::get_network_flag_for_socket( const SOCKET socket_
   }
 
   return ( k_network_flag_none );
-}
-
-void IpAdapterImplWindows::do_handle_send_msg( IpAdapterQMsg *ip_adapter_q_msg )
-{
-  if( ip_adapter_q_msg == nullptr )
-  {
-    return;
-  }
-
-  auto       &endpoint        = ip_adapter_q_msg->end_point_;
-  const auto pu8_data         = ip_adapter_q_msg->_data;
-  const auto u16_data_len     = ip_adapter_q_msg->_dataLength;
-  const auto network_flag     = endpoint.get_network_flags();
-  const auto is_secure        = is_bit_set( network_flag, k_network_flag_secure );
-  const auto is_ipv4_transfer = is_bit_set( network_flag, k_network_flag_ipv4 );
-  const auto is_ipv6_transfer = is_bit_set( network_flag, k_network_flag_ipv6 );
-
-  DBG_INFO2(
-    "ENTER data_len[%d], mcast[%d], port[%d], adapter[%x], if_index[%d], nw_flag[%x]",
-    u16_data_len,
-    ip_adapter_q_msg->is_multicast,
-    endpoint.get_port(),
-    endpoint.get_adapter_type(),
-    endpoint.get_if_index(),
-    endpoint.get_network_flags() );
-
-  if( ip_adapter_q_msg->is_multicast )
-  {
-    auto ipv4_socket = ( is_ipv4_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv4_secure_ucast : k_network_flag_ipv4 ) : nullptr;
-    auto ipv6_socket = ( is_ipv6_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv6_secure_ucast : k_network_flag_ipv6 ) : nullptr;
-
-    endpoint.set_port( is_secure ? COAP_SECURE_PORT : COAP_PORT );
-
-    std::vector<InterfaceAddress *> if_addr_array = get_interface_address_for_index( 0 );
-
-    for( auto &if_addr : if_addr_array )
-    {
-      if( ( ipv4_socket != nullptr ) && if_addr->is_ipv4() )
-      {
-        ipv4_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
-        ipv4_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
-      }
-
-      if( ( ipv6_socket != nullptr ) && if_addr->is_ipv6() )
-      {
-        ipv6_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
-        ipv6_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
-      }
-    }
-  }
-  else     // it is unicast
-  {
-    if( endpoint.get_port() == 0 )
-    {
-      endpoint.set_port( is_secure ? COAP_SECURE_PORT : COAP_PORT );
-    }
-
-    clear_bit( (uint16_t) network_flag, k_network_flag_multicast );
-    auto socket = get_socket_by_mask( network_flag );
-
-    if( socket != nullptr )
-    {
-      send_data( (UdpSocketImplWindows *) socket, endpoint, pu8_data, u16_data_len );
-    }
-  }
-}
-
-void IpAdapterImplWindows::send_data( UdpSocketImplWindows *pcz_udp_socket, Endpoint &endpoint, const uint8_t *data, const uint16_t data_length ) const
-{
-  if( pcz_udp_socket == nullptr )
-  {
-    return;
-  }
-
-  const auto send_status = pcz_udp_socket->SendData( endpoint.get_addr(), endpoint.get_port(), const_cast<uint8_t *>( data ), data_length );
-
-  if( send_status != SocketError::OK )
-  {
-    AdapterEvent cz_adapter_event{ ADAPTER_EVENT_TYPE_ERROR, &endpoint, (uint8_t *) data, data_length, k_adapter_type_ip };
-    cz_adapter_event.set_error_code( ErrCode::SEND_DATA_FAILED );
-
-    if( _adapter_event_callback != nullptr )
-    {
-      _adapter_event_callback( &cz_adapter_event, _adapter_event_cb_data );
-    }
-  }
 }
 
 void IpAdapterImplWindows::get_interface_address_list( std::vector<InterfaceAddress *> &interface_addr_list )
@@ -701,14 +613,15 @@ void IpAdapterImplWindows::get_interface_address_list( std::vector<InterfaceAddr
         }
       }
     }// for loop adapter addresses
-		if (v6addr != nullptr)
-		{
-			char temp_addr_buf[64] = { 0 };
-			auto if_addr = new InterfaceAddress{ (uint32_t)p_cur_adapter_addr->IfIndex, IFF_UP, IpAddrFamily::IPv6, (const char *)&v6addr->sin6_addr };
-			inet_ntop(AF_INET6, static_cast<void *>(&v6addr->sin6_addr), (char *)&temp_addr_buf[0], sizeof(temp_addr_buf));
-			DBG_INFO2("Found address %s", &temp_addr_buf[0]);
-			interface_addr_list.push_back(if_addr);
-		}
+
+    if( v6addr != nullptr )
+    {
+      char temp_addr_buf[64] = { 0 };
+      auto if_addr           = new InterfaceAddress{ (uint32_t) p_cur_adapter_addr->IfIndex, IFF_UP, IpAddrFamily::IPv6, (const char *) &v6addr->sin6_addr };
+      inet_ntop( AF_INET6, static_cast<void *>( &v6addr->sin6_addr ), (char *) &temp_addr_buf[0], sizeof( temp_addr_buf ) );
+      DBG_INFO2( "Found address %s", &temp_addr_buf[0] );
+      interface_addr_list.push_back( if_addr );
+    }
   }// for loop adapters
 }
 
@@ -771,47 +684,6 @@ std::unique_ptr<IP_ADAPTER_ADDRESSES> get_adapters()
 
   return ( nullptr );
 }
-#if 0
-static void convert_ascii_addr_to_ip_addr( const char *pc_ascii_addr, IpAddress &rcz_ip_addr )
-{
-  if( pc_ascii_addr == nullptr )
-  {
-    return;
-  }
-
-  struct addrinfo *addr_info_list {};
-
-  struct addrinfo  hints {};
-
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_flags  = AI_NUMERICHOST;
-
-  if( !getaddrinfo( pc_ascii_addr, nullptr, &hints, &addr_info_list ) )
-  {
-    if( addr_info_list[0].ai_family == AF_INET6 )
-    {
-      auto pst_ipv6_sock_addr = reinterpret_cast<struct sockaddr_in6 *>( addr_info_list[0].ai_addr );
-
-      memcpy( rcz_ip_addr.get_addr(), &pst_ipv6_sock_addr->sin6_addr, sizeof( struct in6_addr ) );
-      rcz_ip_addr.set_addr_family( IpAddrFamily::IPv6 );
-      rcz_ip_addr.set_scope_id( uint8_t( pst_ipv6_sock_addr->sin6_scope_id ) );
-    }
-    else
-    {
-      auto pst_ipv4_sock_addr = reinterpret_cast<struct sockaddr_in *>( addr_info_list[0].ai_addr );
-
-      memcpy( rcz_ip_addr.get_addr(), &pst_ipv4_sock_addr->sin_addr, sizeof( struct in_addr ) );
-      rcz_ip_addr.set_addr_family( IpAddrFamily::IPv4 );
-    }
-  }
-
-  if( nullptr != addr_info_list )
-  {
-    freeaddrinfo( addr_info_list );
-  }
-}
-
-#endif
 }
 }
 #endif/*_OS_WINDOWS_*/

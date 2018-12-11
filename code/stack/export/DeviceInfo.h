@@ -17,12 +17,12 @@ class DeviceInfo
     {
     }
 
-		DeviceInfo(DeviceInfo&& other)
+		DeviceInfo(DeviceInfo&& other) noexcept
 		{
 			*this = std::move(other);
 		}
 
-		DeviceInfo& operator=(DeviceInfo&& other)
+		DeviceInfo& operator=(DeviceInfo&& other) noexcept
 		{
 			if (&other != this)
 			{

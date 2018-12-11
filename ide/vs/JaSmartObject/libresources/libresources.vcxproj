@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\code\resources\common\inc\core\DeviceResource.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\core\WellKnownResource.h" />
-    <ClInclude Include="..\..\..\..\code\resources\common\inc\ResourceUtil.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\AccessControlEntry.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\AccessControlListRes.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\Credential.h" />
@@ -29,6 +28,7 @@
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\DeviceOwnerXferMethodRes.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\ProvisioningStatusRes.h" />
     <ClInclude Include="..\..\..\..\code\resources\common\inc\security\SecurityDataTypes.h" />
+    <ClInclude Include="..\..\..\..\code\resources\common\inc\util\ResourceUtil.h" />
     <ClInclude Include="..\..\..\..\code\resources\export\BinarySwitchResourceBase.h" />
   </ItemGroup>
   <ItemGroup>

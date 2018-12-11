@@ -18,6 +18,11 @@ Endpoint::Endpoint( const uint16_t u16_adapter_type, const uint16_t u16_network_
 {
 }
 
+uint16_t Endpoint::get_adapter_type() const
+{
+	return (_u16_adapter_type);
+}
+
 void Endpoint::set_addr( _in_ const IpAddress &rcz_addr )
 {
   this->_cz_ip_addr = rcz_addr;

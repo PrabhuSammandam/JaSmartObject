@@ -34,6 +34,8 @@ class Uuid
     std::string to_string();
     void        from_string( std::string &uuid_string );
 
+		static bool is_valid_uuid_string(std::string& uuid_string);
+
   private:
     uint8_t   _uuid[16];
 };

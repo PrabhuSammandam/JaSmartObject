@@ -15,12 +15,35 @@
 #include "config_network.h"
 #include "base_utils.h"
 
+#define __FILE_NAME__ "AdapMgrImpl"
+
 using namespace ja_iot::network;
 using namespace ja_iot::base;
 
 namespace ja_iot {
 namespace network {
 void adapter_event_cb( AdapterEvent *pcz_adapter_event, void *pv_user_data );
+class AdapterEventHandler : public IAdapterEventHandler
+{
+  public:
+    void handle_event( AdapterEvent &pcz_adapter_event ) override
+    {
+      _adapter_mgr->handle_adapter_event( &pcz_adapter_event );
+    }
+
+    AdapterManager * _adapter_mgr = nullptr;
+};
+
+class SecureContextEventHandler : public ISecureContextEventHandler
+{
+  public:
+    void handle_event( SecureContextEvent &rcz_secure_context_event ) override
+    {
+      _adapter_mgr->handle_secure_context_event( rcz_secure_context_event );
+    }
+
+    AdapterManager * _adapter_mgr = nullptr;
+};
 
 /**
  * adaptor manager
@@ -37,9 +60,11 @@ void adapter_event_cb( AdapterEvent *pcz_adapter_event, void *pv_user_data );
  */
 
 /* singleton instance of AdapterManager */
+AdapterEventHandler       _gs_adapter_event_handler;
+SecureContextEventHandler _gs_secure_context_event_handler;
 AdapterManager *AdapterManager::_pcz_instance{};
 
-AdapterManager & AdapterManager::Inst()
+AdapterManager            & AdapterManager::Inst()
 {
   if( _pcz_instance == nullptr )
   {
@@ -51,6 +76,8 @@ AdapterManager & AdapterManager::Inst()
 }
 AdapterManager::AdapterManager ()
 {
+  _gs_adapter_event_handler._adapter_mgr        = this;
+  _gs_secure_context_event_handler._adapter_mgr = this;
   this->_adapters_list.reserve( 6 );
 }
 AdapterManager::~AdapterManager ()
@@ -90,8 +117,19 @@ ErrCode AdapterManager::initialize_adapters( const uint16_t u16_configured_adapt
     if( ret_status != ErrCode::OK )
     {
       DBG_ERROR( "AdapterManager::initialize_adapters:%d# init_adapter FAILED for type[%x]", __LINE__, k_adapter_type_tcp );
+      goto exit_label_;
     }
   }
+
+#ifdef _ENABLE_SECURE_
+  ret_status = _secure_context.initialize();
+
+  if( ret_status != ErrCode::OK )
+  {
+    DBG_ERROR2( "Failed initializing SecureContext" );
+  }
+
+#endif
 
 exit_label_:
   DBG_INFO( "AdapterManager::initialize_adapters:%d# EXIT", __LINE__ );
@@ -106,13 +144,18 @@ ErrCode AdapterManager::terminate_adapters()
     pcz_adapter->terminate();
   }
 
-  _adapters_list.clear();
+#ifdef _ENABLE_SECURE_
+  _secure_context.uninitialize();
+#endif
 
-  _cb_error             = nullptr;
-  _pv_error_cb_data     = nullptr;
-  _cb_packet_received   = nullptr;
-  _pv_pkt_recvd_cb_data = nullptr;
+  _adapters_list.clear();
   _network_handlers_list.clear();
+  _event_handler = nullptr;
+
+  // _cb_error             = nullptr;
+  // _pv_error_cb_data     = nullptr;
+  // _cb_packet_received   = nullptr;
+  // _pv_pkt_recvd_cb_data = nullptr;
 
   return ( ErrCode::OK );
 }
@@ -285,76 +328,115 @@ ErrCode AdapterManager::read_data() const
   return ( ErrCode::OK );
 }
 
-ErrCode AdapterManager::send_unicast_data( Endpoint &endpoint, const uint8_t *data, const uint16_t data_length ) const
+ErrCode AdapterManager::send_unicast_data( Endpoint &endpoint, const uint8_t *data, const uint16_t data_length )
 {
-  if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
+  const auto adapter_type = endpoint.get_adapter_type();
+
+  if( ( _u16_selected_adapters == k_adapter_type_default )
+    || ( _u16_selected_adapters == k_adapter_type_all )
+    || !is_bit_set( _u16_selected_adapters, adapter_type ) )
   {
     // no specific adapters selected
     return ( ErrCode::SEND_DATA_FAILED );
   }
 
-  const auto requested_adapters = endpoint.get_adapter_type() != k_adapter_type_default ? endpoint.get_adapter_type() : k_adapter_type_all;
+#ifdef _ENABLE_SECURE_
 
-  for( uint16_t i = 0; i < MAX_NO_OF_ADAPTER_TYPES; i++ )
+  if( endpoint.is_secure() )
   {
-    if( ( requested_adapters & ( 1 << i ) ) == 0 )
+    data_buffer_t data_buffer{ (uint8_t *) data, (uint16_t) data_length };
+
+    if( _secure_context.encrypt( endpoint, data_buffer ) != ErrCode::OK )
     {
-      continue;     // adapter not enabled skip it
+      return ( ErrCode::SEND_DATA_FAILED );
     }
 
-    /*get the required adaptor type*/
-    auto adapter = get_adapter_for_type( 1 << i );
+    return ( ErrCode::OK );
+  }
 
-    if( adapter != nullptr )
+#endif
+
+  for( uint8_t i = 0; i < _adapters_list.size(); i++ )
+  {
+    if( _adapters_list[i]->get_type() == adapter_type )
     {
-      const auto sent_data_length = adapter->send_unicast_data( endpoint, data, data_length );
-
-#ifdef _SINGLE_THREAD_
+      const auto sent_data_length = _adapters_list[i]->send_unicast_data( endpoint, data, data_length );
 
       if( ( 0 > sent_data_length ) || ( uint16_t( sent_data_length ) != data_length ) )
       {
         return ( ErrCode::SEND_DATA_FAILED );
       }
 
-#else
-      (void) ( sent_data_length );
-#endif // _SINGLE_THREAD_
+      break;
     }
   }
 
   return ( ErrCode::OK );
 }
 
-ErrCode AdapterManager::send_multicast_data( Endpoint &endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length ) const
+ErrCode AdapterManager::send_multicast_data( Endpoint &endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length )
 {
-  if( ( _u16_selected_adapters & 0xFF ) == k_adapter_type_default )
+  const auto adapter_type = endpoint.get_adapter_type();
+
+  if( ( _u16_selected_adapters == k_adapter_type_default )
+    || ( _u16_selected_adapters == k_adapter_type_all )
+    || !is_bit_set( _u16_selected_adapters, adapter_type ) )
   {
+    // no specific adapters selected
     return ( ErrCode::SEND_DATA_FAILED );
   }
 
-  const auto requested_adapters = endpoint.get_adapter_type() != k_adapter_type_default ? endpoint.get_adapter_type() : k_adapter_type_all;
-
-  for( uint16_t i = 0; i < MAX_NO_OF_ADAPTER_TYPES; i++ )
+  for( uint8_t i = 0; i < _adapters_list.size(); i++ )
   {
-    if( ( requested_adapters & ( 1 << i ) ) == 0 )
+    if( _adapters_list[i]->get_type() == adapter_type )
     {
-      continue;
-    }
-
-    auto pcz_adapter = get_adapter_for_type( 1 << i );
-
-    if( pcz_adapter != nullptr )
-    {
-      const auto sent_data_length = pcz_adapter->send_multicast_data( endpoint, pu8_data, u16_data_length );
+      const auto sent_data_length = _adapters_list[i]->send_multicast_data( endpoint, pu8_data, u16_data_length );
 
       if( ( 0 > sent_data_length ) || ( uint16_t( sent_data_length ) != u16_data_length ) )
       {
         return ( ErrCode::SEND_DATA_FAILED );
       }
+
+      break;
     }
   }
 
   return ( ErrCode::OK );
+}
+
+void AdapterManager::handle_secure_context_event( SecureContextEvent &secure_context_event )
+{
+  DBG_INFO2( "event[%d]", (uint8_t) secure_context_event._type );
+
+  switch( secure_context_event._type )
+  {
+    case SecureContextEventType::RECEIVE:
+    {
+      if( _event_handler )
+      {
+        _event_handler->handle_packet_received( *secure_context_event._endpoint, secure_context_event._data );
+      }
+    }
+    break;
+    case SecureContextEventType::SEND:
+    {
+      for( uint8_t i = 0; i < _adapters_list.size(); i++ )
+      {
+        if( _adapters_list[i]->get_type() == secure_context_event._endpoint->get_adapter_type() )
+        {
+          _adapters_list[i]->send_unicast_data( *secure_context_event._endpoint,
+            secure_context_event._data._pu8_data,
+            secure_context_event._data._u16_data_len );
+          break;
+        }
+      }
+    }
+    break;
+    case SecureContextEventType::ERROR:
+    {
+    }
+    break;
+  }
 }
 
 void AdapterManager::handle_adapter_event( AdapterEvent *p_adapter_event )
@@ -372,22 +454,38 @@ void AdapterManager::handle_adapter_event( AdapterEvent *p_adapter_event )
   {
     case ADAPTER_EVENT_TYPE_PACKET_RECEIVED:
     {
-      if( _cb_packet_received )
+      auto end_point = *p_adapter_event->get_end_point();
+
+      if( end_point.is_secure() )
       {
-        auto end_point = *p_adapter_event->get_end_point();
-        DBG_INFO( "AdapterManager::handle_adapter_event:%d# Notifying packet received, port[%d], data_length[%d]", __LINE__, end_point.get_port(), p_adapter_event->get_data_length() );
-        _cb_packet_received( this->_pv_pkt_recvd_cb_data, end_point, p_adapter_event->get_data(), p_adapter_event->get_data_length() );
+#ifdef _ENABLE_SECURE_
+        if( _secure_context.decrypt( end_point, p_adapter_event->get_data_buffer() ) == ErrCode::OK )
+        {
+        }
+#endif
+      }
+      else
+      {
+        if( _event_handler )
+        {
+          _event_handler->handle_packet_received( end_point, p_adapter_event->get_data_buffer() );
+        }
       }
     }
     break;
     case ADAPTER_EVENT_TYPE_ERROR:
     {
-      if( _cb_error )
+      // if( _cb_error )
+      // {
+      // auto end_point = *p_adapter_event->get_end_point();
+      //
+      // DBG_INFO( "AdapterManager::handle_adapter_event:%d# Notifying error, port[%d], error[%d]", __LINE__, end_point.get_port(), int(p_adapter_event->get_error_code() ) );
+      // _cb_error( this->_pv_error_cb_data, *p_adapter_event->get_end_point(), p_adapter_event->get_data(), p_adapter_event->get_data_length(), p_adapter_event->get_error_code() );
+      // }
+      if( _event_handler )
       {
         auto end_point = *p_adapter_event->get_end_point();
-
-        DBG_INFO( "AdapterManager::handle_adapter_event:%d# Notifying error, port[%d], error[%d]", __LINE__, end_point.get_port(), int(p_adapter_event->get_error_code() ) );
-        _cb_error( this->_pv_error_cb_data, *p_adapter_event->get_end_point(), p_adapter_event->get_data(), p_adapter_event->get_data_length(), p_adapter_event->get_error_code() );
+        _event_handler->handle_error( end_point, p_adapter_event->get_data_buffer(), p_adapter_event->get_error_code() );
       }
     }
     break;
@@ -453,7 +551,7 @@ IAdapter * AdapterManager::get_adapter_for_type( const uint16_t u16_adapter_type
 ErrCode AdapterManager::init_adapter( const uint16_t u16_configured_adapter_types_bitmask, const uint16_t to_init_adapter_type )
 {
   auto ret_status = ErrCode::OK;
-  IAdapter* pcz_ip_adapter{};
+  IAdapter *pcz_ip_adapter{};
 
   DBG_INFO( "AdapterManager::init_adapter:%d# ENTER req_adapter_type[%x], to_init_adapter_type[%x]", __LINE__, int(u16_configured_adapter_types_bitmask), int(to_init_adapter_type) );
 
@@ -475,7 +573,8 @@ ErrCode AdapterManager::init_adapter( const uint16_t u16_configured_adapter_type
     goto exit_label_;
   }
 
-  pcz_ip_adapter->set_adapter_event_cb( adapter_event_cb, this /* user data */ );
+  pcz_ip_adapter->set_event_handler( &_gs_adapter_event_handler );
+  // pcz_ip_adapter->set_adapter_event_cb( adapter_event_cb, this /* user data */ );
 
   ret_status = pcz_ip_adapter->initialize();
 

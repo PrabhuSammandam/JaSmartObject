@@ -22,6 +22,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "StackEvents.h"
+#include "base_datatypes.h"
 
 #define __FILE_NAME__ "MsgStack"
 
@@ -65,9 +66,25 @@ void HANDLE_STACK_EVENT_send_client_request( ClientRequest *client_request, clie
 
 namespace ja_iot {
 namespace stack {
+class AdapterMgrEventHandler : public IAdapterMgrEventHandler
+{
+  public:
+    void handle_packet_received( Endpoint const &end_point, const data_buffer_t &data_buffer )      override
+    {
+      const auto new_raw_data_msg = new EndpointDataStackEvent{ end_point, data_buffer._pu8_data, data_buffer._u16_data_len };
+
+      cout << "received packet of length " << data_buffer._u16_data_len << endl;
+      _msg_stack->send_stack_event( new_raw_data_msg );
+    }
+    void handle_error( Endpoint const &end_point, const data_buffer_t &data_buffer, ErrCode error ) override {}
+
+    MsgStack * _msg_stack = nullptr;
+};
+
+static AdapterMgrEventHandler _gs_adapter_event_handler;
 MsgStack *MsgStack::_pcz_instance{ nullptr };
 
-OptionsCallback required_options_callback = [] ( uint16_t option_no ) -> bool {
+OptionsCallback               required_options_callback = [] ( uint16_t option_no ) -> bool {
     return ( true );
   };
 MsgStack::MsgStack ()
@@ -90,7 +107,9 @@ MsgStack & MsgStack::inst()
 
 void MsgStack::initialize( const uint16_t configured_adapter_types )
 {
-  AdapterManager::Inst().set_packet_received_cb( packet_received_callback, this );
+  _gs_adapter_event_handler._msg_stack = this;
+//  AdapterManager::Inst().set_packet_received_cb( packet_received_callback, this );
+  AdapterManager::Inst().set_event_handler( &_gs_adapter_event_handler );
 
   auto ret_status = AdapterManager::Inst().initialize_adapters( configured_adapter_types );
 
@@ -128,7 +147,7 @@ void MsgStack::initialize( const uint16_t configured_adapter_types )
 
   _task->Start();
 
-//  ResourceMgr::inst().init_default_resources();
+  // ResourceMgr::inst().init_default_resources();
 
   _heart_beat_timer = new OsalTimer{ 10000000, heart_beat_timer_cb, this };
   _heart_beat_timer->start();

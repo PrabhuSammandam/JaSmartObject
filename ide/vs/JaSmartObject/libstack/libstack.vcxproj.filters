@@ -17,86 +17,86 @@
     <Filter Include="Header Files\common\inc\cbor">
       <UniqueIdentifier>{0287511e-b4f3-4e8c-b8f5-4f448bc12e1e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Source Files">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files\Source Files\common">
+    <Filter Include="Source Files\common">
       <UniqueIdentifier>{2016d011-7ad4-488e-bef1-f5601816cd0e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Source Files\common\src">
+    <Filter Include="Source Files\common\src">
       <UniqueIdentifier>{acf9cb3c-8c48-4c04-96d7-77be410b2d50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Source Files\common\src\cbor">
+    <Filter Include="Source Files\common\src\cbor">
       <UniqueIdentifier>{19e901d8-992e-4486-a407-0779e3716676}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\stack\common\src\Exchange.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\MessageSender.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\ResourceMgr.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\ResPropValue.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\BaseResource.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\QueryContainer.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\InteractionStore.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\BlockTransferStatus.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\MessageIdProvider.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\TokenProvider.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\BaseInteraction.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\ClientInteraction.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\ServerInteraction.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\MsgStack.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\MulticastClientInteraction.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborCodec.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborStreaming.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborEncoding.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborItem.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborItemBuilder.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\cbor\CborPrettyPrinter.cpp">
-      <Filter>Header Files\Source Files\common\src\cbor</Filter>
+      <Filter>Source Files\common\src\cbor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\stack\common\src\SoStackFacade.cpp">
-      <Filter>Header Files\Source Files\common\src</Filter>
+      <Filter>Source Files\common\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -113,20 +113,47 @@ SoStackFacade & SoStackFacade::enable_ipv4( bool is_enabled )
   ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV4_UCAST, true );
   return ( *this );
 }
+
 SoStackFacade & SoStackFacade::enable_ipv4_mcast( bool is_enabled )
 {
   ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV4_MCAST, true );
   return ( *this );
 }
+
+SoStackFacade & SoStackFacade::enable_ipv4_secure(bool is_enabled)
+{
+	ConfigManager::Inst().get_ip_adapter_config()->set_flag(IP_ADAPTER_CONFIG_IPV4_UCAST_SECURE, true);
+	return (*this);
+}
+
+SoStackFacade & SoStackFacade::enable_ipv4_mcast_secure(bool is_enabled)
+{
+	ConfigManager::Inst().get_ip_adapter_config()->set_flag(IP_ADAPTER_CONFIG_IPV4_MCAST_SECURE, true);
+	return (*this);
+}
+
 SoStackFacade & SoStackFacade::enable_ipv6( bool is_enabled )
 {
   ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV6_UCAST, true );
   return ( *this );
 }
+
 SoStackFacade & SoStackFacade::enable_ipv6_mcast( bool is_enabled )
 {
   ConfigManager::Inst().get_ip_adapter_config()->set_flag( IP_ADAPTER_CONFIG_IPV6_MCAST, true );
   return ( *this );
+}
+
+SoStackFacade & SoStackFacade::enable_ipv6_secure(bool is_enabled)
+{
+	ConfigManager::Inst().get_ip_adapter_config()->set_flag(IP_ADAPTER_CONFIG_IPV6_UCAST_SECURE, true);
+	return (*this);
+}
+
+SoStackFacade & SoStackFacade::enable_ipv6_mcast_secure(bool is_enabled)
+{
+	ConfigManager::Inst().get_ip_adapter_config()->set_flag(IP_ADAPTER_CONFIG_IPV6_MCAST_SECURE, true);
+	return (*this);
 }
 }
 }

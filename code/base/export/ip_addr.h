@@ -55,6 +55,7 @@ class IpAddress
     bool         is_ipv6();
     uint32_t     as_u32();
     uint8_t*     get_addr() { return ( &address_[0] ); }
+    uint8_t			get_addr_size(){return is_ipv4() ? 4 : 16;}
     IpAddrFamily get_addr_family() const { return ( address_family_ ); }
     void         set_addr_family( _in_ const IpAddrFamily addr_family ) { address_family_ = addr_family; }
     uint8_t      get_scope_id() const { return ( scope_id_ ); }

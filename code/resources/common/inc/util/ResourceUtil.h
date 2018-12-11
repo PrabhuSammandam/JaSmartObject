@@ -19,6 +19,7 @@ class ResourceUtil
 {
   public:
     static void encode_uuid( const char *key, Uuid &uuid, CborEncoder &cz_cbor_encoder );
+		static uint8_t method_to_permission(uint8_t method);
 };
 }
 }

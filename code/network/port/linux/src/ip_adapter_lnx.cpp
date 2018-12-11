@@ -282,95 +282,6 @@ void IpAdapterImplLinux::do_handle_receive()
   }
 }
 
-/*
- * There are two ways to send message
- * 1. unicast message
- * 2. multicast message
- *
- * For unicast message it is straight forward and need destination address and
- * destination port.
- *
- * For multicast message it needs to be sent in all the interfaces, but the socket
- * used to send the message should be unicast socket and also before sending need to
- * select the interface to send the multicast message.
- * */
-
-void IpAdapterImplLinux::do_handle_send_msg( IpAdapterQMsg *ip_adapter_q_msg )
-{
-  if( ip_adapter_q_msg == nullptr )
-  {
-    return;
-  }
-
-  auto       &endpoint        = ip_adapter_q_msg->end_point_;
-  const auto pu8_data         = ip_adapter_q_msg->_data;
-  const auto u16_data_len     = ip_adapter_q_msg->_dataLength;
-  const auto network_flag     = ip_adapter_q_msg->end_point_.get_network_flags();
-  const auto is_secure        = is_bit_set( network_flag, k_network_flag_secure );
-  const auto is_ipv4_transfer = is_bit_set( network_flag, k_network_flag_ipv4 );
-  const auto is_ipv6_transfer = is_bit_set( network_flag, k_network_flag_ipv6 );
-
-  DBG_INFO2( "ENTER msg_data[%p], data_len[%d], mcast[%d], port[%d], adapter[%x], if_index[%d], nw_flag[%x]"
-           , ip_adapter_q_msg->_data,
-    u16_data_len,
-    ip_adapter_q_msg->is_multicast,
-    endpoint.get_port(),
-    endpoint.get_adapter_type(),
-    endpoint.get_if_index(),
-    endpoint.get_network_flags() );
-
-  if( ip_adapter_q_msg->is_multicast )
-  {
-    auto ipv4_socket = ( is_ipv4_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv4_secure_ucast : k_network_flag_ipv4 ) : nullptr;
-    auto ipv6_socket = ( is_ipv6_transfer ) ? get_socket_by_mask( ( is_secure ) ? k_network_flag_ipv6_secure_ucast : k_network_flag_ipv6 ) : nullptr;
-
-    endpoint.set_port( is_secure ? COAP_SECURE_PORT : COAP_PORT );
-
-    auto if_addr_array = get_interface_address_for_index( 0 );
-
-    for( auto &if_addr : if_addr_array )
-    {
-      if( ipv4_socket != nullptr && if_addr->is_ipv4())
-      {
-        ipv4_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
-        ipv4_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
-      }
-
-      if( ipv6_socket != nullptr && if_addr->is_ipv6())
-      {
-        ipv6_socket->SelectMulticastInterface( endpoint.get_addr(), if_addr->get_index() );
-        ipv6_socket->SendData( endpoint.get_addr(), endpoint.get_port(), pu8_data, u16_data_len );
-      }
-    }
-  }
-  else     // it is unicast
-  {
-    if( endpoint.get_port() == 0 )
-    {
-      endpoint.set_port( is_secure ? COAP_SECURE_PORT : COAP_PORT );
-    }
-
-    /*
-     * 1. uipv4
-     * 2. usipv4
-     * 3. mipv4      X
-     * 4. msipv4     X
-     * 5. uipv6
-     * 6. usipv6
-     * 7. mipv6      X
-     * 8. msipv6     X
-     */
-
-    clear_bit( (uint16_t) network_flag, k_network_flag_multicast );
-    auto socket = get_socket_by_mask( network_flag );
-
-    if( socket != nullptr )
-    {
-      send_data( (UdpSocketImplLinux *) socket, endpoint, pu8_data, u16_data_len );
-    }
-  }
-}
-
 void IpAdapterImplLinux::handle_received_socket_data( int &selected_fd, uint16_t &u16_network_flag )
 {
   int                     level           = 0;
@@ -492,27 +403,6 @@ ErrCode IpAdapterImplLinux::do_pre_stop_server()
   }
 
   return ( ErrCode::OK );
-}
-
-void IpAdapterImplLinux::send_data( UdpSocketImplLinux *pcz_udp_socket, Endpoint &rcz_endpoint, const uint8_t *pu8_data, const uint16_t u16_data_length ) const
-{
-  if( pcz_udp_socket == nullptr )
-  {
-    return;
-  }
-
-  const auto send_status = pcz_udp_socket->SendData( rcz_endpoint.get_addr(), rcz_endpoint.get_port(), const_cast<uint8_t *>( pu8_data ), u16_data_length );
-
-  if( send_status != SocketError::OK )
-  {
-    AdapterEvent cz_adapter_event{ ADAPTER_EVENT_TYPE_ERROR, &rcz_endpoint, (uint8_t *) pu8_data, u16_data_length, k_adapter_type_ip };
-    cz_adapter_event.set_error_code( ErrCode::SEND_DATA_FAILED );
-
-    if( _adapter_event_callback != nullptr )
-    {
-      _adapter_event_callback( &cz_adapter_event, _adapter_event_cb_data );
-    }
-  }
 }
 
 void IpAdapterImplLinux::update_max_fd(int new_fd)

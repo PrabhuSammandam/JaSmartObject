@@ -39,8 +39,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\common_utils.h" />
     <ClInclude Include="..\..\..\..\code\network\common\inc\ip_adapter_base.h" />
     <ClInclude Include="..\..\..\..\code\network\common\inc\logging_network.h" />
+    <ClInclude Include="..\..\..\..\code\network\common\inc\SecureSession.h" />
+    <ClInclude Include="..\..\..\..\code\network\common\inc\SocketHelper.h" />
+    <ClInclude Include="..\..\..\..\code\network\common\src\SecureContextImpl.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\AdapterEvent.h" />
     <ClInclude Include="..\..\..\..\code\network\export\adapter_mgr.h" />
     <ClInclude Include="..\..\..\..\code\network\export\coap\CoapMsgPrinter.h" />
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_block_option.h" />
@@ -60,6 +65,11 @@
     <ClInclude Include="..\..\..\..\code\network\export\i_nwk_platform_factory.h" />
     <ClInclude Include="..\..\..\..\code\network\export\i_udp_socket.h" />
     <ClInclude Include="..\..\..\..\code\network\export\konstants_network.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\network_datatypes.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContext.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextMgr.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextTypes.h" />
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextUtils.h" />
     <ClInclude Include="..\..\..\..\code\network\port\windows\inc\interface_monitor_win.h" />
     <ClInclude Include="..\..\..\..\code\network\port\windows\inc\ip_adapter_win.h" />
     <ClInclude Include="..\..\..\..\code\network\port\windows\inc\platform_factory_win.h" />
@@ -78,6 +88,11 @@
     <ClCompile Include="..\..\..\..\code\network\common\src\interface_addr.cpp" />
     <ClCompile Include="..\..\..\..\code\network\common\src\ip_adapter_base.cpp" />
     <ClCompile Include="..\..\..\..\code\network\common\src\platform_factory.cpp" />
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContext.cpp" />
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextImpl.cpp" />
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextMgr.cpp" />
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextUtils.cpp" />
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureSession.cpp" />
     <ClCompile Include="..\..\..\..\code\network\port\windows\src\interface_monitor_win.cpp" />
     <ClCompile Include="..\..\..\..\code\network\port\windows\src\ip_adapter_win.cpp" />
     <ClCompile Include="..\..\..\..\code\network\port\windows\src\platform_factory_win.cpp" />
@@ -242,8 +257,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_NETWORK_DEBUG_;_OS_WINDOWS_;_IP_ADAPTER_;_LITTLE_ENDIAN_;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\..\code\debug\export;..\..\..\..\code\osal\export;..\..\..\..\code\base\export;..\..\..\..\code\memory\export;..\..\..\..\code\network\export;..\..\..\..\code\network;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG_;_ENABLE_SECURE_;_NETWORK_DEBUG_;_OS_WINDOWS_;_IP_ADAPTER_;_LITTLE_ENDIAN_;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../../../../thirdparty/mbedtls/include;..\..\..\..\code\debug\export;..\..\..\..\code\osal\export;..\..\..\..\code\base\export;..\..\..\..\code\memory\export;..\..\..\..\code\network\export;..\..\..\..\code\network;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

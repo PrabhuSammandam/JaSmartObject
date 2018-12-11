@@ -44,6 +44,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libresources", "libresource
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_security_resources", "test_security_resources\test_security_resources.vcxproj", "{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmbedtls", "libmbedtls\libmbedtls.vcxproj", "{898F6815-072D-4E9F-8331-5E3FC0D17E28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -280,6 +282,22 @@ Global
 		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x64.Build.0 = Release|x64
 		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x86.ActiveCfg = Release|Win32
 		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED}.Release|x86.Build.0 = Release|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Debug|ARM.ActiveCfg = Debug|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Debug|x64.ActiveCfg = Debug|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Debug|x64.Build.0 = Debug|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Debug|x86.ActiveCfg = Debug|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Debug|x86.Build.0 = Debug|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|ARM.ActiveCfg = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|ARM.Build.0 = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|x64.ActiveCfg = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|x64.Build.0 = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|x86.ActiveCfg = Release|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.raspberry_debug|x86.Build.0 = Release|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Release|ARM.ActiveCfg = Release|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Release|x64.ActiveCfg = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Release|x64.Build.0 = Release|x64
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Release|x86.ActiveCfg = Release|Win32
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -297,6 +315,7 @@ Global
 		{3449E88D-A929-4ACB-A2C4-5B06B3C10A8F} = {D36EABCB-5B27-4E9C-B606-6B767E14DFF2}
 		{262527DD-E8FC-4387-9E7F-696301F84F2A} = {4EE62742-1D7A-48C2-AA79-F7A4944FCEE4}
 		{ED6DB0C5-8528-4AA0-88D2-0894EFE195ED} = {393A36E0-76AB-445D-9C2B-74CAF4A1FB13}
+		{898F6815-072D-4E9F-8331-5E3FC0D17E28} = {4EE62742-1D7A-48C2-AA79-F7A4944FCEE4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C1CFFD3D-EF89-4B67-9031-8200B858074E}

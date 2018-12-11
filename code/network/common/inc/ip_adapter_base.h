@@ -15,6 +15,7 @@
 #include "Task.h"
 #include "SimpleList.h"
 #include "PtrMsgQ.h"
+#include "base_datatypes.h"
 #include <base_consts.h>
 #include "Mutex.h"
 #include <vector>
@@ -57,7 +58,8 @@ class IpAdapterBase : public IAdapter
 
     uint16_t get_type() override { return ( base::k_adapter_type_ip ); }
 
-    void          set_adapter_event_cb( const pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) override { this->_adapter_event_callback = pfn_adapter_event_callback; this->_adapter_event_cb_data = pv_user_data; }
+//    void          set_adapter_event_cb( const pfn_adapter_event_cb pfn_adapter_event_callback, void *pv_user_data ) override { this->_adapter_event_callback = pfn_adapter_event_callback; this->_adapter_event_cb_data = pv_user_data; }
+    void          set_event_handler( IAdapterEventHandler *pcz_event_handler ) override { _event_handler = pcz_event_handler; }
     base::ErrCode get_endpoints_list( std::vector<Endpoint *> &rcz_endpoint_list ) override;
     void          SEND_TASK_handle_msg( void *msg );
     void          SEND_TASK_delete_msg( void *msg );
@@ -100,6 +102,7 @@ class IpAdapterBase : public IAdapter
     void          update_interface_listening( std::vector<InterfaceAddress *> &cz_interface_addr_list );
     void          refresh_end_point_list( std::vector<InterfaceAddress *> &cz_interface_addr_list );
     void          refresh_end_point_list();
+    void          send_data_to_socket( IUdpSocket *pcz_udp_socket, Endpoint &endpoint, const data_buffer_t &data_buffer ) const;
 
   private:
 
@@ -126,14 +129,16 @@ class IpAdapterBase : public IAdapter
     osal::Mutex * sender_task_mutex_ = nullptr;
     osal::Task *  _receive_task      = nullptr;
 
-    pfn_adapter_event_cb   _adapter_event_callback = nullptr;
-    void *                 _adapter_event_cb_data  = nullptr;
+//    pfn_adapter_event_cb   _adapter_event_callback = nullptr;
+//    void *                 _adapter_event_cb_data  = nullptr;
+
+    IAdapterEventHandler * _event_handler = nullptr;
 
     base::SimpleList<IpAdapterQMsg, IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_list_{};
     base::PtrMsgQ<IP_ADAPTER_MSG_Q_CAPACITY> ip_adapter_msg_q_{};
 
     osal::Mutex * _access_mutex = nullptr;
-    std::vector<Endpoint *> _cz_end_points{};
+    EndpointList _cz_end_points{};
 };
 }
 }

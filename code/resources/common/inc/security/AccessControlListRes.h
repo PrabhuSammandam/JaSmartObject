@@ -47,6 +47,10 @@ class AccessControlListRes : public BaseResource
     Uuid             & get_resource_owner_uuid() { return ( _acl_obj.get_resource_owner_id() ); }
     void             set_resource_owner_uuid( const Uuid &uuid );
     uint16_t         count() { return ( (uint16_t) _acl_obj.get_ace_list().size() ); }
+		bool             is_allowed(const uint8_t connection_type, IResource* resource, uint8_t method);
+		bool             is_allowed(const Uuid &subject_uuid, IResource* resource, uint8_t method);
+		bool             is_allowed( const uint8_t connection_type, const std::string &href, uint8_t permission, const bool is_discoverable );
+    bool             is_allowed( const Uuid &subject_uuid, const std::string &href, uint8_t permission, const bool is_discoverable );
 
   private:
     uint8_t handle_get( QueryContainer &query_container, Interaction *interaction ) override;

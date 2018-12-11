@@ -70,6 +70,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -108,6 +110,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -162,6 +166,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -249,6 +255,12 @@
                                 								
                                 <option id="gnu.cpp.compiler.option.other.other.1330591118" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -Wno-attributes" valueType="string"/>
                                 								
+                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.1622690155" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
+                                    								
+                                </option>
+                                								
                                 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1625787632" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                                 							
                             </tool>
@@ -258,6 +270,12 @@
                                 <option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.so.release.option.optimization.level.763676625" name="Optimization Level" superClass="gnu.c.compiler.so.release.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
                                 								
                                 <option defaultValue="gnu.c.debugging.level.none" id="gnu.c.compiler.so.release.option.debugging.level.1123666042" name="Debug Level" superClass="gnu.c.compiler.so.release.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+                                								
+                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.261891777" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
+                                    								
+                                </option>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1760788910" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
                                 							
@@ -284,6 +302,12 @@
                             </tool>
                             							
                             <tool id="cdt.managedbuild.tool.gnu.assembler.so.release.1844131649" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.release">
+                                								
+                                <option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.both.asm.option.include.paths.333125870" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
+                                    								
+                                </option>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.assembler.input.14479308" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
                                 							
@@ -366,6 +390,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -380,6 +406,12 @@
                                     <listOptionValue builtIn="false" value="_DEBUG_"/>
                                     									
                                     <listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_CLIENT_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_SERVER_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_SECURE_"/>
                                     								
                                 </option>
                                 								
@@ -404,6 +436,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -418,6 +452,12 @@
                                     <listOptionValue builtIn="false" value="_DEBUG_"/>
                                     									
                                     <listOptionValue builtIn="false" value="_NETWORK_DEBUG_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_CLIENT_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_SERVER_"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="_ENABLE_SECURE_"/>
                                     								
                                 </option>
                                 								
@@ -458,6 +498,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libnetwork/network/export}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libmbedtls/mbedtls/include}&quot;"/>
                                     								
                                 </option>
                                 								

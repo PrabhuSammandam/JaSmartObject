@@ -32,6 +32,7 @@ bool AccessControlListRes::is_method_supported( uint8_t method )
   return ( method == COAP_MSG_CODE_GET || method == COAP_MSG_CODE_POST || method == COAP_MSG_CODE_DEL );
 }
 
+
 uint8_t AccessControlListRes::handle_get( QueryContainer &query_container, Interaction *interaction )
 {
   std::vector<int> query_ace_id_list;
@@ -249,6 +250,56 @@ void AccessControlListRes::set_resource_owner_uuid( const Uuid &uuid )
   /* update storage */
 }
 
+bool AccessControlListRes::is_allowed( const uint8_t connection_type, IResource *resource, uint8_t method )
+{
+  auto permission = ResourceUtil::method_to_permission( method );
+
+  return ( is_allowed( connection_type, resource->get_uri(), permission, resource->get_property() & OCF_RESOURCE_PROP_DISCOVERABLE ) );
+}
+
+bool AccessControlListRes::is_allowed( const Uuid &subject_uuid, IResource *resource, uint8_t method )
+{
+  auto permission = ResourceUtil::method_to_permission( method );
+
+  return ( is_allowed( subject_uuid, resource->get_uri(), permission, resource->get_property() & OCF_RESOURCE_PROP_DISCOVERABLE ) );
+}
+
+bool AccessControlListRes::is_allowed( const uint8_t connection_type, const std::string &href, uint8_t permission, const bool is_discoverable )
+{
+  for( auto ace : _acl_obj.get_ace_list() )
+  {
+    if( ( ace->get_subject()->getType() == ACE_SUBJECT_TYPE_CONNECTION )
+      && ( static_cast<AceSubjectConnection *>( ace->get_subject() )->getConnection() == connection_type ) )
+    {
+      if( ace->has_resource( href, is_discoverable )
+        && ( permission == ( permission & ace->get_permission() ) ) )
+      {
+        return ( true );
+      }
+    }
+  }
+
+  return ( false );
+}
+
+bool AccessControlListRes::is_allowed( const Uuid &subject_uuid, const std::string &href, uint8_t permission, const bool is_discoverable )
+{
+  for( auto ace : _acl_obj.get_ace_list() )
+  {
+    if( ( ace->get_subject()->getType() == ACE_SUBJECT_TYPE_UUID )
+      && ( static_cast<AceSubjectUuid *>( ace->get_subject() )->get_uuid() == subject_uuid ) )
+    {
+      if( ace->has_resource( href, is_discoverable )
+        && ( permission == ( permission & ace->get_permission() ) ) )
+      {
+        return ( true );
+      }
+    }
+  }
+
+  return ( false );
+}
+
 AccessControlList AccessControlListRes::find_ace_by_connection( uint8_t connection_type )
 {
   AccessControlList temp_ace_list;
@@ -330,14 +381,14 @@ static uint8_t ACL_INTL_initialize_default_instance( AccessControlListRes &acl )
 /*****************************************************************************************************************/
 /**********************************   Acl2Object             *****************************************************/
 /*****************************************************************************************************************/
-
-Acl2Object::~Acl2Object()
+Acl2Object::~Acl2Object ()
 {
-	for (auto ace : _ace_list)
-	{
-		delete ace;
-	}
-	_ace_list.clear();
+  for( auto ace : _ace_list )
+  {
+    delete ace;
+  }
+
+  _ace_list.clear();
 }
 
 void Acl2Object::encode_to_cbor( CborEncoder &cz_cbor_encoder )

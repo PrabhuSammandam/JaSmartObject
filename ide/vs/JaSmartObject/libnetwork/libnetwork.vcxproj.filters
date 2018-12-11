@@ -9,101 +9,143 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\coap">
+    <Filter Include="Source Files\coap">
+      <UniqueIdentifier>{2d12f226-d7d4-4d86-85fc-1e2e9f966273}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\port">
+      <UniqueIdentifier>{7e93f41d-279b-4b70-8fe9-b7311d0d5615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common">
+      <UniqueIdentifier>{ac2e1453-3ebb-4abf-9798-bd075d274df3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\common\inc">
+      <UniqueIdentifier>{b620bfe0-e6ba-40e0-b2a4-f0c75355d3db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\export">
+      <UniqueIdentifier>{87d7620c-f846-4519-8914-7669c73c6ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\export\coap">
       <UniqueIdentifier>{2b2e7f77-5a5e-4624-ba6c-3273b652dccd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port">
+      <UniqueIdentifier>{811e9fe5-9638-4991-9721-3de67d292499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port\windows">
+      <UniqueIdentifier>{093d6f67-f614-4cdd-8d1e-486ca5e5370c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\port\windows\inc">
+      <UniqueIdentifier>{f336d0fa-e408-4cac-9453-2cf4b7ba6796}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\code\network\common\inc\ip_adapter_base.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\common\inc\logging_network.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\adapter_mgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\config_mgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\config_network.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\data_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\end_point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\interface_addr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\ip_adapter_config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\i_adapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\i_interface_monitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\i_nwk_platform_factory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\i_udp_socket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\export\konstants_network.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\interface_monitor_win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\ip_adapter_win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\platform_factory_win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\udp_socket_win.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_block_option.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_consts.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_msg.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_msg_codec.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_option.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\coap_options_set.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\code\network\export\coap\CoapMsgPrinter.h">
-      <Filter>Header Files\coap</Filter>
+      <Filter>Header Files\export\coap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\ip_adapter_base.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\logging_network.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\common_utils.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\SecureSession.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\inc\SocketHelper.h">
+      <Filter>Header Files\common\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\adapter_mgr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\config_mgr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\config_network.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\data_types.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\end_point.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\i_adapter.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\i_interface_monitor.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\i_nwk_platform_factory.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\i_udp_socket.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\interface_addr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\ip_adapter_config.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\konstants_network.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\interface_monitor_win.h">
+      <Filter>Header Files\port\windows\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\ip_adapter_win.h">
+      <Filter>Header Files\port\windows\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\platform_factory_win.h">
+      <Filter>Header Files\port\windows\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\port\windows\inc\udp_socket_win.h">
+      <Filter>Header Files\port\windows\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\AdapterEvent.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\network_datatypes.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContext.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextMgr.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextTypes.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\export\SecureContextUtils.h">
+      <Filter>Header Files\export</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\code\network\common\src\SecureContextImpl.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\code\network\common\src\adapter_mgr_impl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_block_option.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_msg_codec.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_option.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_options_set.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\network\common\src\config_mgr.cpp">
@@ -118,25 +160,52 @@
     <ClCompile Include="..\..\..\..\code\network\common\src\ip_adapter_base.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\common\src\platform_factory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\code\network\port\windows\src\interface_monitor_win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\port\windows\src\ip_adapter_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\port\windows\src\platform_factory_win.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\code\network\port\windows\src\udp_socket_win.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_block_option.cpp">
+      <Filter>Source Files\coap</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_msg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\coap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_msg_codec.cpp">
+      <Filter>Source Files\coap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_option.cpp">
+      <Filter>Source Files\coap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\coap\coap_options_set.cpp">
+      <Filter>Source Files\coap</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\code\network\common\src\coap\CoapMsgPrinter.cpp">
+      <Filter>Source Files\coap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\port\windows\src\platform_factory_win.cpp">
+      <Filter>Source Files\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\port\windows\src\udp_socket_win.cpp">
+      <Filter>Source Files\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\port\windows\src\ip_adapter_win.cpp">
+      <Filter>Source Files\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\platform_factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureContextUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\code\network\common\src\SecureSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

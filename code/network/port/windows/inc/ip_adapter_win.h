@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <network_datatypes.h>
 
 #ifdef _OS_WINDOWS_
 
@@ -51,14 +52,14 @@ class IpAdapterImplWindows : public IpAdapterBase
     base::ErrCode do_post_start_server() override;
     base::ErrCode do_pre_stop_server() override;
 
-    void do_handle_send_msg( IpAdapterQMsg *msg ) override;
+		void do_handle_send_msg(IpAdapterQMsg *msg) override;
     void do_handle_receive() override;
     void do_init_fast_shutdown_mechanism() override;
 
     void do_init_address_change_notify_mechanism() override;
     void do_un_init_address_change_notify_mechanism() override;
 
-    std::vector<InterfaceAddress *> get_interface_address_for_index( uint8_t u8_index ) override;
+    InterfaceAddressList get_interface_address_for_index( uint8_t u8_index ) override;
 
   private:
     void                                  add_socket_to_event_array( UdpSocketImplWindows *ip_socket );

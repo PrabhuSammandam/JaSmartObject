@@ -75,9 +75,10 @@ constexpr uint8_t ACL_WILDCARD_ALL_DISCOVERABLE     = 0x01;
 constexpr uint8_t ACL_WILDCARD_ALL_NON_DISCOVERABLE = 0x02;
 constexpr uint8_t ACL_WILDCARD_ALL_RESOURCES        = 0x03;
 
-constexpr uint8_t CRUDN_PERMISSION_NONE     = 0x00;
-constexpr uint8_t CRUDN_PERMISSION_CREATE   = 0x01;
-constexpr uint8_t CRUDN_PERMISSION_RETRIEVE = 0x02;
-constexpr uint8_t CRUDN_PERMISSION_UPDATE   = 0x04;
-constexpr uint8_t CRUDN_PERMISSION_DELETE   = 0x08;
-constexpr uint8_t CRUDN_PERMISSION_NOTIFY   = 0x10;
+constexpr uint8_t CRUDN_PERMISSION_NONE         = 0x00;
+constexpr uint8_t CRUDN_PERMISSION_CREATE       = 0x01;
+constexpr uint8_t CRUDN_PERMISSION_RETRIEVE     = 0x02;
+constexpr uint8_t CRUDN_PERMISSION_UPDATE       = 0x04;
+constexpr uint8_t CRUDN_PERMISSION_DELETE       = 0x08;
+constexpr uint8_t CRUDN_PERMISSION_NOTIFY       = 0x10;
+constexpr uint8_t CRUDN_PERMISSION_FULL_CONTROL = 0x1F;// all CRUDN

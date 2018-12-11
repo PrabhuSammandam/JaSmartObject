@@ -28,9 +28,13 @@ class SoStackFacade
 
     SoStackFacade& enable_ipv4(bool is_enabled);
     SoStackFacade& enable_ipv4_mcast(bool is_enabled);
-    SoStackFacade& enable_ipv6(bool is_enabled);
+		SoStackFacade& enable_ipv4_secure(bool is_enabled);
+		SoStackFacade& enable_ipv4_mcast_secure(bool is_enabled);
+		SoStackFacade& enable_ipv6(bool is_enabled);
     SoStackFacade& enable_ipv6_mcast(bool is_enabled);
-  private:
+		SoStackFacade& enable_ipv6_secure(bool is_enabled);
+		SoStackFacade& enable_ipv6_mcast_secure(bool is_enabled);
+private:
     SoStackFacade ();
     ~SoStackFacade ();
 

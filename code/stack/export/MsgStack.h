@@ -42,6 +42,7 @@ class MsgStack
     MsgStack( MsgStack &&other ) noexcept               = delete;
     MsgStack & operator = ( const MsgStack &other )     = delete;
     MsgStack & operator = ( MsgStack &&other ) noexcept = delete;
+    friend class AdapterMgrEventHandler;
 };
 }
 }
