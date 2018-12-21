@@ -5,6 +5,7 @@
  *      Author: psammand
  */
 
+#include <string.h>
 #include <base_utils.h>
 #include <mbedtls/ssl.h>
 #include <mbedtls/ssl_internal.h>

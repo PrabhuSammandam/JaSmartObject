@@ -318,6 +318,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/common/inc}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -354,6 +356,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/common/inc}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -394,6 +398,8 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libstack/stack/export}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/libresources/resources/common/inc}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -457,6 +463,12 @@
             		
         </scannerConfigBuildInfo>
         		
+        <scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675;cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675.;cdt.managedbuild.tool.gnu.c.compiler.base.376426422;cdt.managedbuild.tool.gnu.c.compiler.input.1970664670">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+            		
+        </scannerConfigBuildInfo>
+        		
         <scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366;cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.;cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.1407553836;cdt.managedbuild.tool.gnu.c.compiler.input.858204000">
             			
             <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
@@ -482,6 +494,12 @@
         </scannerConfigBuildInfo>
         		
         <scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675;cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675.;cdt.managedbuild.tool.gnu.c.compiler.mingw.lib.debug.674059155;cdt.managedbuild.tool.gnu.c.compiler.input.2129410834">
+            			
+            <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+            		
+        </scannerConfigBuildInfo>
+        		
+        <scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675;cdt.managedbuild.config.gnu.mingw.lib.debug.1016966366.444196675.;cdt.managedbuild.tool.gnu.cpp.compiler.base.1495985144;cdt.managedbuild.tool.gnu.cpp.compiler.input.919132955">
             			
             <autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
             		

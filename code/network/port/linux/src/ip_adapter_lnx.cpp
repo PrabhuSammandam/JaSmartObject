@@ -192,6 +192,11 @@ int check_data_available( UdpSocketImplLinux *udp_socket, fd_set *read_fds, uint
   return ( -1 );
 }
 
+void IpAdapterImplLinux::do_handle_send_msg( IpAdapterQMsg *ip_adapter_q_msg )
+{
+
+}
+
 void IpAdapterImplLinux::do_handle_receive()
 {
   while( !is_terminated_ )
@@ -370,15 +375,15 @@ void IpAdapterImplLinux::handle_received_socket_data( int &selected_fd, uint16_t
     ? reinterpret_cast<struct in6_pktinfo *>( pktinfo )->ipi6_ifindex
     : reinterpret_cast<struct in_pktinfo *>( pktinfo )->ipi_ifindex;
 
-  if( this->_adapter_event_callback )
+  if(this->_event_handler)
   {
-    Endpoint endpoint{ k_adapter_type_ip, u16_network_flag, u16_recvd_port, u32_if_index, ip_addr };
-    auto         received_data = new uint8_t[recvLen];
-    memcpy( &received_data[0], &_pu8_receive_buffer[0], recvLen );
+	    Endpoint endpoint{ k_adapter_type_ip, u16_network_flag, u16_recvd_port, u32_if_index, ip_addr };
+	    auto         received_data = new uint8_t[recvLen];
+	    memcpy( &received_data[0], &_pu8_receive_buffer[0], recvLen );
 
-    AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_PACKET_RECEIVED, &endpoint, &received_data[0], recvLen, k_adapter_type_ip );
+	    AdapterEvent adapter_event( ADAPTER_EVENT_TYPE_PACKET_RECEIVED, &endpoint, &received_data[0], recvLen, k_adapter_type_ip );
 
-    this->_adapter_event_callback( &adapter_event, _adapter_event_cb_data );
+	    this->_event_handler->handle_event(adapter_event);
   }
 }
 
